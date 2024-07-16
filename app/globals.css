@@ -7,7 +7,6 @@
   --text-color: #171717;
 }
 
-
 [data-theme='dark'] {
   --background: #1a1a1a;
   --text-color: #e0e6f2;
@@ -18,7 +17,6 @@ html, body {
   color: var(--text-color);
   transition: all 0.3s ease;
 }
-
 
 @layer utilities {
   .text-balance {
