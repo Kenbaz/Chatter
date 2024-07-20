@@ -1,33 +1,14 @@
 'use client'
 import React, { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import dynamic from 'next/dynamic';
 import { openSigninModal, openSignupOptionsModal } from "./_store/modalSlice";
+
 import SignInModal from "./_components/SignInModal";
 import SignUpModal from "./_components/SignUpModal";
 import SignUpOptionsModal from "./_components/SignUpOtptionsModal";
 import { RootState } from "./_store/store";
 import ThemeToggle from "./_components/ThemeToggle";
-import "froala-editor/css/froala_style.min.css";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import "froala-editor/js/plugins/image.min.js";
-import "froala-editor/js/plugins/char_counter.min.js";
-import "froala-editor/js/plugins/markdown.min.js";
-import "froala-editor/js/plugins/code_view.min.js";
-import "froala-editor/js/plugins/video.min.js";
 
-
-
-const FroalaEditor = dynamic(() => import("react-froala-wysiwyg"), {
-  ssr: false,
-});
-
-const FroalaEditorView = dynamic(
-  () => import("react-froala-wysiwyg/FroalaEditorView"),
-  {
-    ssr: false,
-  }
-);
 
 const LandingPage: FC = () => {
   const dispatch = useDispatch();
@@ -45,12 +26,6 @@ const LandingPage: FC = () => {
            <ThemeToggle />
          </nav>
        </header>
-       <div className="w-[50%] m-auto mt-10">
-         <FroalaEditor tag="textarea" />
-       </div>
-       <div>
-         <FroalaEditorView/>
-       </div>
 
        {showSignupOptionsModal && <SignUpOptionsModal />}
        {showSigninModal && <SignInModal />}

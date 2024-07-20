@@ -1,6 +1,6 @@
 
 import React, { FC, useRef, useEffect, useState, FormEvent, useCallback } from 'react'; 
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/libs/authServices';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeModals, openSignupModal } from '../_store/modalSlice';
@@ -14,7 +14,7 @@ const SignInModal: FC = () => {
 
     const { signInUser, signInWithGoogle } = useAuth();
 
-    // const router = useRouter();
+    const router = useRouter();
     const dispatch = useDispatch();
     const { showSigninModal } = useSelector((state: RootState) => state.modal);
     const { isLoading } = useSelector((state: RootState) => state.loading);
@@ -25,8 +25,10 @@ const SignInModal: FC = () => {
         try {
             dispatch(setLoading(true));
             await signInUser(email, password);
-            // router.push('/home');
-            close();
+            setTimeout(() => {
+              router.push("/create-post");
+              close();
+            }, 2000);
         } catch (error) {
             //
         } finally {
@@ -38,8 +40,10 @@ const SignInModal: FC = () => {
         try {
             dispatch(setLoading(true));
             await signInWithGoogle();
-            // router.push('/home');
-            close();
+             setTimeout(() => {
+               router.push("/create-post");
+               close();
+             }, 2000);
         } catch (error) {
             //
         } finally {
