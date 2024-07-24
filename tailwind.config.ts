@@ -14,6 +14,10 @@ const config: Config = {
         secondary: "#3E4C59",
         spanColor: "#52606D",
         tinWhite: "#FFFFFFDE",
+        headerColor: "#0a0a0a",
+      },
+      scale: {
+        20: "0.3",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

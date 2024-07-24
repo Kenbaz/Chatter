@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, FC } from "react";
+import React, { useState, useEffect, FC, useCallback, useRef, useMemo, ChangeEvent } from "react";
 import dynamic from "next/dynamic";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../_store/store";
@@ -9,17 +9,19 @@ import { storage, firestore } from "@/src/libs/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   collection,
-  addDoc,
-  updateDoc,
   doc,
   getDoc,
   setDoc,
+  serverTimestamp,
+  Timestamp,
+  FieldValue,
 } from "firebase/firestore";
 import { setLoading } from "../_store/loadingSlice";
 import { useAuth } from "@/src/libs/authServices";
 import { auth } from "@/src/libs/firebase";
 import { setError } from "../_store/errorSlice";
 import ContentPreview from "./ContentPreview";
+import { FaPlus, FaMinus } from 'react-icons/fa';
 import "react-markdown-editor-lite/lib/index.css";
 
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
@@ -31,6 +33,13 @@ interface ContentEditorProps {
   postId?: string;
 }
 
+interface LocalContent {
+  title: string;
+  content: string;
+  tags: string[];
+  coverImage: string;
+}
+
 interface PostData {
   title: string;
   tags: string[];
@@ -38,9 +47,43 @@ interface PostData {
   authorId: string;
   status: string;
   coverImage: string;
-  updatedAt: string;
-  createdAt?: string;
+  updatedAt: string | FieldValue | Timestamp;
+  createdAt?: string | FieldValue;
 }
+
+const useLocalStorage = <T,>(
+  key: string,
+  initialValue: T
+): [T, (value: T | ((prev: T) => T)) => void] => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue;
+    }
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.log(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T | ((prev: T) => T)) => {
+    try {
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return [storedValue, setValue];
+};
+
 
 const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const dispatch = useDispatch();
@@ -48,16 +91,34 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
 
   const { signOutUser } = useAuth();
 
+  const [localContent, setLocalContent] = useLocalStorage <LocalContent>(`content_${userId} `, {
+    title: '',
+    content: '',
+    tags: [],
+    coverImage: '',
+  });
+
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-  const [coverImageUrl, setCoverImageUrl] = useState<string>("");
-  const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [content, setContent] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState<string>(localContent.coverImage);
+  const [title, setTitle] = useState(localContent.title);
+  const [tags, setTags] = useState<string[]>(localContent.tags);
+  const [content, setContent] = useState(localContent.content);
   const [isPreview, setIsPreview] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [publishDate, setPublishDate] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
+  const editorRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const INITIAL_EDITOR_HEIGHT = "300px";
+  const FULL_SCREEN_THRESHOLD = 0;
+
+  const [editorHeight, setEditorHeight] = useState(INITIAL_EDITOR_HEIGHT);
+
+ 
   useEffect(() => {
     const fetchPostData = async (id: string) => {
       try {
@@ -94,18 +155,36 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     setPublishDate(new Date().toLocaleDateString());
   }, [postId, dispatch, userId]);
 
-  const handleCoverImageUpload = async (file: File) => {
-    try {
-      setCoverImageFile(file);
-    const storageRef = ref(storage, `Cover_images/${file.name}`);
-    const snapShot = await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(snapShot.ref);
-    setCoverImageUrl(url);
-    } catch (error) {
-      console.error('Error uploading cover image:', error);
-      dispatch(setError('Please select file'))
-    }
+
+const clearLocalStorage = useCallback(() => {
+  setLocalContent({
+    title: "",
+    content: "",
+    tags: [],
+    coverImage: "",
+  });
+}, [setLocalContent]);
+
+
+ const handleCoverImageUpload = async (file: File) => {
+   try {
+     setIsUploading(true);
+     dispatch(setLoading(true));
+     setCoverImageFile(file);
+     const storageRef = ref(storage, `Cover_images/${file.name}`);
+     const snapShot = await uploadBytes(storageRef, file);
+     const url = await getDownloadURL(snapShot.ref);
+     setCoverImageUrl(url);
+     setLocalContent((prev) => ({ ...prev, coverImage: url }));
+   } catch (error) {
+     console.error("Error uploading cover image:", error);
+     dispatch(setError("Please select file"));
+   } finally {
+     setIsUploading(false);
+     dispatch(setLoading(false));
+   }
   };
+  
 
   const handleSetCoverImage = () => {
     console.log("Setting cover image");
@@ -126,14 +205,35 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     input.click()
   };
 
+  const handleEditorChange = ({ text }: { text: string }) => {
+    setContent(text);
+    setLocalContent((prev) => ({ ...prev, content: text }));
+    checkFullScreen(text);
+    scrollToBottom();
+  };
+
+  const handleRemoveCoverImage = () => {
+    setCoverImageUrl('');
+    setLocalContent({
+      coverImage: '',
+      title: title,
+      content: content,
+      tags: tags
+    })
+  }
+
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    setLocalContent((prev) => ({ ...prev, title: newTitle }));
+  };
+
   const handleTagInput = (input: string) => {
     const newTags = input.split(",").map((tag) => tag.trim());
     setTags(newTags);
+    setLocalContent((prev) => ({ ...prev, tags: newTags }));
   };
 
-  const handleEditorChange = ({ text }: { text: string }) => {
-    setContent(text);
-  };
 
   const validateForm = (): boolean => {
     if (!title.trim()) {
@@ -165,7 +265,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       authorId: userId,
       status: publish ? "published" : "draft",
       coverImage: coverImageUrl,
-      updatedAt: new Date().toISOString(),
+      updatedAt: serverTimestamp(),
     };
 
     try {
@@ -174,10 +274,14 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
         : doc(collection(firestore, "Posts"));
 
       if (!postId) {
-        postData.createdAt = new Date().toISOString();
+        postData.createdAt = serverTimestamp();
       }
 
       await setDoc(postRef, postData, { merge: true });
+
+      // Clear local storage after a successful save
+      clearLocalStorage();
+
       setSuccessMessage(
         `${publish ? "Post published successfully" : "Draft saved"}`
       );
@@ -189,9 +293,21 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     }
   };
 
-  const togglePreview = () => {
-    setIsPreview(!isPreview);
-  };
+   const discardPost = () => {
+     // Clear local storage
+     clearLocalStorage();
+
+     // Reset all state variables
+     setTitle("");
+     setContent("");
+     setTags([]);
+     setCoverImageUrl("");
+  
+     setSuccessMessage("Post discarded");
+   };
+
+ 
+  const togglePreview = () => setIsPreview(!isPreview);
 
   const handleImageUpload = async (file: File): Promise<string> => {
     const storageRef = ref(storage, `Post_images/${file.name}`);
@@ -210,6 +326,48 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       })
     );
   };
+
+  const scrollToBottom = useCallback(() => {
+    if (editorRef.current) {
+      const textarea = editorRef.current.querySelector('textarea');
+      if (textarea) {
+        setTimeout(() => {
+          textarea.scrollTop = textarea.scrollHeight;
+        }, 0)
+      }
+    }
+  }, []);
+
+  const checkFullScreen = useCallback(
+    (text: string) => {
+      if (text.length > FULL_SCREEN_THRESHOLD && !isFullScreen) {
+        setIsFullScreen(true);
+        const vh = window.innerHeight;
+        setEditorHeight(`${vh}px`);
+        if (editorRef.current) {
+          editorRef.current.scrollIntoView({ behavior: "smooth" });
+          setTimeout(scrollToBottom, 300);
+        }
+      } else if (text.length <= FULL_SCREEN_THRESHOLD && isFullScreen) {
+        setIsFullScreen(false);
+        setEditorHeight(INITIAL_EDITOR_HEIGHT);
+        if (contentRef.current) {
+          contentRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    },
+    [isFullScreen, scrollToBottom]
+  );
+
+ 
+  useEffect(() => {
+    if (isFullScreen) {
+      scrollToBottom();
+    }
+  }, [isFullScreen, scrollToBottom]);
+
+  
+ 
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -232,111 +390,136 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
         </div>
       ) : (
         <>
-          {successMessage && (
-            <div
-              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <span className="block sm:inline">{successMessage}</span>
-            </div>
-          )}
-
-          <button
-            onClick={handleSetCoverImage}
-            className="border p-2 rounded-full mr-4 mb-4"
+          <div
+            ref={contentRef}
+            className="mr-4 mb-4 overflow-y-auto content-ref h-[610px]"
           >
-            Set cover image
-          </button>
+            {successMessage && (
+              <div className=" px-4 py-3 rounded relative mb-2" role="alert">
+                <span className="block sm:inline">{successMessage}</span>
+              </div>
+            )}
 
-          {coverImageUrl && (
-            <div className="relative w-[20%] h-32 mb-4">
-              <Image
-                src={coverImageUrl}
-                alt="Cover"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                style={{ objectFit: "cover" }}
-                className="rounded-lg"
+            <button
+              onClick={handleSetCoverImage}
+              className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4"
+              disabled={isUploading}
+            >
+              Set cover image
+            </button>
+
+            {isUploading && (
+              <div className="flex items-center text-sm space-x-2 mb-4">
+                <span className="text-[14px]">Uploading</span>
+                <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
+              </div>
+            )}
+
+            {coverImageUrl && (
+              <div className="relative w-[150px] h-[70px] mb-4">
+                <Image
+                  src={coverImageUrl}
+                  alt="Cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                  className="rounded-lg"
+                />
+                <button
+                  onClick={handleRemoveCoverImage}
+                  className="absolute top-2 left-44 px-3 text-sm bg-red-500 text-white rounded-full py-1"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            <div className="mb-6">
+              <input
+                type="text"
+                placeholder="Title..."
+                value={title}
+                onChange={handleTitleChange}
+                className="w-full bg-headerColor text-4xl -mb-7 font-bold text-tinWhite p-2 border-none outline-none rounded focus:ring-0 placeholder-gray-300"
               />
-              <button
-                onClick={() => setCoverImageUrl("")}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2"
-              >
-                Remove
-              </button>
             </div>
-          )}
 
-          <div className="mb-6">
             <input
               type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-primary text-4xl font-bold text-tinWhite p-2 mb-4 border-none outline-none rounded focus:ring-0 placeholder-gray-300"
+              placeholder="Tags (comma-separated)"
+              onChange={(e) => handleTagInput(e.target.value)}
+              className="w-full p-2 mb-4 border-none rounded bg-headerColor outline-none"
             />
-          </div>
 
-          <input
-            type="text"
-            placeholder="Tags (comma-separated)"
-            onChange={(e) => handleTagInput(e.target.value)}
-            className="w-full p-2 mb-4 border rounded bg-primary outline-none border-none"
-          />
-
-          <button
-            className="cursor-pointer mb-4 bg-red-500 text-white px-4 py-2 rounded"
+            {/* <button
+            className="cursor-pointer absolute top-4 mb-4 bg-red-500 text-white px-4 py-2 rounded"
             onClick={() => signOutUser()}
           >
             Sign out
-          </button>
+          </button> */}
 
-          <div className="w-full mb-4 border rounded custom-editor">
-            <MdEditor
-              style={{ height: "300px" }}
-              renderHTML={(text) => <ContentPreview content={text} />}
-              onChange={handleEditorChange}
-              value={content}
-              onImageUpload={handleImageUpload}
-              config={{
-                view: {
-                  menu: true,
-                  md: true,
-                  html: false,
-                },
-                canView: {
-                  menu: true,
-                  md: true,
-                  html: false,
-                  fullScreen: true,
-                  hideMenu: true,
-                },
-                markdownClass: "custom-markdown",
-                htmlClass: "custom-html",
-              }}
-            />
+            <div
+              ref={editorRef}
+              className={`w-full mb-4 relative rounded-lg custom-editor ${
+                isFullScreen ? "full-screen" : ""
+              }`}
+              style={{ height: editorHeight }}
+            >
+              <MdEditor
+                style={{ height: "100%" }}
+                placeholder="Write contents with markdown.."
+                renderHTML={(text) => <ContentPreview content={text} />}
+                onChange={handleEditorChange}
+                value={content}
+                onImageUpload={handleImageUpload}
+                config={{
+                  view: {
+                    menu: true,
+                    md: true,
+                    html: false,
+                  },
+                  canView: {
+                    menu: true,
+                    md: true,
+                    html: false,
+                    fullScreen: false,
+                    hideMenu: false,
+                  },
+                  markdownClass: "custom-markdown",
+                  htmlClass: "custom-html",
+                }}
+              />
+            </div>
           </div>
+          <button
+            onClick={togglePreview}
+            className="text-tinWhite absolute top-3 text-[15px] right-96 px-2 py-2 rounded-lg preview-btn hover:bg-teal-700 hover:opacity-95"
+          >
+            Preview
+          </button>
           <div className="flex justify-between">
-            <button
-              onClick={togglePreview}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+            <div className="flex gap-4">
+              <button
+                onClick={() => savePost(true)}
+                disabled={isLoading}
+                className="bg-teal-800 w-[100px] hover:bg-teal-900 text-white px-3 py-2 rounded-lg"
+              >
+                Publish
+              </button>
+              <button
+                onClick={() => savePost(false)}
+                disabled={isLoading}
+                className=" text-white px-2 py-1 rounded-lg hover:bg-teal-800 hover:opacity-60"
+              >
+                Save draft
+              </button>
+            </div>
+            {/* <button
+              onClick={discardPost}
+              className="bg-red-500 text-white px-2 hover:bg-red-600 py-1 rounded"
             >
-              Preview
-            </button>
-            <button
-              onClick={() => savePost(false)}
-              disabled={isLoading}
-              className="bg-gray-500 text-white px-4 py-2 rounded"
-            >
-              Save as Draft
-            </button>
-            <button
-              onClick={() => savePost(true)}
-              disabled={isLoading}
-              className="bg-green-500 text-white px-4 py-2 rounded"
-            >
-              Publish
-            </button>
+              Discard
+            </button> */}
           </div>
         </>
       )}
