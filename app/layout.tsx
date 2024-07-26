@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "highlight.js/styles/github.css";
 import { Providers } from "./_components/Providers";
+import ClientInitWrapper from "./_components/ClientInitWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,10 +17,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+ 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ClientInitWrapper>{children}</ClientInitWrapper>
+        </Providers>
       </body>
     </html>
   );

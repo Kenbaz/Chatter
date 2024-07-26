@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, FC, FormEvent, useCallback } from "
 import { useDispatch, useSelector } from "react-redux";
 // import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/libs/authServices";
-import { clearError } from "../_store/errorSlice";
+import { clearError, setError } from "../_store/errorSlice";
 import {
   openSigninModal,
   openSignupOptionsModal,
@@ -11,6 +11,8 @@ import {
 } from "../_store/modalSlice";
 import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
+import { Profile } from "@/src/libs/userServices";
+
 
 const SignUpModal: FC = () => {
   const dispatch = useDispatch();
@@ -25,19 +27,37 @@ const SignUpModal: FC = () => {
   const emailInput = useRef<HTMLInputElement>(null);
 
   const { registerUser, signInWithGoogle } = useAuth();
+  const { hasUserSetPreferences } = Profile();
 
   const signUp = async (e: FormEvent) => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      await registerUser(email, password);
-      setSuccessMessage("User creation successful");
-      setTimeout(() => {
-        // router.push("/home");
-        close();
-      }, 2000);
+      const user = await registerUser(email, password);
+
+      if (user) {
+        const needsPreferences = !(await hasUserSetPreferences(user.uid));
+        setSuccessMessage("User creation successful");
+
+        if (needsPreferences) {
+          // router.push('/select-categories');
+          console.log("User needs to select categories");
+        } else {
+          // router.push('/home')
+        }
+
+        setTimeout(() => {
+          close();
+        }, 2000);
+      } else {
+        throw new Error("User registration failed")
+      }
     } catch (error) {
-      //
+      if (error instanceof Error) {
+        dispatch(setError(error.message));
+      } else {
+        dispatch(setError("An unknown error occurred"));
+      }
     } finally {
       dispatch(setLoading(false));
     }

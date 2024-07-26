@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, FC, useCallback, useRef, useMemo, ChangeEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  FC,
+  useCallback,
+  useRef,
+  useMemo,
+  ChangeEvent,
+} from "react";
 import dynamic from "next/dynamic";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../_store/store";
@@ -21,8 +29,9 @@ import { useAuth } from "@/src/libs/authServices";
 import { auth } from "@/src/libs/firebase";
 import { setError } from "../_store/errorSlice";
 import ContentPreview from "./ContentPreview";
-import { FaPlus, FaMinus } from 'react-icons/fa';
+import { FaPlus, FaMinus } from "react-icons/fa";
 import "react-markdown-editor-lite/lib/index.css";
+import { tagFuncs } from "@/src/libs/contentServices";
 
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
   ssr: false,
@@ -38,6 +47,11 @@ interface LocalContent {
   content: string;
   tags: string[];
   coverImage: string;
+}
+
+interface Tag {
+  id: string;
+  name: string;
 }
 
 interface PostData {
@@ -84,24 +98,29 @@ const useLocalStorage = <T,>(
   return [storedValue, setValue];
 };
 
-
 const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loading.isLoading);
 
   const { signOutUser } = useAuth();
 
-  const [localContent, setLocalContent] = useLocalStorage <LocalContent>(`content_${userId} `, {
-    title: '',
-    content: '',
-    tags: [],
-    coverImage: '',
-  });
+  const [localContent, setLocalContent] = useLocalStorage<LocalContent>(
+    `content_${userId} `,
+    {
+      title: "",
+      content: "",
+      tags: [],
+      coverImage: "",
+    }
+  );
 
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-  const [coverImageUrl, setCoverImageUrl] = useState<string>(localContent.coverImage);
+  const [coverImageUrl, setCoverImageUrl] = useState<string>(
+    localContent.coverImage
+  );
   const [title, setTitle] = useState(localContent.title);
-  const [tags, setTags] = useState<string[]>(localContent.tags);
+  const [selectedTags, setSelectedTags] = useState<string[]>(localContent.tags);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [content, setContent] = useState(localContent.content);
   const [isPreview, setIsPreview] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -110,7 +129,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const editorRef = useRef<HTMLDivElement>(null)
+  const editorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const INITIAL_EDITOR_HEIGHT = "300px";
@@ -118,7 +137,25 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
 
   const [editorHeight, setEditorHeight] = useState(INITIAL_EDITOR_HEIGHT);
 
- 
+  useEffect(() => {
+    const fetchTags = async () => {
+      const allTags = await tagFuncs().getAllTags();
+      setAvailableTags(allTags);
+    };
+
+    fetchTags();
+  }, []);
+
+  const handleTagSelect = (tagId: string) => {
+    setSelectedTags((prev) => {
+      const newTags = prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId];
+      setLocalContent((prevContent) => ({ ...prevContent, tags: newTags }));
+      return newTags;
+    });
+  };
+
   useEffect(() => {
     const fetchPostData = async (id: string) => {
       try {
@@ -129,7 +166,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
           const postData = docSnap.data();
           setTitle(postData.title);
           setContent(postData.content);
-          setTags(postData.tags);
+          setSelectedTags(postData.tags);
           setCoverImageUrl(postData.coverImage);
         } else {
           console.log("No such document");
@@ -155,36 +192,33 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     setPublishDate(new Date().toLocaleDateString());
   }, [postId, dispatch, userId]);
 
+  const clearLocalStorage = useCallback(() => {
+    setLocalContent({
+      title: "",
+      content: "",
+      tags: [],
+      coverImage: "",
+    });
+  }, [setLocalContent]);
 
-const clearLocalStorage = useCallback(() => {
-  setLocalContent({
-    title: "",
-    content: "",
-    tags: [],
-    coverImage: "",
-  });
-}, [setLocalContent]);
-
-
- const handleCoverImageUpload = async (file: File) => {
-   try {
-     setIsUploading(true);
-     dispatch(setLoading(true));
-     setCoverImageFile(file);
-     const storageRef = ref(storage, `Cover_images/${file.name}`);
-     const snapShot = await uploadBytes(storageRef, file);
-     const url = await getDownloadURL(snapShot.ref);
-     setCoverImageUrl(url);
-     setLocalContent((prev) => ({ ...prev, coverImage: url }));
-   } catch (error) {
-     console.error("Error uploading cover image:", error);
-     dispatch(setError("Please select file"));
-   } finally {
-     setIsUploading(false);
-     dispatch(setLoading(false));
-   }
+  const handleCoverImageUpload = async (file: File) => {
+    try {
+      setIsUploading(true);
+      dispatch(setLoading(true));
+      setCoverImageFile(file);
+      const storageRef = ref(storage, `Cover_images/${file.name}`);
+      const snapShot = await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(snapShot.ref);
+      setCoverImageUrl(url);
+      setLocalContent((prev) => ({ ...prev, coverImage: url }));
+    } catch (error) {
+      console.error("Error uploading cover image:", error);
+      dispatch(setError("Please select file"));
+    } finally {
+      setIsUploading(false);
+      dispatch(setLoading(false));
+    }
   };
-  
 
   const handleSetCoverImage = () => {
     console.log("Setting cover image");
@@ -202,7 +236,7 @@ const clearLocalStorage = useCallback(() => {
         console.log("No file selected");
       }
     };
-    input.click()
+    input.click();
   };
 
   const handleEditorChange = ({ text }: { text: string }) => {
@@ -213,27 +247,20 @@ const clearLocalStorage = useCallback(() => {
   };
 
   const handleRemoveCoverImage = () => {
-    setCoverImageUrl('');
+    setCoverImageUrl("");
     setLocalContent({
-      coverImage: '',
+      coverImage: "",
       title: title,
       content: content,
-      tags: tags
-    })
-  }
+      tags: selectedTags,
+    });
+  };
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     setLocalContent((prev) => ({ ...prev, title: newTitle }));
   };
-
-  const handleTagInput = (input: string) => {
-    const newTags = input.split(",").map((tag) => tag.trim());
-    setTags(newTags);
-    setLocalContent((prev) => ({ ...prev, tags: newTags }));
-  };
-
 
   const validateForm = (): boolean => {
     if (!title.trim()) {
@@ -260,7 +287,7 @@ const clearLocalStorage = useCallback(() => {
 
     const postData: PostData = {
       title,
-      tags,
+      tags: selectedTags,
       content,
       authorId: userId,
       status: publish ? "published" : "draft",
@@ -293,20 +320,19 @@ const clearLocalStorage = useCallback(() => {
     }
   };
 
-   const discardPost = () => {
-     // Clear local storage
-     clearLocalStorage();
+  const discardPost = () => {
+    // Clear local storage
+    clearLocalStorage();
 
-     // Reset all state variables
-     setTitle("");
-     setContent("");
-     setTags([]);
-     setCoverImageUrl("");
-  
-     setSuccessMessage("Post discarded");
-   };
+    // Reset all state variables
+    setTitle("");
+    setContent("");
+    setSelectedTags([]);
+    setCoverImageUrl("");
 
- 
+    setSuccessMessage("Post discarded");
+  };
+
   const togglePreview = () => setIsPreview(!isPreview);
 
   const handleImageUpload = async (file: File): Promise<string> => {
@@ -329,11 +355,11 @@ const clearLocalStorage = useCallback(() => {
 
   const scrollToBottom = useCallback(() => {
     if (editorRef.current) {
-      const textarea = editorRef.current.querySelector('textarea');
+      const textarea = editorRef.current.querySelector("textarea");
       if (textarea) {
         setTimeout(() => {
           textarea.scrollTop = textarea.scrollHeight;
-        }, 0)
+        }, 0);
       }
     }
   }, []);
@@ -352,22 +378,18 @@ const clearLocalStorage = useCallback(() => {
         setIsFullScreen(false);
         setEditorHeight(INITIAL_EDITOR_HEIGHT);
         if (contentRef.current) {
-          contentRef.current.scrollIntoView({ behavior: 'smooth' });
+          contentRef.current.scrollIntoView({ behavior: "smooth" });
         }
       }
     },
     [isFullScreen, scrollToBottom]
   );
 
- 
   useEffect(() => {
     if (isFullScreen) {
       scrollToBottom();
     }
   }, [isFullScreen, scrollToBottom]);
-
-  
- 
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -376,7 +398,7 @@ const clearLocalStorage = useCallback(() => {
           <ContentPreview
             title={title}
             content={content}
-            tags={tags}
+            tags={selectedTags}
             coverImageUrl={coverImageUrl}
             authorName={authorName}
             publishDate={publishDate}
@@ -399,7 +421,6 @@ const clearLocalStorage = useCallback(() => {
                 <span className="block sm:inline">{successMessage}</span>
               </div>
             )}
-
             <button
               onClick={handleSetCoverImage}
               className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4"
@@ -407,14 +428,12 @@ const clearLocalStorage = useCallback(() => {
             >
               Set cover image
             </button>
-
             {isUploading && (
               <div className="flex items-center text-sm space-x-2 mb-4">
                 <span className="text-[14px]">Uploading</span>
                 <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
               </div>
             )}
-
             {coverImageUrl && (
               <div className="relative w-[150px] h-[70px] mb-4">
                 <Image
@@ -433,7 +452,6 @@ const clearLocalStorage = useCallback(() => {
                 </button>
               </div>
             )}
-
             <div className="mb-6">
               <input
                 type="text"
@@ -443,13 +461,23 @@ const clearLocalStorage = useCallback(() => {
                 className="w-full bg-headerColor text-4xl -mb-7 font-bold text-tinWhite p-2 border-none outline-none rounded focus:ring-0 placeholder-gray-300"
               />
             </div>
-
-            <input
-              type="text"
-              placeholder="Tags (comma-separated)"
-              onChange={(e) => handleTagInput(e.target.value)}
-              className="w-full p-2 mb-4 border-none rounded bg-headerColor outline-none"
-            />
+            <div
+              className="w-full p-2 mb-4 border-none rounded bg-headerColor
+            outline-none"
+            >
+              <label>Select Tags:</label>
+              <div>
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    onClick={() => handleTagSelect(tag.id)}
+                    className={selectedTags.includes(tag.id) ? "selected" : ""}
+                  >
+                    {tag.name}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* <button
             className="cursor-pointer absolute top-4 mb-4 bg-red-500 text-white px-4 py-2 rounded"
@@ -457,7 +485,6 @@ const clearLocalStorage = useCallback(() => {
           >
             Sign out
           </button> */}
-
             <div
               ref={editorRef}
               className={`w-full mb-4 relative rounded-lg custom-editor ${

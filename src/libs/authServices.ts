@@ -16,7 +16,7 @@ interface UserDetails {
 export const useAuth = () => {
     const dispatch = useDispatch();
 
-    const registerUser = async (email: string, password: string): Promise<void> => {
+    const registerUser = async (email: string, password: string): Promise<User> => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
@@ -24,6 +24,7 @@ export const useAuth = () => {
 
             await storeUserInDatabase(user);
             dispatch(clearError());
+            return user;
         } catch (error) {
             let errorMessage = "Failed to register user";
 
@@ -48,6 +49,7 @@ export const useAuth = () => {
             }
             dispatch(setError(errorMessage));
             console.error(errorMessage);
+            throw error
         }
     };
 
