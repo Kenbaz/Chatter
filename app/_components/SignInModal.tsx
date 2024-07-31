@@ -1,85 +1,91 @@
-
-import React, { FC, useRef, useEffect, useState, FormEvent, useCallback } from 'react'; 
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/src/libs/authServices';
-import { useDispatch, useSelector } from 'react-redux';
-import { closeModals, openSignupModal } from '../_store/modalSlice';
-import { setLoading } from '../_store/loadingSlice';
-import { RootState } from '../_store/store';
+import React, {
+  FC,
+  useRef,
+  useEffect,
+  useState,
+  FormEvent,
+  useCallback,
+} from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/libs/authServices";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModals, openSignupModal } from "../_store/modalSlice";
+import { setLoading } from "../_store/loadingSlice";
+import { RootState } from "../_store/store";
 
 const SignInModal: FC = () => {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const emailInput = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const emailInput = useRef<HTMLInputElement>(null);
 
-    const { signInUser, signInWithGoogle } = useAuth();
+  const { signInUser, signInWithGoogle } = useAuth();
 
-    const router = useRouter();
-    const dispatch = useDispatch();
-    const { showSigninModal } = useSelector((state: RootState) => state.modal);
-    const { isLoading } = useSelector((state: RootState) => state.loading);
-    const { error } = useSelector((state: RootState) => state.error);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { showSigninModal } = useSelector((state: RootState) => state.modal);
+  const { isLoading } = useSelector((state: RootState) => state.loading);
+  const { error } = useSelector((state: RootState) => state.error);
 
-    const signUserIn = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            dispatch(setLoading(true));
-            await signInUser(email, password);
-            setTimeout(() => {
-              router.push("/create-post");
-              close();
-            }, 2000);
-        } catch (error) {
-            //
-        } finally {
-            dispatch(setLoading(false));
-        }
-    };
-
-    const signInWithGoogleAccount = async () => {
-        try {
-            dispatch(setLoading(true));
-            await signInWithGoogle();
-             setTimeout(() => {
-               router.push("/create-post");
-               close();
-             }, 2000);
-        } catch (error) {
-            //
-        } finally {
-            dispatch(setLoading(false));
-        };
-    };
-
-    const close = useCallback(() => {
-      dispatch(closeModals());
-    }, [dispatch]);
-
-    const swicthToSignUp = () => {
+  const signUserIn = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      dispatch(setLoading(true));
+      await signInUser(email, password);
+      setTimeout(() => {
+        router.push("/create-post");
         close();
-        dispatch(openSignupModal());
+      }, 2000);
+    } catch (error) {
+      //
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  const signInWithGoogleAccount = async () => {
+    try {
+      dispatch(setLoading(true));
+      await signInWithGoogle();
+      setTimeout(() => {
+        //  router.push("/feeds");
+        close();
+      }, 2000);
+    } catch (error) {
+      //
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  const close = useCallback(() => {
+    dispatch(closeModals());
+  }, [dispatch]);
+
+  const swicthToSignUp = () => {
+    close();
+    dispatch(openSignupModal());
+  };
+
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        close();
+      }
     };
 
-   useEffect(() => {
-     const handleEscKey = (event: KeyboardEvent) => {
-       if (event.key === "Escape") {
-         close();
-       }
-     };
+    document.addEventListener("keydown", handleEscKey);
+    if (emailInput.current) {
+      emailInput.current.focus();
+    }
 
-     document.addEventListener("keydown", handleEscKey);
-     if (emailInput.current) {
-       emailInput.current.focus();
-     }
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [close]);
 
-     return () => {
-       document.removeEventListener("keydown", handleEscKey);
-     };
-   }, [close]);
+  if (!showSigninModal) return null;
 
-    if (!showSigninModal) return null
-
-     return (
+  return (
     <div className="modal" onClick={close}>
       <div
         className="modal-content text-white"
@@ -127,7 +133,7 @@ const SignInModal: FC = () => {
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
           {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -136,14 +142,20 @@ const SignInModal: FC = () => {
             className="mt-2 hover:underline"
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign in with Google'}
+            {isLoading ? "Signing in..." : "Sign in with Google"}
           </button>
           <p className="mt-4 text-gray-400">
-            Don&apos;t have an account? <a className="hover:underline cursor-pointer" tabIndex={0} onClick={swicthToSignUp}>Sign up</a>
+            Don&apos;t have an account?{" "}
+            <a
+              className="hover:underline cursor-pointer"
+              tabIndex={0}
+              onClick={swicthToSignUp}
+            >
+              Sign up
+            </a>
           </p>
         </div>
       </div>
-      
     </div>
   );
 };

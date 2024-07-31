@@ -31,13 +31,13 @@ const CategoryNavigation: FC = () => {
         <nav>
             <ul>
                 <li>
-                    <Link href="/for-you">
-                        <a>For You</a>
+                    <Link href="/feeds">
+                        For You
                     </Link>
                 </li>
                 {categories.map(category => (
                     <li key={category.id}>
-                        <Link href={`/category/${category.id}`}>
+                        <Link href={`/feeds/category/${category.id}`}>
                             <a>{category.name} ({category.postCount})</a>
                         </Link>
                     </li>

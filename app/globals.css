@@ -72,6 +72,7 @@ body {
     cursor: pointer;
   }
 
+  /* Text editor styles starts*/
  .custom-editor {
    background-color: #262626;
  }
@@ -147,5 +148,50 @@ body {
   word-wrap: break-word;
   overflow-wrap: break-word;
 };
+
+/*Text editor styles end*/
+
+/*FullPostView styles*/
+
+ .full-post-container {
+   max-width: 800px;
+   margin: 0 auto;
+   padding: 20px;
+ }
+
+ .post-metadata {
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 20px;
+   color: #666;
+ }
+
+ .post-content {
+   line-height: 1.6;
+   margin-bottom: 20px;
+ }
+
+ .post-tags {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 10px;
+ }
+
+ .tag {
+   background-color: #f0f0f0;
+   padding: 5px 10px;
+   border-radius: 5px;
+ }
+
+ .back-btn {
+   margin-bottom: 20px;
+   padding: 10px 15px;
+   background-color: #f0f0f0;
+   border: none;
+   border-radius: 5px;
+   cursor: pointer;
+ }
+
+ /*FullPostView styles end*/
 
 }

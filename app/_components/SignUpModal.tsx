@@ -43,7 +43,7 @@ const SignUpModal: FC = () => {
           // router.push('/select-categories');
           console.log("User needs to select categories");
         } else {
-          // router.push('/home')
+          // router.push('/feeds')
         }
 
         setTimeout(() => {
@@ -69,7 +69,7 @@ const SignUpModal: FC = () => {
       await signInWithGoogle();
       setSuccessMessage("Signed in with Google succesfully");
       setTimeout(() => {
-        // router.push("/home");
+        // router.push("/feeds");
         close();
       }, 2000);
     } catch (error) {

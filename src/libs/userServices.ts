@@ -3,29 +3,26 @@ import { firestore } from "./firebase";
 import { useDispatch } from "react-redux";
 import { setError, clearError } from "@/app/_store/errorSlice";
 
-interface UserData {
+
+export interface UserData {
   readonly email: string;
   readonly uid: string;
   readonly createdAt: string;
-  displayName?: string;
-  fullName?: string;
+  username?: string;
+  fullname?: string;
   bio?: string;
   profilePictureUrl?: string;
   preferredCategories: string[];
   interests?: string[];
-  skills?: string[];
   languages?: string[];
   location?: string;
+  website_url?: string;
   socialLinks?: {
-    twitter?: string;
-    linkedIn?: string;
-    github?: string;
+    twitter: string;
+    linkedIn: string;
+    github: string;
   };
-  education?: {
-    institution: string;
-    degree: string;
-    graduationYear: number;
-  }[];
+  education?: string;
 }
 
 interface UserDataValidationRules {
@@ -39,7 +36,7 @@ interface UserDataValidationRules {
 
 export const Profile = () => {
   const dispatch = useDispatch();
-
+  
   const userDataValidationRules: UserDataValidationRules = {
     email: {
       type: "string",
@@ -138,7 +135,12 @@ export const Profile = () => {
   };
 
   const updateUserInterests = async (userId: string, interests: string[]) => {
-    await updateUserProfile(userId, { interests });
+    try {
+      await updateUserProfile(userId, { interests });
+      dispatch(clearError());
+    } catch (error) {
+      dispatch(setError(`Error updating interest: ${error}`));
+    }
   };
 
   const getUserInterests = async (userId: string): Promise<string[]> => {
@@ -150,15 +152,25 @@ export const Profile = () => {
     userId: string,
     profilePictureUrl: string
   ) => {
-    await updateUserProfile(userId, { profilePictureUrl });
+    try {
+      await updateUserProfile(userId, { profilePictureUrl });
+      dispatch(clearError());
+    } catch (error) {
+      dispatch(setError('Profile picture upload failed'))
+    }
   };
 
   const updateUserBio = async (userId: string, bio: string) => {
-    await updateUserProfile(userId, { bio });
+    try {
+      await updateUserProfile(userId, { bio });
+      dispatch(clearError());
+    } catch (error) {
+      dispatch(setError('Bio update failed'))
+    }
   };
 
-  const updateUserSkills = async (userId: string, skills: string[]) => {
-    await updateUserProfile(userId, { skills });
+  const updateUserLanguages = async (userId: string, languages: string[]) => {
+    await updateUserProfile(userId, { languages });
   };
 
   const updateUserPreferredCategories = async (
@@ -182,57 +194,57 @@ export const Profile = () => {
     return userDoc.exists() && userDoc.data().preferredCategories?.length > 0;
   };
 
-  const ensureUserFields = async (userId: string) => {
-    const userData = await getUserProfile(userId);
-    const updates: Partial<Omit<UserData, "email" | "uid" | "createdAt">> = {};
+  // const ensureUserFields = async (userId: string) => {
+  //   const userData = await getUserProfile(userId);
+  //   const updates: Partial<Omit<UserData, "email" | "uid" | "createdAt">> = {};
 
-    // List of fields to ensure exists
-    const fieldsToEnsure: (keyof Omit<
-      UserData,
-      "email" | "uid" | "createdAt"
-    >)[] = [
-      "displayName",
-      "fullName",
-      "bio",
-      "profilePictureUrl",
-      "interests",
-      "skills",
-      "languages",
-      "location",
-      "socialLinks",
-      "education",
-    ];
+  //   // List of fields to ensure exists
+  //   const fieldsToEnsure: (keyof Omit<
+  //     UserData,
+  //     "email" | "uid" | "createdAt"
+  //   >)[] = [
+  //     "username",
+  //     "fullname",
+  //     "bio",
+  //     "profilePictureUrl",
+  //     "interests",
+  //     "skills",
+  //     "languages",
+  //     "location",
+  //     "socialLinks",
+  //     "education",
+  //   ];
 
-    for (const field of fieldsToEnsure) {
-      if (!(field in userData)) {
-        switch (field) {
-          case "interests":
-          case "skills":
-          case "languages":
-          case "preferredCategories":
-            updates[field] = [];
-            break;
-          case "socialLinks":
-            updates[field] = {};
-            break;
-          case "education":
-            updates[field] = [];
-            break;
-          default:
-            if (
-              typeof userData[field] === "string" ||
-              userData[field] === undefined
-            ) {
-              updates[field] = "";
-            }
-        }
-      }
-    }
+  //   for (const field of fieldsToEnsure) {
+  //     if (!(field in userData)) {
+  //       switch (field) {
+  //         case "interests":
+  //         case "skills":
+  //         case "languages":
+  //         case "preferredCategories":
+  //           updates[field] = [];
+  //           break;
+  //         case "socialLinks":
+  //           updates[field] = {};
+  //           break;
+  //         case "education":
+  //           updates[field] = [];
+  //           break;
+  //         default:
+  //           if (
+  //             typeof userData[field] === "string" ||
+  //             userData[field] === undefined
+  //           ) {
+  //             updates[field] = "";
+  //           }
+  //       }
+  //     }
+  //   }
 
-    if (Object.keys(updates).length > 0) {
-      await updateUserProfile(userId, updates);
-    }
-  };
+  //   if (Object.keys(updates).length > 0) {
+  //     await updateUserProfile(userId, updates);
+  //   }
+  // };
 
   return {
     updateUserProfile,
@@ -240,9 +252,9 @@ export const Profile = () => {
     updateUserInterests,
     getUserInterests,
     updateUserBio,
-    updateUserSkills,
+    updateUserLanguages,
     setUserProfilePicture,
-    ensureUserFields,
+    // ensureUserFields,
     updateUserPreferredCategories,
     getUserPreferredCategories,
     hasUserSetPreferences,

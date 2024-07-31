@@ -6,7 +6,6 @@ import React, {
   FC,
   useCallback,
   useRef,
-  useMemo,
   ChangeEvent,
 } from "react";
 import dynamic from "next/dynamic";
@@ -27,7 +26,7 @@ import {
 import { setLoading } from "../_store/loadingSlice";
 import { useAuth } from "@/src/libs/authServices";
 import { auth } from "@/src/libs/firebase";
-import { setError } from "../_store/errorSlice";
+import { setError, clearError } from "../_store/errorSlice";
 import ContentPreview from "./ContentPreview";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import "react-markdown-editor-lite/lib/index.css";
@@ -100,6 +99,7 @@ const useLocalStorage = <T,>(
 
 const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const dispatch = useDispatch();
+  const { error } = useSelector((state: RootState) => state.error);
   const isLoading = useSelector((state: RootState) => state.loading.isLoading);
 
   const { signOutUser } = useAuth();
@@ -168,6 +168,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
           setContent(postData.content);
           setSelectedTags(postData.tags);
           setCoverImageUrl(postData.coverImage);
+          dispatch(clearError());
         } else {
           console.log("No such document");
           dispatch(setError("Post not found"));
@@ -185,7 +186,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     const fetchAuthorName = async () => {
       const userDoc = await getDoc(doc(firestore, "Users", userId));
       if (userDoc.exists()) {
-        setAuthorName(userDoc.data().name || "Anonymous");
+        setAuthorName(userDoc.data().fullname || "Anonymous");
       }
     };
     fetchAuthorName();
@@ -211,6 +212,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       const url = await getDownloadURL(snapShot.ref);
       setCoverImageUrl(url);
       setLocalContent((prev) => ({ ...prev, coverImage: url }));
+      dispatch(clearError());
     } catch (error) {
       console.error("Error uploading cover image:", error);
       dispatch(setError("Please select file"));
@@ -313,9 +315,11 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
         `${publish ? "Post published successfully" : "Draft saved"}`
       );
       dispatch(setLoading(false));
+      dispatch(clearError());
     } catch (error) {
       dispatch(setError("Error saving post"));
       console.error("Error saving post:", error);
+    } finally {
       dispatch(setLoading(false));
     }
   };
@@ -421,6 +425,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
                 <span className="block sm:inline">{successMessage}</span>
               </div>
             )}
+            {error && <p className="text-red-500 mt-2">{error}</p>}
             <button
               onClick={handleSetCoverImage}
               className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4"
@@ -531,14 +536,14 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
                 disabled={isLoading}
                 className="bg-teal-800 w-[100px] hover:bg-teal-900 text-white px-3 py-2 rounded-lg"
               >
-                Publish
+                {isLoading ? 'Publishing' : 'Publish'}
               </button>
               <button
                 onClick={() => savePost(false)}
                 disabled={isLoading}
                 className=" text-white px-2 py-1 rounded-lg hover:bg-teal-800 hover:opacity-60"
               >
-                Save draft
+                {isLoading ? 'Saving draft' : 'Save draft'}
               </button>
             </div>
             {/* <button
