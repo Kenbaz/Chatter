@@ -3,14 +3,14 @@
 import { useEffect, FC, useState, useCallback } from "react";
 import { useInView } from "react-intersection-observer";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
-import CategoryNavigation from "./CategoryNav";
+import ContentsNavigation from "./ContentsNav";
 import PostCard from "./PostCard";
-import { postFuncs, feeds, PostData } from "@/src/libs/contentServices";
+import { feeds, PostData } from "@/src/libs/contentServices";
 import SearchBar from "./SearchBar";
+import { useSearchParams } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { firestore } from "@/src/libs/firebase";
 
-interface FeedPageProps {
-  slug?: string[];
-}
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -18,23 +18,32 @@ type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
 interface Filters {
   sortBy: SortBy;
   dateRange: DateRange;
-  category: string;
 }
 
-const FeedsPage: FC<FeedPageProps> = ({ slug }) => {
+interface FeedsPageProps {
+  initialFeedType?: string;
+}
+
+const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
+  const searchParams = useSearchParams();
   const { user } = useRequireAuth();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [authorName, setAuthorName] = useState('');
   const [error, setError] = useState('');
+  const [feedType, setFeedType] = useState(initialFeedType);
   const [hasMore, setHasMore] = useState(true);
    const [filters, setFilters] = useState<Filters>({
      sortBy: "recent",
      dateRange: "all",
-     category: slug?.[1] || "",
    });
+  
+   useEffect(() => {
+     setFeedType(searchParams.get("feedType") as string | undefined);
+   }, [searchParams]);
 
-  const { getPostsByCategory } = postFuncs();
-  const { getPersonalizedFeed } = feeds();
+
+  const { getPersonalizedFeed, getFollowingFeed, getLatestFeed } = feeds();
 
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -45,50 +54,64 @@ const FeedsPage: FC<FeedPageProps> = ({ slug }) => {
     const lastPostId = posts[posts.length - 1]?.id;
 
     try {
-      if (slug?.[0] === "category" && slug[1]) {
-        fetchedPosts = await getPostsByCategory(slug[1], 10, lastPostId, {
-          sortBy: filters.sortBy,
-          dateRange: filters.dateRange
-        });
-      } else {
-        fetchedPosts = await getPersonalizedFeed(user.uid, 10, lastPostId, {
-          sortBy: filters.sortBy,
-          dateRange: filters.dateRange
-        });
-      }
+       switch (feedType) {
+         case "following":
+           fetchedPosts = await getFollowingFeed(user.uid, 10, lastPostId, {
+             sortBy: filters.sortBy,
+             dateRange: filters.dateRange,
+           });
+           break;
+         case "latest":
+           fetchedPosts = await getLatestFeed(10, lastPostId);
+           break;
+         default:
+           fetchedPosts = await getPersonalizedFeed(user.uid, 10, lastPostId, {
+             sortBy: filters.sortBy,
+             dateRange: filters.dateRange,
+           });
+       }
 
       if (fetchedPosts.length === 0) {
         setHasMore(false);
       } else {
-        setPosts((prevPosts) => [...prevPosts, ...fetchedPosts]);
+        setPosts((prevPosts) => [...prevPosts, ...fetchedPosts])
       }
     } catch (error) {
-      console.error("Error fetching posts:", error);
       setError('Posts fetch failed, please refresh');
       setHasMore(false);
     } finally {
       setLoading(false);
     }
+
+    const fetchAuthorName = async () => {
+      const userDoc = await getDoc(doc(firestore, "Users", user.uid));
+      if (userDoc.exists()) {
+        setAuthorName(userDoc.data().fullname || "Anonymous");
+      }
+    };
+    fetchAuthorName();
   }, [
     user,
-    slug,
-    getPostsByCategory,
     getPersonalizedFeed,
+    getFollowingFeed,
+    getLatestFeed,
+    feedType,
     hasMore,
     filters,
+    posts
   ]);
 
   useEffect(() => {
     setPosts([]);
     setHasMore(true);
     fetchMorePosts();
-  }, [slug, user, filters]);
+  }, [filters, feedType]);
 
   useEffect(() => {
-    if (inView) {
+    if (inView && !loading) {
       fetchMorePosts();
     }
-  }, [inView, fetchMorePosts]);
+  }, [inView, fetchMorePosts, loading]);
 
   const handleFilterChange = (filterName: keyof Filters, value: string) => {
     setFilters((prev) => {
@@ -107,22 +130,20 @@ const FeedsPage: FC<FeedPageProps> = ({ slug }) => {
       ) {
         return { ...prev, [filterName]: value };
       }
-      if (filterName === "category") {
-        return { ...prev, [filterName]: value };
-      }
       return prev;
     });
     setPosts([]); // Reset posts when filters change
     setHasMore(true);
   };
 
+
   return (
-    <div className="feed-container">
+    <div className="feed-container min-h-screen border">
       <div>
         <SearchBar />
       </div>
       <div>
-        <CategoryNavigation />
+        <ContentsNavigation />
       </div>
       <div className="feed-content">
         <div className="filter-options">
@@ -144,9 +165,8 @@ const FeedsPage: FC<FeedPageProps> = ({ slug }) => {
           </select>
         </div>
         {error && <p className="text-red-500 mt-2">{error}</p>}
-        <h1>{slug?.[0] === "category" ? `${slug[1]} Posts` : "For You"}</h1>
         {posts.map((post, index) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={`${post.id}-${index}`} post={post} />
         ))}
         <div ref={ref}>
           {loading && <div>Loading...</div>}

@@ -11,6 +11,8 @@ interface UserDetails {
     email: string | null;
     uid: string;
     createdAt: string;
+    followerCount: number;
+    followingCount: number;
 }
 
 export const useAuth = () => {
@@ -58,6 +60,8 @@ export const useAuth = () => {
             email: user.email || 'No email provided',
             uid: user.uid,
             createdAt: new Date().toISOString(),
+            followerCount: 0,
+            followingCount: 0,
         };
 
         try {

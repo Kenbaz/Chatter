@@ -1,7 +1,5 @@
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import { runTransaction, doc, getDoc, updateDoc, addDoc, deleteDoc, query, where, getDocs, increment, collection } from "firebase/firestore";
 import { firestore } from "./firebase";
-import { useDispatch } from "react-redux";
-import { setError, clearError } from "@/app/_store/errorSlice";
 
 
 export interface UserData {
@@ -12,7 +10,6 @@ export interface UserData {
   fullname?: string;
   bio?: string;
   profilePictureUrl?: string;
-  preferredCategories: string[];
   interests?: string[];
   languages?: string[];
   location?: string;
@@ -35,7 +32,6 @@ interface UserDataValidationRules {
 }
 
 export const Profile = () => {
-  const dispatch = useDispatch();
   
   const userDataValidationRules: UserDataValidationRules = {
     email: {
@@ -107,19 +103,16 @@ export const Profile = () => {
   ) => {
     const { isValid, errors } = validateUserData(data);
 
-    if (isValid) {
+    if (!isValid) {
       console.error("Validation errors:", errors);
-      dispatch(setError(`Validation failed: ${errors}`));
       return;
     }
 
     try {
       const userRef = doc(firestore, "Users", userId);
       await updateDoc(userRef, data);
-      dispatch(clearError());
     } catch (error) {
       console.error("Error updating profile:", error);
-      dispatch(setError(`Error updating profile: ${error}`));
     }
   };
 
@@ -137,9 +130,8 @@ export const Profile = () => {
   const updateUserInterests = async (userId: string, interests: string[]) => {
     try {
       await updateUserProfile(userId, { interests });
-      dispatch(clearError());
     } catch (error) {
-      dispatch(setError(`Error updating interest: ${error}`));
+      console.error(`Error updating interest: ${error}`);
     }
   };
 
@@ -154,18 +146,16 @@ export const Profile = () => {
   ) => {
     try {
       await updateUserProfile(userId, { profilePictureUrl });
-      dispatch(clearError());
     } catch (error) {
-      dispatch(setError('Profile picture upload failed'))
+      console.error('Profile picture upload failed')
     }
   };
 
   const updateUserBio = async (userId: string, bio: string) => {
     try {
       await updateUserProfile(userId, { bio });
-      dispatch(clearError());
     } catch (error) {
-      dispatch(setError('Bio update failed'))
+      console.error('Bio update failed')
     }
   };
 
@@ -173,26 +163,6 @@ export const Profile = () => {
     await updateUserProfile(userId, { languages });
   };
 
-  const updateUserPreferredCategories = async (
-    userId: string,
-    categoriesId: string[]
-  ) => {
-    const userRef = doc(firestore, "Users", userId);
-    await updateDoc(userRef, { preferredCategories: categoriesId });
-  };
-
-  const getUserPreferredCategories = async (
-    userId: string
-  ): Promise<string[]> => {
-    const userDoc = await getDoc(doc(firestore, "Users", userId));
-    return userDoc.data()?.preferredCategories || [];
-  };
-
-  const hasUserSetPreferences = async (userId: string): Promise<boolean> => {
-    const userRef = doc(firestore, "Users", userId);
-    const userDoc = await getDoc(userRef);
-    return userDoc.exists() && userDoc.data().preferredCategories?.length > 0;
-  };
 
   // const ensureUserFields = async (userId: string) => {
   //   const userData = await getUserProfile(userId);
@@ -255,8 +225,162 @@ export const Profile = () => {
     updateUserLanguages,
     setUserProfilePicture,
     // ensureUserFields,
-    updateUserPreferredCategories,
-    getUserPreferredCategories,
-    hasUserSetPreferences,
   };
 };
+
+export const ImplementFollowersFuncs = () => {
+
+  const updateFollowerCount = async (userId: string, count: number) => {
+    try {
+      const userRef = doc(firestore, "Users", userId);
+      console.log(`Updating follower count for user ${userId} by ${count}`);
+      await updateDoc(userRef, {
+        followerCount: increment(count),
+      });
+      console.log(`Successfully updated follower count for user ${userId}`);
+    } catch (error) {
+      console.error("Error updating follower count:", error);
+    }
+  };
+
+  const getFollowingUsers = async (userId: string): Promise<string[]> => {
+    const followsRef = collection(firestore, "Follows");
+    const q = query(
+      followsRef,
+      where("followerId", "==", userId)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => doc.data().followedId);
+  };
+
+  const updateFollowingCount = async (userId: string, count: number) => {
+    try {
+      const userRef = doc(firestore, "Users", userId);
+      console.log(`Updating following count for user ${userId} by ${count}`);
+      await updateDoc(userRef, {
+        followingCount: increment(count),
+      });
+      console.log(`Successfully updated following count for user ${userId}`);
+    } catch (error) {
+      console.error("Error updating following count:", error);
+    }
+  };
+
+  const followUser = async (currentUserId: string, targetUserId: string) => {
+    if (currentUserId === targetUserId) return;
+
+    const followsRef = doc(
+      firestore,
+      "Follows",
+      `${currentUserId}_${targetUserId}`
+    );
+    const currentUserRef = doc(firestore, "Users", currentUserId);
+    const targetUserRef = doc(firestore, "Users", targetUserId);
+
+    try {
+      await runTransaction(firestore, async (transaction) => {
+        const followDoc = await transaction.get(followsRef);
+        if (followDoc.exists()) {
+          throw "Already following this user";
+        }
+
+        const currentUserDoc = await transaction.get(currentUserRef);
+        const targetUserDoc = await transaction.get(targetUserRef);
+
+        if (!currentUserDoc.exists() || !targetUserDoc.exists()) {
+          throw "User document does not exist";
+        }
+
+        transaction.set(followsRef, {
+          followerId: currentUserId,
+          followedId: targetUserId,
+          createdAt: new Date().toISOString(),
+        });
+
+        transaction.update(currentUserRef, {
+          followingCount: (currentUserDoc.data().followingCount || 0) + 1,
+        });
+
+        transaction.update(targetUserRef, {
+          followerCount: (targetUserDoc.data().followerCount || 0) + 1,
+        });
+      });
+
+      console.log("Successfully followed user");
+    } catch (error) {
+      console.error("Error following user:", error);
+      throw error;
+    }
+
+  };
+
+  const unfollowUser = async (currentUserId: string, targetUserId: string) => {
+     const followsRef = doc(
+       firestore,
+       "Follows",
+       `${currentUserId}_${targetUserId}`
+     );
+     const currentUserRef = doc(firestore, "Users", currentUserId);
+     const targetUserRef = doc(firestore, "Users", targetUserId);
+
+     try {
+       await runTransaction(firestore, async (transaction) => {
+         const followDoc = await transaction.get(followsRef);
+         if (!followDoc.exists()) {
+           throw "Not following this user";
+         }
+
+         const currentUserDoc = await transaction.get(currentUserRef);
+         const targetUserDoc = await transaction.get(targetUserRef);
+
+         if (!currentUserDoc.exists() || !targetUserDoc.exists()) {
+           throw "User document does not exist";
+         }
+
+         transaction.delete(followsRef);
+
+         const currentFollowingCount =
+           currentUserDoc.data().followingCount || 0;
+         transaction.update(currentUserRef, {
+           followingCount: Math.max(currentFollowingCount - 1, 0),
+         });
+
+         const targetFollowerCount = targetUserDoc.data().followerCount || 0;
+         transaction.update(targetUserRef, {
+           followerCount: Math.max(targetFollowerCount - 1, 0),
+         });
+       });
+
+       console.log("Successfully unfollowed user");
+     } catch (error) {
+       console.error("Error unfollowing user:", error);
+       throw error;
+     }
+  };
+
+  const isFollowingUser = async (currentUserId: string, targetUserId: string): Promise<boolean> => {
+    const followsRef = collection(firestore, 'Follows');
+    const q = query(
+      followsRef,
+      where("followerId", "==", currentUserId),
+      where("followedId", "==", targetUserId)
+    );
+    const querySnapshot = await getDocs(q);
+
+    return !querySnapshot.empty;
+  }
+
+  const getFollowerCount = async (userId: string): Promise<number> => {
+    const userRef = doc(firestore, "Users", userId);
+    const userDoc = await getDoc(userRef);
+    return userDoc.data()?.followerCount || 0;
+  };
+
+  const getFollowingCount = async (userId: string): Promise<number> => {
+    const userRef = doc(firestore, "Users", userId);
+    const userDoc = await getDoc(userRef);
+    return userDoc.data()?.followingCount || 0;
+  };
+
+  return {followUser, unfollowUser, getFollowingUsers, getFollowerCount, isFollowingUser, getFollowingCount}
+}

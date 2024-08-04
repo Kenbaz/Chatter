@@ -25,7 +25,7 @@ const TagPage: FC = () => {
     });
 
     const loadMorePosts = useCallback(async () => {
-        if (!params.tagName || isLoading || !hasMore) return;
+        if (!params.tagName || !hasMore) return;
 
         dispatch(setLoading(true));
         try {
@@ -35,7 +35,15 @@ const TagPage: FC = () => {
             if (newPosts.length === 0) {
                 setHasMore(false);
             } else {
-                setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+                 setPosts((prevPosts) => {
+                   const uniqueNewPosts = newPosts.filter(
+                     (newPost) =>
+                       !prevPosts.some(
+                         (existingPost) => existingPost.id === newPost.id
+                       )
+                   );
+                   return [...prevPosts, ...uniqueNewPosts];
+                 });
             }
             dispatch(clearError());
         } catch (error) {
@@ -44,19 +52,19 @@ const TagPage: FC = () => {
         } finally {
             dispatch(setLoading(false));
         }
-    }, [params.tagName, posts, isLoading, hasMore, getPostsByTag, dispatch])
+    }, [params.tagName, posts, hasMore, getPostsByTag, dispatch])
 
     useEffect(() => {
       setPosts([]);
       setHasMore(true);
       loadMorePosts();
-    }, [params.tagName, loadMorePosts]);
+    }, [params.tagName]);
 
      useEffect(() => {
-       if (inView) {
+       if (inView && !isLoading) {
          loadMorePosts();
        }
-     }, [inView, loadMorePosts]);
+     }, [inView, loadMorePosts, isLoading]);
 
 
      return (

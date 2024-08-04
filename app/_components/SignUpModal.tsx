@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState, FC, FormEvent, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/libs/authServices";
 import { clearError, setError } from "../_store/errorSlice";
 import {
@@ -11,12 +11,11 @@ import {
 } from "../_store/modalSlice";
 import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
-import { Profile } from "@/src/libs/userServices";
 
 
 const SignUpModal: FC = () => {
   const dispatch = useDispatch();
-//   const router = useRouter();
+  const router = useRouter();
   const { showSignupModal } = useSelector((state: RootState) => state.modal);
   const { error } = useSelector((state: RootState) => state.error);
   const { isLoading } = useSelector((state: RootState) => state.loading);
@@ -27,31 +26,20 @@ const SignUpModal: FC = () => {
   const emailInput = useRef<HTMLInputElement>(null);
 
   const { registerUser, signInWithGoogle } = useAuth();
-  const { hasUserSetPreferences } = Profile();
 
   const signUp = async (e: FormEvent) => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      const user = await registerUser(email, password);
+      await registerUser(email, password);
 
-      if (user) {
-        const needsPreferences = !(await hasUserSetPreferences(user.uid));
-        setSuccessMessage("User creation successful");
+      setSuccessMessage("User creation successful");
 
-        if (needsPreferences) {
-          // router.push('/select-categories');
-          console.log("User needs to select categories");
-        } else {
-          // router.push('/feeds')
-        }
-
-        setTimeout(() => {
+      setTimeout(() => {
+          router.push('/feeds')
           close();
         }, 2000);
-      } else {
-        throw new Error("User registration failed")
-      }
+      
     } catch (error) {
       if (error instanceof Error) {
         dispatch(setError(error.message));
@@ -69,7 +57,7 @@ const SignUpModal: FC = () => {
       await signInWithGoogle();
       setSuccessMessage("Signed in with Google succesfully");
       setTimeout(() => {
-        // router.push("/feeds");
+        router.push("/feeds");
         close();
       }, 2000);
     } catch (error) {

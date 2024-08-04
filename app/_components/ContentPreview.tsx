@@ -4,6 +4,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
+import { FieldValue } from "firebase/firestore";
 
 
 interface ContentPreviewProps {
@@ -12,7 +13,7 @@ interface ContentPreviewProps {
   tags?: string[];
   coverImageUrl?: string;
   authorName?: string;
-  publishDate?: string;
+  publishDate?: string | FieldValue;
 }
 
 const ContentPreview: FC<ContentPreviewProps> = ({
@@ -68,25 +69,31 @@ const ContentPreview: FC<ContentPreviewProps> = ({
       <a className="text-blue-600 hover:underline" {...props} />
     ),
     img: ({ node, ...props }) => (
-      <div className="my-4 max-w-lg mx-auto">
+
         <Image
           src={props.src || ""}
           alt={props.alt || ""}
-          width={500}
-          height={300}
+          width={400}
+          height={200}
           style={{objectFit: 'contain'}}
         />
-      </div>
+
     ),
     
   };
+
+  const formattedDate =
+    publishDate instanceof FieldValue
+      ? new Date().toLocaleDateString()
+      : publishDate;
+  
 
   return (
     <article className="max-w-4xl mx-auto p-4">
       {title && <h1 className="text-3xl font-bold mb-4">{title}</h1>}
       {authorName && publishDate && (
         <div className="mb-4 text-sm text-gray-600">
-          By {authorName} | Published on {publishDate}
+          By {authorName} | Published on {formattedDate}
         </div>
       )}
       {coverImageUrl && (
@@ -95,6 +102,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
             src={coverImageUrl}
             alt="Cover"
             fill
+            priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectFit: "cover" }}
             className="rounded-lg"

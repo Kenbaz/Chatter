@@ -8,11 +8,16 @@ import { setError, clearError } from "../_store/errorSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../_store/store";
 import Link from "next/link";
+import { doc, getDoc } from "firebase/firestore";
+import { firestore } from "@/src/libs/firebase";
+import { useRequireAuth } from "@/src/libs/useRequireAuth";
+
 
 const SearchBar: FC = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PostData[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [authorName, setAuthorName] = useState('');
 
   const dispatch = useDispatch();
   const { error } = useSelector((state: RootState) => state.error);
@@ -21,9 +26,13 @@ const SearchBar: FC = () => {
 
   const { searchPosts } = postFuncs();
 
+  const { user } = useRequireAuth();
+
   useEffect(() => {
+    if (!user) return;
+
     const handleSearch = async () => {
-      if (query.trim() === "") {
+      if (query.trim().length < 2) {
         setResults([]);
         setShowDropdown(false);
         return;
@@ -43,8 +52,16 @@ const SearchBar: FC = () => {
       }
     };
 
+    const fetchAuthorName = async () => {
+      const userDoc = await getDoc(doc(firestore, "Users", user.uid));
+      if (userDoc.exists()) {
+        setAuthorName(userDoc.data().fullname || "Anonymous");
+      }
+    };
+
     const debounceTimer = setTimeout(handleSearch, 300);
 
+    fetchAuthorName();
     return () => clearTimeout(debounceTimer);
   }, [query]);
 
@@ -79,8 +96,8 @@ const SearchBar: FC = () => {
             results.map((post) => (
               <Link key={post.id} href={`/post/${post.id}`}>
                 <div className="search-result-item">
-                  <h3>{post.title}</h3>
-                  <p>{post.content.substring(0, 50)}...</p>
+                  <small dangerouslySetInnerHTML={{__html: post.author}}/>
+                  <h3 dangerouslySetInnerHTML={{ __html: post.title }} />
                 </div>
               </Link>
             ))

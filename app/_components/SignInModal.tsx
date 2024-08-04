@@ -32,7 +32,7 @@ const SignInModal: FC = () => {
       dispatch(setLoading(true));
       await signInUser(email, password);
       setTimeout(() => {
-        router.push("/create-post");
+        router.push("/feeds");
         close();
       }, 2000);
     } catch (error) {
@@ -47,7 +47,7 @@ const SignInModal: FC = () => {
       dispatch(setLoading(true));
       await signInWithGoogle();
       setTimeout(() => {
-        //  router.push("/feeds");
+         router.push("/feeds");
         close();
       }, 2000);
     } catch (error) {

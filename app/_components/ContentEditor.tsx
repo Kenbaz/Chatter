@@ -31,6 +31,8 @@ import ContentPreview from "./ContentPreview";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import "react-markdown-editor-lite/lib/index.css";
 import { tagFuncs } from "@/src/libs/contentServices";
+import { Comment } from "@/src/libs/contentServices";
+import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
   ssr: false,
@@ -58,10 +60,13 @@ interface PostData {
   tags: string[];
   content: string;
   authorId: string;
+  author: string,
   status: string;
   coverImage: string;
   updatedAt: string | FieldValue | Timestamp;
   createdAt?: string | FieldValue;
+  likes: string[];
+  comments: Comment[],
 }
 
 const useLocalStorage = <T,>(
@@ -100,7 +105,7 @@ const useLocalStorage = <T,>(
 const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const dispatch = useDispatch();
   const { error } = useSelector((state: RootState) => state.error);
-  const isLoading = useSelector((state: RootState) => state.loading.isLoading);
+  const {isLoading} = useSelector((state: RootState) => state.loading);
 
   const { signOutUser } = useAuth();
 
@@ -122,6 +127,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>(localContent.tags);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [content, setContent] = useState(localContent.content);
+  const [selectedTagNames, setSelectedTagNames] = useState<string[]>([]);
   const [isPreview, setIsPreview] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [authorName, setAuthorName] = useState("");
@@ -146,15 +152,23 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     fetchTags();
   }, []);
 
-  const handleTagSelect = (tagId: string) => {
+  const handleTagSelect = (tag: Tag) => {
     setSelectedTags((prev) => {
-      const newTags = prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId];
+      const newTags = prev.includes(tag.id)
+        ? prev.filter((id) => id !== tag.id)
+        : [...prev, tag.id];
       setLocalContent((prevContent) => ({ ...prevContent, tags: newTags }));
       return newTags;
     });
   };
+
+  useEffect(() => {
+    const tagNames = selectedTags
+      .map((tagId) => availableTags.find((tag) => tag.id === tagId)?.name || "")
+      .filter((name) => name !== "");
+    setSelectedTagNames(tagNames);
+  }, [selectedTags, availableTags]);
+
 
   useEffect(() => {
     const fetchPostData = async (id: string) => {
@@ -289,12 +303,15 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
 
     const postData: PostData = {
       title,
-      tags: selectedTags,
+      tags: selectedTagNames,
       content,
       authorId: userId,
+      author: authorName,
       status: publish ? "published" : "draft",
       coverImage: coverImageUrl,
       updatedAt: serverTimestamp(),
+      likes: [],
+      comments: [],
     };
 
     try {
@@ -307,6 +324,17 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       }
 
       await setDoc(postRef, postData, { merge: true });
+
+      // sync with algolia
+      const algoliaObject = {
+        objectID: postRef.id,
+        title: postData.title,
+        authorId: postData.authorId,
+        author: postData.author,
+        updatedAt: new Date().toISOString(),
+        createdAt: postData.createdAt ? new Date().toISOString() : undefined,
+      };
+      await algoliaPostsIndex.saveObject(algoliaObject);
 
       // Clear local storage after a successful save
       clearLocalStorage();
@@ -402,7 +430,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
           <ContentPreview
             title={title}
             content={content}
-            tags={selectedTags}
+            tags={selectedTagNames}
             coverImageUrl={coverImageUrl}
             authorName={authorName}
             publishDate={publishDate}
@@ -475,7 +503,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
                 {availableTags.map((tag) => (
                   <button
                     key={tag.id}
-                    onClick={() => handleTagSelect(tag.id)}
+                    onClick={() => handleTagSelect(tag)}
                     className={selectedTags.includes(tag.id) ? "selected" : ""}
                   >
                     {tag.name}
@@ -484,12 +512,12 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
               </div>
             </div>
 
-            {/* <button
+            <button
             className="cursor-pointer absolute top-4 mb-4 bg-red-500 text-white px-4 py-2 rounded"
             onClick={() => signOutUser()}
           >
             Sign out
-          </button> */}
+          </button>
             <div
               ref={editorRef}
               className={`w-full mb-4 relative rounded-lg custom-editor ${

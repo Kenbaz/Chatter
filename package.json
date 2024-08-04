@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@algolia/client-search": "^4.24.0",
     "@reduxjs/toolkit": "^2.2.6",
+    "@types/algoliasearch": "^4.0.0",
+    "algoliasearch": "^4.24.0",
     "firebase": "^10.12.3",
     "highlight.js": "^11.10.0",
     "lodash": "^4.17.21",
@@ -25,7 +28,8 @@
     "rehype-highlight": "^7.0.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
-    "turndown": "^7.2.0"
+    "turndown": "^7.2.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.15",
