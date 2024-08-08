@@ -72,6 +72,11 @@ body {
     cursor: pointer;
   }
 
+  .tag-dropdown {
+    scroll-behavior: smooth;
+    scrollbar-color: #555 transparent;
+  }
+
   /* Text editor styles starts*/
  .custom-editor {
    background-color: #262626;

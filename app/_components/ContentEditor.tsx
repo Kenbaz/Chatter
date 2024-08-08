@@ -28,7 +28,6 @@ import { useAuth } from "@/src/libs/authServices";
 import { auth } from "@/src/libs/firebase";
 import { setError, clearError } from "../_store/errorSlice";
 import ContentPreview from "./ContentPreview";
-import { FaPlus, FaMinus } from "react-icons/fa";
 import "react-markdown-editor-lite/lib/index.css";
 import { tagFuncs } from "@/src/libs/contentServices";
 import { Comment } from "@/src/libs/contentServices";
@@ -64,7 +63,7 @@ interface PostData {
   status: string;
   coverImage: string;
   updatedAt: string | FieldValue | Timestamp;
-  createdAt?: string | FieldValue;
+  createdAt?: string | Timestamp;
   likes: string[];
   comments: Comment[],
 }
@@ -134,6 +133,8 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const [publishDate, setPublishDate] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+   const [tagColors, setTagColors] = useState<Record<string, string>>({});
 
   const editorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -147,6 +148,13 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     const fetchTags = async () => {
       const allTags = await tagFuncs().getAllTags();
       setAvailableTags(allTags);
+
+      // Generate random colors for hashtags
+      const colors = allTags.reduce((acc, tag) => {
+        acc[tag.id] = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+        return acc;
+      }, {} as Record<string, string>);
+      setTagColors(colors);
     };
 
     fetchTags();
@@ -154,12 +162,22 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
 
   const handleTagSelect = (tag: Tag) => {
     setSelectedTags((prev) => {
-      const newTags = prev.includes(tag.id)
-        ? prev.filter((id) => id !== tag.id)
-        : [...prev, tag.id];
+      let newTags;
+      if (prev.includes(tag.id)) {
+        newTags = prev.filter((id) => id !== tag.id);
+      } else if (prev.length < 3) {
+        newTags = [...prev, tag.id];
+      } else {
+        // If already 3 tags selected, don't add more
+        return prev;
+      }
       setLocalContent((prevContent) => ({ ...prevContent, tags: newTags }));
       return newTags;
     });
+  };
+
+  const toggleTagDropdown = () => {
+    setIsTagDropdownOpen(!isTagDropdownOpen);
   };
 
   useEffect(() => {
@@ -309,7 +327,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       author: authorName,
       status: publish ? "published" : "draft",
       coverImage: coverImageUrl,
-      updatedAt: serverTimestamp(),
+      updatedAt: Timestamp.now(),
       likes: [],
       comments: [],
     };
@@ -320,7 +338,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
         : doc(collection(firestore, "Posts"));
 
       if (!postId) {
-        postData.createdAt = serverTimestamp();
+        postData.createdAt = Timestamp.now();
       }
 
       await setDoc(postRef, postData, { merge: true });
@@ -464,7 +482,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
             {isUploading && (
               <div className="flex items-center text-sm space-x-2 mb-4">
                 <span className="text-[14px]">Uploading</span>
-                <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
+                <div className="animate-spin rounded-[50%] h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
               </div>
             )}
             {coverImageUrl && (
@@ -494,22 +512,42 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
                 className="w-full bg-headerColor text-4xl -mb-7 font-bold text-tinWhite p-2 border-none outline-none rounded focus:ring-0 placeholder-gray-300"
               />
             </div>
-            <div
-              className="w-full p-2 mb-4 border-none rounded bg-headerColor
-            outline-none"
-            >
-              <label>Select Tags:</label>
-              <div>
-                {availableTags.map((tag) => (
-                  <button
-                    key={tag.id}
-                    onClick={() => handleTagSelect(tag)}
-                    className={selectedTags.includes(tag.id) ? "selected" : ""}
-                  >
-                    {tag.name}
-                  </button>
-                ))}
+            <div className="mb-6 relative">
+              <div 
+                onClick={toggleTagDropdown}
+                className="w-full p-2 mb-4  rounded bg-headerColor outline-none cursor-pointer text-tinWhite"
+              >
+                {selectedTags.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 ">
+                    {selectedTags.map((tagId) => {
+                      const tag = availableTags.find(t => t.id === tagId);
+                      return tag ? (
+                        <span key={tag.id} className="bg-gray-800 rounded-full px-2 py-1 text-sm">
+                          <span style={{ color: tagColors[tag.id] }}>#</span>{tag.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                ) : (
+                  "Select Tags (max 3)"
+                )}
               </div>
+              {isTagDropdownOpen && (
+                  <div className="tag-dropdown w-full mt-1 h-[250px] overflow-y-scroll border-none rounded shadow-lg">
+                    <div className="mb-4 border p-2 border-t-0 border-l-0 border-r-0 border-gray-800 text-cyan-800">Tags</div>
+                  {availableTags.map((tag) => (
+                    <div
+                      key={tag.id}
+                      onClick={() => handleTagSelect(tag)}
+                      className={`p-2 mb-2 rounded-lg hover:rounded-lg hover:text-cyan-800 hover:bg-gray-800 cursor-pointer ${
+                        selectedTags.includes(tag.id) ? "bg-gray-800 text-cyan-800" : ""
+                      } text-tinWhite`}
+                    >
+                      <span style={{ color: tagColors[tag.id] }}>#</span>{tag.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <button

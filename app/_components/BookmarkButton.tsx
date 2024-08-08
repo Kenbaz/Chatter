@@ -1,61 +1,65 @@
-'use client';
-
-import { useState, useEffect, FC } from "react";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
-import { useBookmarkFuncs } from "@/src/libs/bookmark";
+import { FC, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setError, clearError } from "@/app/_store/errorSlice";
+import { bookmarkFuncs } from "@/src/libs/contentServices"; 
 
 interface BookmarkButtonProps {
-    postId: string;
+  userId: string;
+  postId: string;
 }
 
-const BookmarkButton: FC<BookmarkButtonProps> = ({ postId }) => {
-    const { user } = useRequireAuth();
-    const [isBookmarked, setIsBookmarked] = useState(false);
-    const [bookmarkId, setBookmarkId] = useState<string | null>(null);
-    
-    const { addBookmark, removeBookmark, isBookmarked: checkIsBookmarked, getBookmarks } = useBookmarkFuncs();
+ const BookmarkButton: FC<BookmarkButtonProps> = ({
+  userId,
+  postId,
+}) => {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const dispatch = useDispatch();
+  const {
+    addBookmark,
+    removeBookmark,
+    isBookmarked: checkIsBookmarked,
+  } = bookmarkFuncs();
 
-    useEffect(() => {
-        const checkBookmarkStatus = async () => {
-            if (user) {
-                const bookmarked = await checkIsBookmarked(user.uid, postId);
-                setIsBookmarked(bookmarked);
-                if (bookmarked) {
-                    const bookmarks = await getBookmarks(user.uid);
-                    const bookmark = bookmarks.find(b => b.postId === postId);
-                    if (bookmark) {
-                        setBookmarkId(bookmark.id);
-                    }
-                }
-            }
-        };
-        checkBookmarkStatus();
-    }, [user, postId, checkIsBookmarked, getBookmarks]);
-
-    const handleBookmarkToggle = async () => {
-        if (!user) return;
-
-        try {
-            if (isBookmarked && bookmarkId) {
-                await removeBookmark(bookmarkId);
-                setBookmarkId(null);
-            } else {
-                const newBookmarkId = await addBookmark(user.uid, postId);
-                setBookmarkId(newBookmarkId);
-            }
-            setIsBookmarked(!isBookmarked);
-        } catch (error) {
-            console.error("Error toggling bookmark:", error);
-        }
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      try {
+        const bookmarked = await checkIsBookmarked(userId, postId);
+        setIsBookmarked(bookmarked);
+        dispatch(clearError());
+      } catch (error) {
+        dispatch(setError("Failed to check bookmark status"));
+        console.error("Error checking bookmark status:", error);
+      }
     };
 
-    if (!user) return null;
+    checkBookmarkStatus();
+  }, [userId, postId, checkIsBookmarked, dispatch]);
 
-    return (
-        <button onClick={handleBookmarkToggle}>
-            {isBookmarked ? "Remove Bookmark" : "Save Bookmark"}
-        </button>
-    )
+  const handleBookmarkToggle = async () => {
+    try {
+      if (isBookmarked) {
+        await removeBookmark(userId, postId);
+        setIsBookmarked(false);
+      } else {
+        await addBookmark(userId, postId);
+        setIsBookmarked(true);
+      }
+      dispatch(clearError());
+    } catch (error) {
+      dispatch(
+        setError(
+          isBookmarked ? "Failed to remove bookmark" : "Failed to add bookmark"
+        )
+      );
+      console.error("Error toggling bookmark:", error);
+    }
+  };
+
+  return (
+    <button onClick={handleBookmarkToggle}>
+      {isBookmarked ? "Remove Bookmark" : "Add Bookmark"}
+    </button>
+  );
 };
 
 export default BookmarkButton;

@@ -11,6 +11,7 @@ import {
 } from "../_store/modalSlice";
 import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
+import { tagFuncs } from "@/src/libs/contentServices";
 
 
 const SignUpModal: FC = () => {
@@ -27,12 +28,14 @@ const SignUpModal: FC = () => {
 
   const { registerUser, signInWithGoogle } = useAuth();
 
+  const { initializeDefaultTags } = tagFuncs();
+
   const signUp = async (e: FormEvent) => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
       await registerUser(email, password);
-
+      await initializeDefaultTags()
       setSuccessMessage("User creation successful");
 
       setTimeout(() => {
@@ -55,6 +58,7 @@ const SignUpModal: FC = () => {
     try {
       dispatch(setLoading(true));
       await signInWithGoogle();
+      await initializeDefaultTags()
       setSuccessMessage("Signed in with Google succesfully");
       setTimeout(() => {
         router.push("/feeds");

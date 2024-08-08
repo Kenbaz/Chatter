@@ -14,7 +14,8 @@ const TagPage: FC = () => {
     const params = useParams();
     const dispatch = useDispatch();
     const [posts, setPosts] = useState<PostData[]>([]);
-    const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const { getPostsByTag } = tagFuncs();
 
     const { error } = useSelector((state: RootState) => state.error);
@@ -50,13 +51,15 @@ const TagPage: FC = () => {
             dispatch(setError('Error fetching posts. Please try again'));
             console.error('Failed to fetch posts by tag:', error);
         } finally {
-            dispatch(setLoading(false));
+          dispatch(setLoading(false));
+          setInitialLoadComplete(true);
         }
     }, [params.tagName, posts, hasMore, getPostsByTag, dispatch])
 
     useEffect(() => {
       setPosts([]);
       setHasMore(true);
+      setInitialLoadComplete(false);
       loadMorePosts();
     }, [params.tagName]);
 
@@ -69,13 +72,17 @@ const TagPage: FC = () => {
 
      return (
        <div className="tag-page">
-         <h1>#{params.tagName}</h1>
-         {posts.length > 0 ? (
+         <h1 className="text-xl font-bold">#{params.tagName}</h1>
+         {!initialLoadComplete ? (
+           <div>Loading...</div>
+         ) : posts.length > 0 ? (
            <>
              {posts.map((post) => (
-               <PostCard key={post.id} post={post} />
+               <PostCard key={post.id} post={post} authorId={post.authorId} />
              ))}
-             <div ref={ref}>{isLoading && <div>Loading more posts...</div>}</div>
+             {hasMore && (
+               <div ref={ref}>{isLoading && <div>Loading...</div>}</div>
+             )}
            </>
          ) : (
            <p>No posts found with this tag.</p>
