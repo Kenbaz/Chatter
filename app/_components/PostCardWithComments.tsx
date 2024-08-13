@@ -1,43 +1,45 @@
-'use client';
+"use client";
 
-import { FC, useState, useEffect } from 'react';
-import { PostData, likeFuncs } from '@/src/libs/contentServices';
-import Markdown from 'react-markdown';
-import { useRequireAuth } from '@/src/libs/useRequireAuth';
-import Image from 'next/image';
-import Link from 'next/link';
-import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '@/src/libs/firebase';
-import { FaComment } from 'react-icons/fa6';
-import { analyticsFuncs } from '@/src/libs/contentServices';
-import ProfileHoverDropdown from './ProfileHoverDropdown';
-import { Profile, ImplementFollowersFuncs, UserData } from '@/src/libs/userServices';
+import { FC, useState, useEffect} from "react";
+import { PostData } from "@/src/libs/contentServices";
+import Markdown from "react-markdown";
+import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import Image from "next/image";
+import Link from "next/link";
+import { FaComment } from "react-icons/fa6";
+import { analyticsFuncs } from "@/src/libs/contentServices";
+import ProfileHoverDropdown from "./ProfileHoverDropdown";
+import {
+  Profile,
+  ImplementFollowersFuncs,
+  UserData,
+} from "@/src/libs/userServices";
+
 
 interface PostCardProps {
   post: PostData;
   authorId: string;
 }
 
-const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
+
+const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   const { user } = useRequireAuth();
   const [likeCount, setLikeCount] = useState(post.likes.length);
-   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
+  const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
   const [commentCount, setCommentCount] = useState(post.comments.length);
   const [showProfileHover, setShowProfileHover] = useState(false);
-  const [authorName, setAuthorName] = useState('');
+    const [authorName, setAuthorName] = useState("");
+    const [comments, setComments] = useState(post.comments);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldShowDropdown, setShouldShowDropdown] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [publishedDate, setPublishedDate] = useState('');
-  const [authorProfilePicture, setAuthorProfilePicture] = useState(
-    ""
-  );
+  const [authorProfilePicture, setAuthorProfilePicture] = useState("");
 
   const { getPostAnalytics } = analyticsFuncs();
   const { getUserProfile } = Profile();
-   const { followUser, unfollowUser, isFollowingUser } =
+  const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
-  
+
   const isCurrentUser = user?.uid === authorId;
 
   useEffect(() => {
@@ -81,8 +83,9 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
 
     fetchAuthorData();
     checkFollowStatus();
-    fetchPostAnalytics()
+    fetchPostAnalytics();
   }, [authorId, user]);
+    
 
   const handleMouseEnter = () => {
     setShowProfileHover(true);
@@ -97,18 +100,19 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
     setShouldShowDropdown(false);
   };
 
+    const limitedComments = comments.slice(0, 2);
 
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-[250px] p-2">
+    <div className="post-card bg-primary mb-2 p-2">
       <div
         className="profile-picture-container"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div className="flex items-center mt-2 gap-2">
-          <div className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+          <div className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 cursor-pointer overflow-hidden flex justify-center items-center">
             {isLoading ? (
               <div>...</div>
             ) : (
@@ -143,7 +147,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
         )}
       </div>
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2">
+        <h1 className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2">
           {post.title}
         </h1>
       </Link>
@@ -151,7 +155,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
             <span className="p-1 font-light rounded-lg hover:bg-gray-700">
-              <span className="text-gray-400">#</span>
+              <span className="text-teal-700">#</span>
               {tag}
             </span>
           </Link>
@@ -176,8 +180,37 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
           </span>
         )}
       </div>
+      {comments.length > 0 && (
+        <div className="comments-preview mt-4">
+          {limitedComments.map((comment) => (
+            <div
+              key={comment.id}
+              className="comment flex gap-3 mb-2 p-2 rounded"
+            >
+              <div>
+                <div className="w-[20px] h-[20px] border border-teal-700 rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+                  <Image
+                    src={
+                      comment.profilePicture ||
+                      "/images/default-profile-image-2.jpg"
+                    }
+                    alt="avatar"
+                    width={20}
+                    height={20}
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              </div>
+              <div className="bg-customGray p-[10px] rounded-lg">
+                <small className="text-customWhite">{comment.author}</small>
+                <p className="text-sm mt-2 text-white">{comment.content}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default PostCard;
+export default PostCardWithComments;

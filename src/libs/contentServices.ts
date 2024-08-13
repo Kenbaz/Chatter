@@ -35,12 +35,14 @@ interface Reply {
   content: string;
   createdAt: string;
   likes: string[]; 
+  profilePicture?: string;
 }
 
 export interface Comment {
   id: string;
   postId: string;
   authorId: string;
+  profilePicture?: string;
   author: string;
   content: string;
   createdAt: string;
@@ -334,6 +336,7 @@ export const feeds = () => {
         comments: doc.data().comments as Comment[],
         bookmarks: doc.data().bookmarks as string[],
         views: doc.data().views as number,
+        viewedBy: doc.data().viewedBy as string[],
       }));
     } catch (error) {
       console.error("Error in getPersonalizedFeed:", error);
@@ -571,7 +574,8 @@ export const commentFuncs = () => {
     postId: string,
     authorId: string,
     content: string,
-    author: string
+    author: string,
+    profilePicture?: string,
   ): Promise<Comment> => {
     try {
       const postRef = doc(firestore, "Posts", postId);
@@ -586,6 +590,11 @@ export const commentFuncs = () => {
         likes: [],
         replies: [],
       };
+
+      // Only add profilePicture if it's defined
+      if (profilePicture) {
+        newComment.profilePicture = profilePicture;
+      }
 
       await runTransaction(firestore, async (transaction) => {
         const postDoc = await transaction.get(postRef);
@@ -643,7 +652,8 @@ export const commentFuncs = () => {
     commentId: string,
     authorId: string,
     content: string,
-    author: string
+    author: string,
+    profilePicture?: string,
   ): Promise<Reply> => {
     try {
       const replyData: Reply = {
@@ -655,6 +665,12 @@ export const commentFuncs = () => {
         createdAt: new Date().toISOString(),
         likes: [],
       };
+
+      // Only add profilePicture if it's defined
+      if (profilePicture) {
+        replyData.profilePicture = profilePicture;
+      };
+
       const postRef = doc(firestore, "Posts", postId);
 
       await runTransaction(firestore, async (transaction) => {
@@ -664,16 +680,16 @@ export const commentFuncs = () => {
         }
 
         const post = postDoc.data() as PostData;
-        
-         const updatedComments = post.comments.map((comment) => {
-           if (comment.id === commentId) {
-             return {
-               ...comment,
-               replies: [...(comment.replies || []), replyData],
-             };
-           }
-           return comment;
-         });
+
+        const updatedComments = post.comments.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              replies: [...(comment.replies || []), replyData],
+            };
+          }
+          return comment;
+        });
 
         transaction.update(postRef, { comments: updatedComments });
       });

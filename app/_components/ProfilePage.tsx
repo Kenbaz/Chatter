@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import PostCard from "./PostCard";
+import { ImplementFollowersFuncs } from "@/src/libs/userServices";
 
 interface UserProfileData {
   username: string;
@@ -19,6 +20,7 @@ interface UserProfileData {
   bio: string;
   profilePictureUrl: string;
   interests: string[];
+  work: string;
   languages: string[];
   location: string;
   website_url: string;
@@ -41,13 +43,30 @@ const ProfilePage: FC = () => {
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [userPosts, setUserPosts] = useState<PostData[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [lastPostId, setLastPostId] = useState<string | null>(null);
   const { getPostsByAuthor } = postFuncs();
+  const { followUser, unfollowUser, isFollowingUser } =
+    ImplementFollowersFuncs();
+
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      if (user && params.userId) {
+        const following = await isFollowingUser(
+          user.uid,
+          params.userId as string
+        );
+        setIsFollowing(following);
+        setIsOwnProfile(user.uid === params.userId);
+      }
+    };
+    checkFollowStatus();
+  }, [user, params.userId]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (params.userId) {
-       
         try {
           dispatch(setLoading(true));
           const userProfileData = await getUserProfile(params.userId as string);
@@ -73,6 +92,22 @@ const ProfilePage: FC = () => {
 
     fetchUserProfile();
   }, [params.userId]);
+
+  const handleFollow = async () => {
+    if (!user || !params.userId) return;
+    try {
+      if (user.uid === params.userId) return;
+
+      if (isFollowing) {
+        await unfollowUser(user.uid, params.userId as string);
+      } else {
+        await followUser(user.uid, params.userId as string);
+      }
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.error("Error following/unfollowing user:", error);
+    }
+  };
 
   const loadMorePosts = async () => {
     if (!hasMorePosts || !params.userId) return;
@@ -104,14 +139,23 @@ const ProfilePage: FC = () => {
   return (
     <div className="user-profile-page">
       {error && <p className="text-red-600">{error}</p>}
+
       <div className="profile-header">
+        {!isOwnProfile && (
+          <button onClick={handleFollow} className="follow-btn">
+            {isFollowing ? "Unfollow" : "Follow"}
+          </button>
+        )}
         <div className="w-[120px] h-[120px] rounded-[50%] overflow-hidden flex justify-center items-center">
           <Image
-            src={profileData.profilePictureUrl || "/images/default-profile-image-2.jpg"}
+            src={
+              profileData.profilePictureUrl ||
+              "/images/default-profile-image-2.jpg"
+            }
             alt={`${profileData.username}'s profile picture`}
             width={120}
             height={120}
-            style={{objectFit: 'cover'}}
+            style={{ objectFit: "cover" }}
           />
         </div>
 
@@ -119,6 +163,7 @@ const ProfilePage: FC = () => {
         <small>@{profileData.username}</small>
         <p>{profileData.bio}</p>
         <p>{profileData.location}</p>
+        <p>{profileData.work}</p>
         {isCurrentUser && (
           <Link href="/profile/edit">
             <button>Edit Profile</button>
@@ -173,13 +218,19 @@ const ProfilePage: FC = () => {
       <div className="social-links">
         <h3>Connect with {profileData.fullname}</h3>
         {profileData.socialLinks && profileData.socialLinks.twitter && (
-          <Link href={profileData.socialLinks.twitter} target="_blank">Twitter</Link>
+          <Link href={profileData.socialLinks.twitter} target="_blank">
+            Twitter
+          </Link>
         )}
         {profileData.socialLinks && profileData.socialLinks.linkedIn && (
-          <Link href={profileData.socialLinks.linkedIn} target="_blank">LinkedIn</Link>
+          <Link href={profileData.socialLinks.linkedIn} target="_blank">
+            LinkedIn
+          </Link>
         )}
         {profileData.socialLinks && profileData.socialLinks.github && (
-          <Link href={profileData.socialLinks.github} target="_blank">GitHub</Link>
+          <Link href={profileData.socialLinks.github} target="_blank">
+            GitHub
+          </Link>
         )}
       </div>
     </div>

@@ -22,7 +22,7 @@ const ContentsNavigation: FC = () => {
         <li>
           <Link
             href={`${pathname}?${createQueryString("feedType", "forYou")}`}
-            className={feedType === "forYou" ? "font-bold" : ""}
+            className={feedType === "forYou" ? "font-bold text-white" : "font-light"}
           >
             For You
           </Link>
@@ -30,7 +30,7 @@ const ContentsNavigation: FC = () => {
         <li>
           <Link
             href={`${pathname}?${createQueryString("feedType", "following")}`}
-            className={feedType === "following" ? "font-bold" : ""}
+            className={feedType === "following" ? "font-bold text-white" : "font-light"}
           >
             Following
           </Link>
@@ -38,7 +38,7 @@ const ContentsNavigation: FC = () => {
         <li>
           <Link
             href={`${pathname}?${createQueryString("feedType", "latest")}`}
-            className={feedType === "latest" ? "font-bold" : ""}
+            className={feedType === "latest" ? "font-bold text-white" : "font-light"}
           >
             Latest
           </Link>

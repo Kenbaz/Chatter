@@ -15,9 +15,9 @@ const LandingPage: FC = () => {
   const { showSigninModal, showSignupModal, showSignupOptionsModal } = useSelector((state: RootState) => state.modal);
 
    return (
-     <div className={`min-h-screen`}>
-       <header className="border border-secondary rounded-full w-2/3 m-auto h-16 p-2 flex gap-3 items-center justify-between">
-         <h1>Chatter</h1>
+     <div className={`h-screen`}>
+       <header className=" dark:bg-customGray1 rounded-full w-1/2 mt-5 m-auto h-16 p-2 flex gap-3 items-center justify-between">
+         <h1><span className="text-gold2 font-extrabold text-2xl">C</span>hatter</h1>
          <nav className="mr-10 flex gap-4 w-2/5 justify-between items-center h-8 p-2">
            <button onClick={() => dispatch(openSignupOptionsModal())}>
              Get started

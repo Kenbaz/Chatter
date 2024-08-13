@@ -12,12 +12,11 @@ import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/src/libs/firebase";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 
-
 const SearchBar: FC = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PostData[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [authorName, setAuthorName] = useState('');
+  const [authorName, setAuthorName] = useState("");
 
   const dispatch = useDispatch();
   const { error } = useSelector((state: RootState) => state.error);
@@ -80,7 +79,7 @@ const SearchBar: FC = () => {
   }, []);
 
   return (
-    <div className="search-bar-container border outline-none relative w-full rounded-lg border-teal-600 z-50">
+    <div className="search-bar-container border relative w-full rounded-lg border-secondary z-50">
       {error && <p className="text-red-600">{error}</p>}
       <div className="relative">
         <input
@@ -95,13 +94,16 @@ const SearchBar: FC = () => {
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="search-results-dropdown w-full border border-t-0 rounded-t-sm border-secondary rounded-b-lg dark:bg-customGray1 p-1"
+          className="search-results-dropdown absolute w-full border border-t-0 rounded-t-sm border-secondary rounded-b-lg dark:bg-customGray1 p-1"
         >
           {results.length > 0 ? (
             results.map((post) => (
               <Link key={post.id} href={`/post/${post.id}`}>
                 <div className="search-result-item mb-2 dark:hover:bg-lightGray2 p-1">
-                  <small className="font-bold text-gray-400" dangerouslySetInnerHTML={{ __html: post.author }} />
+                  <small
+                    className="font-bold text-gray-400"
+                    dangerouslySetInnerHTML={{ __html: post.author }}
+                  />
                   <h3 dangerouslySetInnerHTML={{ __html: post.title }} />
                 </div>
               </Link>

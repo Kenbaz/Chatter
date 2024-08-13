@@ -12,6 +12,7 @@ export interface UserData {
   profilePictureUrl?: string;
   interests?: string[];
   languages?: string[];
+  work?: string;
   location?: string;
   website_url?: string;
   socialLinks?: {
@@ -64,6 +65,7 @@ export const Profile = () => {
     profilePictureUrl: { type: "string", pattern: /^https?:\/\/.*$/ },
     interests: { type: "array", maxLength: 20 },
     languages: { type: "array", maxLength: 10 },
+    work: { type: 'string', maxLength: 400},
     location: { type: "string", maxLength: 100 },
     education: { type: "string", maxLength: 150 },
     socialLinks: {
@@ -104,6 +106,7 @@ export const Profile = () => {
     fullname: "Please enter your full name (up to 100 characters)",
     bio: "Your bio can be up to 500 characters long",
     location: "Please enter your location (city, country, etc.)",
+    work: "This field can only take 400 characters",
 
     // Profile Picture
     profilePictureUrl: "Please provide a valid URL for your profile picture",
@@ -268,6 +271,22 @@ export const Profile = () => {
     return userData?.interests || [];
   };
 
+  const getUserProfilePicture = async (
+    userId: string
+  ): Promise<string | undefined> => {
+    try {
+      const userRef = doc(firestore, "Users", userId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        return userDoc.data().profilePictureUrl;
+      }
+      return undefined;
+    } catch (error) {
+      console.error("Error fetching user profile picture:", error);
+      return undefined;
+    }
+  };
+
   const setUserProfilePicture = async (
     userId: string,
     profilePictureUrl: string
@@ -284,6 +303,14 @@ export const Profile = () => {
       await updateUserProfile(userId, { bio });
     } catch (error) {
       console.error('Bio update failed')
+    }
+  };
+
+  const updateUserWork = async (userId: string, work: string) => {
+    try {
+      await updateUserProfile(userId, { work });
+    } catch (error) {
+      console.error('Failed to update work')
     }
   };
 
@@ -305,59 +332,6 @@ export const Profile = () => {
     }
   };
 
-
-  // const ensureUserFields = async (userId: string) => {
-  //   const userData = await getUserProfile(userId);
-  //   const updates: Partial<Omit<UserData, "email" | "uid" | "createdAt">> = {};
-
-  //   // List of fields to ensure exists
-  //   const fieldsToEnsure: (keyof Omit<
-  //     UserData,
-  //     "email" | "uid" | "createdAt"
-  //   >)[] = [
-  //     "username",
-  //     "fullname",
-  //     "bio",
-  //     "profilePictureUrl",
-  //     "interests",
-  //     "skills",
-  //     "languages",
-  //     "location",
-  //     "socialLinks",
-  //     "education",
-  //   ];
-
-  //   for (const field of fieldsToEnsure) {
-  //     if (!(field in userData)) {
-  //       switch (field) {
-  //         case "interests":
-  //         case "skills":
-  //         case "languages":
-  //         case "preferredCategories":
-  //           updates[field] = [];
-  //           break;
-  //         case "socialLinks":
-  //           updates[field] = {};
-  //           break;
-  //         case "education":
-  //           updates[field] = [];
-  //           break;
-  //         default:
-  //           if (
-  //             typeof userData[field] === "string" ||
-  //             userData[field] === undefined
-  //           ) {
-  //             updates[field] = "";
-  //           }
-  //       }
-  //     }
-  //   }
-
-  //   if (Object.keys(updates).length > 0) {
-  //     await updateUserProfile(userId, updates);
-  //   }
-  // };
-
   return {
     updateUserProfile,
     getUserProfile,
@@ -366,11 +340,12 @@ export const Profile = () => {
     getUserInterests,
     updateUserBio,
     validateUserData,
+    getUserProfilePicture,
     validateField,
     userDataValidationRules,
     updateUserLanguages,
     setUserProfilePicture,
-    // ensureUserFields,
+    updateUserWork,
   };
 };
 

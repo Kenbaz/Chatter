@@ -14,10 +14,12 @@
 
 html,
 body {
+  @apply dark:text-tinWhite dark:bg-customBlack;
   background-color: var(--background);
   color: var(--text-color);
   transition: all 0.3s ease;
   overflow: hidden;
+  height: 100vh;
 }
 
 @layer utilities {
@@ -38,6 +40,7 @@ body {
     height: 100%;
     backdrop-filter: blur(1px);
   }
+
 
   .content-ref::-webkit-scrollbar {
     background-color: transparent;
@@ -75,6 +78,20 @@ body {
   .tag-dropdown {
     scroll-behavior: smooth;
     scrollbar-color: #555 transparent;
+  }
+
+  .feed-container::-webkit-scrollbar {
+    background-color: #262626;
+  }
+
+  .interest-dropdown::-webkit-scrollbar {
+    background-color: #262626;
+    width: 10px;
+  }
+
+  .interest-dropdown::-webkit-scrollbar-thumb {
+    background-color: #666;
+    border-radius: 10px;
   }
 
   /* Text editor styles starts*/
@@ -176,27 +193,54 @@ body {
    margin-bottom: 20px;
  }
 
- .post-tags {
-   display: flex;
-   flex-wrap: wrap;
-   gap: 10px;
+ .feed-container {
+   position: relative;
+   /* overflow-x: hidden; */
  }
 
- .tag {
-   background-color: #f0f0f0;
-   padding: 5px 10px;
-   border-radius: 5px;
+ .feed-content {
+   transition: transform 0.3s ease-in-out;
+   transform: translateY(0);
  }
 
- .back-btn {
-   margin-bottom: 20px;
-   padding: 10px 15px;
-   background-color: #f0f0f0;
-   border: none;
-   border-radius: 5px;
-   cursor: pointer;
+ .feed-content.search-visible {
+   transform: translateY(5px);
  }
+    
 
  /*FullPostView styles end*/
+
+ /* Like animaion*/
+
+ @keyframes likeAnimation {
+   0% {
+     transform: scale(0);
+     opacity: 1;
+   }
+
+   100% {
+     transform: scale(1.5);
+     opacity: 0;
+   }
+ }
+
+ .like-button {
+   overflow: hidden;
+ }
+
+ .like-animation {
+   pointer-events: none;
+   background: radial-gradient(circle, rgba(255, 0, 0, 0.8) 0%, rgba(255, 0, 0, 0) 70%);
+   border-radius: 50%;
+   transform: scale(0);
+   opacity: 0;
+ }
+
+ .like-button.animating .like-animation {
+   animation: likeAnimation 0.5s ease-out;
+ }
+
+ /* Like animation end*/
+ 
 
 }

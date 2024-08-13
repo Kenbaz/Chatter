@@ -11,8 +11,6 @@ import {
 } from "@/src/libs/contentServices";
 import { ImplementFollowersFuncs, Profile } from "@/src/libs/userServices";
 import { postFuncs } from "@/src/libs/contentServices";
-import { getDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
-import { firestore } from "@/src/libs/firebase";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,6 +18,8 @@ import ContentPreview from "./ContentPreview";
 import ConfirmModal from "./ConfirmModal";
 import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 import { analyticsFuncs } from "@/src/libs/contentServices";
+import BookmarkButton from "./BookmarkButton";
+import { FaHeartCircleMinus, FaHeartCirclePlus, FaComment } from "react-icons/fa6";
 
 const FullPostView: FC = () => {
   const { user } = useRequireAuth();
@@ -54,7 +54,7 @@ const FullPostView: FC = () => {
   const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
 
-  const { fetchAuthorName } = Profile();
+  const { fetchAuthorName, getUserProfilePicture } = Profile();
   const { trackView } = analyticsFuncs();
 
   useEffect(() => {
@@ -91,6 +91,10 @@ const FullPostView: FC = () => {
   const handleLike = async () => {
     if (!user || !post) return;
     try {
+      const button = document.querySelector('.like-button');
+      button?.classList.add('animating');
+      setTimeout(() => button?.classList.remove('animating'), 500)
+
       if (isLiked) {
         await unlikePost(user.uid, post.id);
       } else {
@@ -156,11 +160,13 @@ const FullPostView: FC = () => {
     if (!user || !post) return;
     try {
       const currentUserName = await fetchAuthorName(user.uid);
+       const profilePicture = await getUserProfilePicture(user.uid);
       const newCommentObj = await addComment(
         post.id,
         user.uid,
         newComment,
-        currentUserName
+        currentUserName,
+        profilePicture
       );
       setComments((prevComments) => [...prevComments, newCommentObj]);
       setNewComment("");
@@ -203,12 +209,14 @@ const FullPostView: FC = () => {
     if (!user || !post) return;
     try {
       const currentUserName = await fetchAuthorName(user.uid);
+      const profilePicture = await getUserProfilePicture(user.uid);
       const newReplyObj = await addReply(
         post.id,
         commentId,
         user.uid,
         newReply,
-        currentUserName
+        currentUserName,
+        profilePicture,
       );
       setComments(
         comments.map((comment) =>
@@ -267,26 +275,32 @@ const FullPostView: FC = () => {
   if (!post) return <div>Post not found</div>;
 
   return (
-    <div className="full-post-container h-screen overflow-y-scroll">
+    <div className="full-post-container relative h-screen">
       <Link href="/feeds">
-        <button className="back-btn">Back to feed</button>
+        <button className="back-btn hidden lg:block">Back to feed</button>
       </Link>
-      {user && post && user.uid === post.authorId && (
-        <>
-          <button onClick={openDeleteModal} className="delete-post-btn">
-            Delete post
-          </button>
-          <button
-            onClick={() => handleViewAnalytics(post.id)}
-            className="view-analytics-btn"
-          >
-            View Analytics
-          </button>
-        </>
-      )}
+      <div className="absolute p-2 z-50 top-[200px] right-2 font-light text-[15px] mt-1 flex gap-4">
+        {user && post && user.uid === post.authorId && (
+          <>
+            <button
+              onClick={openDeleteModal}
+              className="delete-post-btn text-white hover:text-red-600"
+            >
+              Delete post
+            </button>
+            <button
+              onClick={() => handleViewAnalytics(post.id)}
+              className="view-analytics-btn text-white hover:text-gold4"
+            >
+              Stats
+            </button>
+          </>
+        )}
+      </div>
 
       <ContentPreview
         title={post.title}
+        authorId={post.authorId}
         content={post.content}
         tags={post.tags}
         coverImageUrl={post.coverImage}
@@ -301,70 +315,167 @@ const FullPostView: FC = () => {
          ))}
        </div> */}
       <div className="post-actions">
-        <button onClick={handleLike}>
-          {isLiked ? "Unlike" : "Like"} ({post.likes.length})
-        </button>
-        {user && post && !isOwnPost && (
-          <button onClick={handleFollow} className="follow-btn">
-            {isFollowing ? "Unfollow Author" : "Follow Author"}
+        <div className="flex items-center w-full p-4 bg-headerColor justify-around fixed z-50 bottom-0">
+          <button
+            className="like-button relative flex items-center gap-2"
+            onClick={handleLike}
+          >
+            <span className="text-2xl">
+              {isLiked ? (
+                <FaHeartCircleMinus className="text-red-500 transition-all duration-200 ease-in-out" />
+              ) : (
+                <FaHeartCirclePlus />
+              )}
+            </span>
+            <span className="font-light">{post.likes.length}</span>
+            <span className="like-animation absolute inset-0"></span>
           </button>
-        )}
-      </div>
-      <div className="comments-section">
-        <h3>Comments</h3>
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-        />
-        <button onClick={handleAddComment}>Post Comment</button>
-        {comments.map((comment) => (
-          <div key={comment.id} className="comment">
-            <p>{comment.content}</p>
-            <small>
-              By: {comment.author} on{" "}
-              {new Date(comment.createdAt).toLocaleDateString()}
-            </small>
-            <button
-              onClick={() =>
-                handleLikeComment(comment.id, comment.likes.includes(user?.uid))
-              }
-            >
-              {comment.likes.includes(user?.uid) ? "Unlike" : "Like"} (
-              {comment.likes.length})
-            </button>
-            <button onClick={() => setReplyingTo(comment.id)}>Reply</button>
-            {replyingTo === comment.id && (
-              <div>
-                <textarea
-                  value={newReply}
-                  onChange={(e) => setNewReply(e.target.value)}
-                  placeholder="Add a reply..."
-                />
-                <button onClick={() => handleAddReply(comment.id)}>
-                  Post Reply
-                </button>
-              </div>
-            )}
-            {comment.replies.map((reply) => (
-              <div key={reply.id} className="reply">
-                <p>{reply.content}</p>
-                <small>
-                  By: {reply.author} on{" "}
-                  {new Date(reply.createdAt).toLocaleDateString()}
-                </small>
-                <button
-                  onClick={() =>
-                    handleLikeComment(reply.id, reply.likes.includes(user?.uid))
-                  }
-                >
-                  {reply.likes.includes(user?.uid) ? "Unlike" : "Like"} (
-                  {reply.likes.length})
-                </button>
-              </div>
-            ))}
+          <div className="flex items-center gap-2">
+            <FaComment className="text-xl" />
+            <span className="font-light">{post.comments.length}</span>
           </div>
-        ))}
+          <div className="flex items-center gap-2">
+            <BookmarkButton postId={post.id} userId={user.uid} />
+            <span className="font-light">{post.bookmarks.length}</span>
+          </div>
+        </div>
+        <div className="absolute z-50 top-[220px] text-[15px] border-teal-700 text-teal-400 right-2 border p-1 rounded-lg">
+          {user && post && !isOwnPost && (
+            <button onClick={handleFollow} className="follow-btn">
+              {isFollowing ? "Unfollow" : "Follow"}
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="comments-section p-2 mt-2 bg-primary">
+        <h3 className="text-white mb-4 font-semibold">Comments</h3>
+        <div className="flex flex-col gap-2 mb-10">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="border border-teal-700 rounded-md p-2"
+          />
+          <button
+            className="w-20 p-1 rounded-lg bg-teal-800"
+            onClick={handleAddComment}
+          >
+            Submit
+          </button>
+        </div>
+        <div className="">
+          {comments.map((comment) => (
+            <div key={comment.id} className="comment">
+              <div className="flex mb-3">
+                <div>
+                  <div className="w-[20px] h-[20px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+                    <Image
+                      src={
+                        comment.profilePicture ||
+                        "/images/default-profile-image-2.jpg"
+                      }
+                      alt="avatar"
+                      width={20}
+                      height={20}
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                  <div className="h-10 border-dashed border w-1 ml-2 "></div>
+                </div>
+                <div>
+                  <div className="flex flex-col p-[10px] border border-customGray rounded-lg mb-2 -mt-4">
+                    <div className="">
+                      <small className="text-gray-400">
+                        {comment.author} on{" "}
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                      </small>
+                      <p className="mt-3 w-full tracking-normal text-[15px]">
+                        {comment.content}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    className="mb-4"
+                    onClick={() =>
+                      handleLikeComment(
+                        comment.id,
+                        comment.likes.includes(user?.uid)
+                      )
+                    }
+                  >
+                    {comment.likes.includes(user?.uid) ? "Unlike" : "Like"} (
+                    {comment.likes.length})
+                  </button>
+                  <button onClick={() => setReplyingTo(comment.id)}>
+                    Reply
+                  </button>
+                </div>
+              </div>
+
+              {replyingTo === comment.id && (
+                <div className="flex flex-col gap-2">
+                  <textarea
+                    value={newReply}
+                    onChange={(e) => setNewReply(e.target.value)}
+                    placeholder="Reply..."
+                    className="border border-teal-700 rounded-md p-2"
+                  />
+                  <button
+                    className="w-20 p-1 rounded-lg bg-teal-800"
+                    onClick={() => handleAddReply(comment.id)}
+                  >
+                    Reply
+                  </button>
+                </div>
+              )}
+              {comment.replies.map((reply) => (
+                <div key={reply.id} className="reply">
+                  <div className="flex mb-3 ml-5">
+                    <div>
+                      <div className="w-[20px] h-[20px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+                        <Image
+                          src={
+                            reply.profilePicture ||
+                            "/images/default-profile-image-2.jpg"
+                          }
+                          alt="avatar"
+                          width={20}
+                          height={20}
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <div>
+                        <div className="flex flex-col p-[10px] border border-customGray rounded-lg mb-2 -mt-4">
+                          <small>
+                            {reply.author} on{" "}
+                            {new Date(reply.createdAt).toLocaleDateString()}
+                          </small>
+                          <p className="mt-3 w-full tracking-normal text-[15px]">
+                            {reply.content}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        className="mb-5"
+                        onClick={() =>
+                          handleLikeComment(
+                            reply.id,
+                            reply.likes.includes(user?.uid)
+                          )
+                        }
+                      >
+                        {reply.likes.includes(user?.uid) ? "Unlike" : "Like"} (
+                        {reply.likes.length})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       <ConfirmModal
         isOpen={isDeleteModalOpen}

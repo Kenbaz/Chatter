@@ -550,12 +550,6 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
               )}
             </div>
 
-            <button
-            className="cursor-pointer absolute top-4 mb-4 bg-red-500 text-white px-4 py-2 rounded"
-            onClick={() => signOutUser()}
-          >
-            Sign out
-          </button>
             <div
               ref={editorRef}
               className={`w-full mb-4 relative rounded-lg custom-editor ${

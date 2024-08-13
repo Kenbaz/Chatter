@@ -16,11 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+      <div className={`${inter.className} overflow-y-scroll h-screen`}>
         <header className="h-14 bg-headerColor"></header>
         <Providers>{children}</Providers>
-      </body>
-    </html>
+      </div>
   );
 }

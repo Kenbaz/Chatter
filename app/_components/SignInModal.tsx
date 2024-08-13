@@ -16,6 +16,8 @@ import { RootState } from "../_store/store";
 const SignInModal: FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isEmailSignupLoading, setIsEmailSignupLoading] = useState(false);
+  const [isGoogleSignupLoading, setIsGoogleSignupLoading] = useState(false);
   const emailInput = useRef<HTMLInputElement>(null);
 
   const { signInUser, signInWithGoogle } = useAuth();
@@ -29,7 +31,7 @@ const SignInModal: FC = () => {
   const signUserIn = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      dispatch(setLoading(true));
+      setIsEmailSignupLoading(true);
       await signInUser(email, password);
       setTimeout(() => {
         router.push("/feeds");
@@ -38,13 +40,13 @@ const SignInModal: FC = () => {
     } catch (error) {
       //
     } finally {
-      dispatch(setLoading(false));
+      setIsEmailSignupLoading(false);
     }
   };
 
   const signInWithGoogleAccount = async () => {
     try {
-      dispatch(setLoading(true));
+      setIsGoogleSignupLoading(true);
       await signInWithGoogle();
       setTimeout(() => {
          router.push("/feeds");
@@ -53,7 +55,7 @@ const SignInModal: FC = () => {
     } catch (error) {
       //
     } finally {
-      dispatch(setLoading(false));
+      setIsGoogleSignupLoading(false);
     }
   };
 
@@ -86,7 +88,7 @@ const SignInModal: FC = () => {
   if (!showSigninModal) return null;
 
   return (
-    <div className="modal" onClick={close}>
+    <div className="modal " onClick={close}>
       <div
         className="modal-content text-white"
         role="dialog"
@@ -105,7 +107,7 @@ const SignInModal: FC = () => {
               <label htmlFor="email"></label>
               <input
                 ref={emailInput}
-                className="h-8 rounded-full p-2 text-gray-900 outline-none text-base placeholder:text-sm"
+                className="h-8 rounded-full p-2 text-gray-900 dark:text-tinWhite outline-none text-base placeholder:text-sm"
                 type="email"
                 id="email"
                 value={email}
@@ -118,7 +120,7 @@ const SignInModal: FC = () => {
             <div className="flex flex-col">
               <label htmlFor="password"></label>
               <input
-                className="h-8 rounded-full p-2 text-gray-900 outline-none text-base placeholder:text-sm"
+                className="h-8 rounded-full p-2 dark:text-tinWhite text-gray-900 outline-none text-base placeholder:text-sm"
                 type="password"
                 id="password"
                 value={password}
@@ -133,7 +135,7 @@ const SignInModal: FC = () => {
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isEmailSignupLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
           {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -142,7 +144,7 @@ const SignInModal: FC = () => {
             className="mt-2 hover:underline"
             disabled={isLoading}
           >
-            {isLoading ? "Signing in..." : "Sign in with Google"}
+            {isGoogleSignupLoading ? "Signing in..." : "Sign in with Google"}
           </button>
           <p className="mt-4 text-gray-400">
             Don&apos;t have an account?{" "}

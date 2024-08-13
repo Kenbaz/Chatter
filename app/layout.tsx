@@ -4,6 +4,7 @@ import "./globals.css";
 import "highlight.js/styles/github.css";
 import { Providers } from "./_components/Providers";
 import ClientInitWrapper from "./_components/ClientInitWrapper";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,10 +20,12 @@ export default function RootLayout({
 }>) {
  
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className}`}>
         <Providers>
-          <ClientInitWrapper>{children}</ClientInitWrapper>
+          <ThemeProvider attribute="class">
+            <ClientInitWrapper>{children}</ClientInitWrapper>
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setError, clearError } from "@/app/_store/errorSlice";
 import { bookmarkFuncs } from "@/src/libs/contentServices"; 
+import { FaBookmark } from "react-icons/fa6";
 
 interface BookmarkButtonProps {
   userId: string;
@@ -57,7 +58,7 @@ interface BookmarkButtonProps {
 
   return (
     <button onClick={handleBookmarkToggle}>
-      {isBookmarked ? "Remove Bookmark" : "Add Bookmark"}
+      {isBookmarked ? <FaBookmark className="text-blue-500 text-xl"/> : <FaBookmark className="text-xl"/>}
     </button>
   );
 };

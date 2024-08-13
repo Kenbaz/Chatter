@@ -23,6 +23,8 @@ const SignUpModal: FC = () => {
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isEmailSignupLoading, setIsEmailSignupLoading] = useState(false);
+  const [isGoogleSignupLoading, setIsGoogleSignupLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
   const emailInput = useRef<HTMLInputElement>(null);
 
@@ -33,7 +35,7 @@ const SignUpModal: FC = () => {
   const signUp = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      dispatch(setLoading(true));
+      setIsEmailSignupLoading(true);
       await registerUser(email, password);
       await initializeDefaultTags()
       setSuccessMessage("User creation successful");
@@ -50,13 +52,13 @@ const SignUpModal: FC = () => {
         dispatch(setError("An unknown error occurred"));
       }
     } finally {
-      dispatch(setLoading(false));
+      setIsEmailSignupLoading(false);
     }
   };
 
   const signInWithGoogleAccount = async () => {
     try {
-      dispatch(setLoading(true));
+      setIsGoogleSignupLoading(true);
       await signInWithGoogle();
       await initializeDefaultTags()
       setSuccessMessage("Signed in with Google succesfully");
@@ -67,7 +69,7 @@ const SignUpModal: FC = () => {
     } catch (error) {
       //
     } finally {
-      dispatch(setLoading(false));
+      setIsGoogleSignupLoading(false);
     }
   };
 
@@ -147,7 +149,7 @@ const SignUpModal: FC = () => {
                 className="ml-[118px] mt-5 hover:underline text-lg"
                 type="submit"
               >
-                {isLoading ? "Signing up..." : "Sign up"}
+                {isEmailSignupLoading ? "Signing up..." : "Sign up"}
               </button>
             </form>
           )}
@@ -158,13 +160,17 @@ const SignUpModal: FC = () => {
                 onClick={signInWithGoogleAccount}
                 className="mt-2 hover:underline"
               >
-                {isLoading ? "Signing in..." : "Sign up with Google"}
+                {isGoogleSignupLoading
+                  ? "Signing in..."
+                  : "Sign up with Google"}
               </button>
               <p className="mt-4 text-gray-400">
-                Already have an account? <a className="hover:underline cursor-pointer"
+                Already have an account?{" "}
+                <a
+                  className="hover:underline cursor-pointer"
                   onClick={switchToSignIn}
                 >
-                   Sign in
+                  Sign in
                 </a>
               </p>
               <p className="mt-4 text-sm">

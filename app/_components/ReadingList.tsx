@@ -33,7 +33,7 @@ const ReadingListPage: FC = () => {
     <div>
       <h1>Your Reading List</h1>
       {bookmarkedPosts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard key={post.id} post={post} authorId={post.authorId} />
       ))}
       {bookmarkedPosts.length === 0 && <p>Your reading list is empty.</p>}
     </div>
