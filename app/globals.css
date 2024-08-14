@@ -240,7 +240,37 @@ body {
    animation: likeAnimation 0.5s ease-out;
  }
 
+ @keyframes circleReflection {
+   0% {
+     transform: scale(0);
+     opacity: 0.5;
+   }
+
+   100% {
+     transform: scale(1.5);
+     opacity: 0;
+   }
+ }
+ 
+ .liked-comment::after, .liked-reply::after {
+   content: '';
+   position: absolute;
+   top: 50%;
+   left: 10px;
+   /* Adjust this value to center the effect around the icon */
+   width: 25px;
+   /* Match the icon size */
+   height: 25px;
+   /* Match the icon size */
+   border-radius: 50%;
+   background: rgba(255, 0, 0, 0.3);
+   /* Red with opacity */
+   transform: translate(-50%, -50%);
+   animation: circleReflection 0.5s ease-out;
+ }
+
  /* Like animation end*/
  
+
 
 }

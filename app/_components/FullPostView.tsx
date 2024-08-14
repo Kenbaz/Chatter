@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, FC, useState } from "react";
+import { useEffect, FC, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import {
@@ -19,7 +19,12 @@ import ConfirmModal from "./ConfirmModal";
 import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 import { analyticsFuncs } from "@/src/libs/contentServices";
 import BookmarkButton from "./BookmarkButton";
-import { FaHeartCircleMinus, FaHeartCirclePlus, FaComment } from "react-icons/fa6";
+import {
+  FaHeartCircleMinus,
+  FaHeartCirclePlus,
+  FaComment,
+  FaEllipsis,
+} from "react-icons/fa6";
 
 const FullPostView: FC = () => {
   const { user } = useRequireAuth();
@@ -33,10 +38,18 @@ const FullPostView: FC = () => {
   const [authorName, setAuthorName] = useState("");
   const [isOwnPost, setIsOwnPost] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isReplyLiked, setIsReplyLiked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newReply, setNewReply] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [bookmarkCount, setBookmarkCount] = useState(0);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editCommentContent, setEditCommentContent] = useState("");
+  const [openMenuCommentId, setOpenMenuCommentId] = useState<string | null>(
+    null
+  );
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
 
@@ -50,6 +63,8 @@ const FullPostView: FC = () => {
     addReply,
     likeComment,
     unlikeComment,
+    likeReply,
+    unlikeReply,
   } = commentFuncs();
   const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
@@ -74,6 +89,8 @@ const FullPostView: FC = () => {
           const name = await fetchAuthorName(postData.authorId);
           setAuthorName(name);
 
+           setBookmarkCount(postData.bookmarks?.length || 0);
+
           await trackView(postData.id, user.uid);
         } else {
           console.log("No such post!");
@@ -91,9 +108,9 @@ const FullPostView: FC = () => {
   const handleLike = async () => {
     if (!user || !post) return;
     try {
-      const button = document.querySelector('.like-button');
-      button?.classList.add('animating');
-      setTimeout(() => button?.classList.remove('animating'), 500)
+      const button = document.querySelector(".like-button");
+      button?.classList.add("animating");
+      setTimeout(() => button?.classList.remove("animating"), 500);
 
       if (isLiked) {
         await unlikePost(user.uid, post.id);
@@ -114,6 +131,17 @@ const FullPostView: FC = () => {
     } catch (error) {
       console.error("Error liking/unliking post:", error);
     }
+  };
+
+  const handleCommentClick = () => {
+    if (commentInputRef.current) {
+      commentInputRef.current.scrollIntoView({ behavior: "smooth" });
+      commentInputRef.current.focus();
+    }
+  };
+
+  const updateBookmarkCount = (isBookmarked: boolean) => {
+    setBookmarkCount((prev) => (isBookmarked ? prev + 1 : prev - 1));
   };
 
   const handleDeletePost = async () => {
@@ -157,47 +185,84 @@ const FullPostView: FC = () => {
   };
 
   const handleAddComment = async () => {
-    if (!user || !post) return;
+    if (!user || !post || !newComment.trim()) return;
     try {
       const currentUserName = await fetchAuthorName(user.uid);
-       const profilePicture = await getUserProfilePicture(user.uid);
+      const profilePicture = await getUserProfilePicture(user.uid);
       const newCommentObj = await addComment(
         post.id,
         user.uid,
-        newComment,
+        newComment.trim(),
         currentUserName,
         profilePicture
       );
       setComments((prevComments) => [...prevComments, newCommentObj]);
       setNewComment("");
+
+      // Update the post with the new comment count
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+
+        const updatedComments = [...prevPost.comments, newCommentObj];
+
+        return {
+          ...prevPost,
+          comments: updatedComments,
+        };
+      });
     } catch (error) {
       console.error("Error adding comment:", error);
     }
   };
 
   const handleEditComment = async (commentId: string, newContent: string) => {
+    if (!newContent.trim() || !user || !post) return;
+
     try {
-      await updateComment(commentId, newContent);
+      await updateComment(post.id, commentId, newContent.trim(), user.uid);
+
       setComments((prevComments) =>
         prevComments.map((comment) =>
           comment.id === commentId
-            ? { ...comment, content: newContent }
+            ? { ...comment, content: newContent.trim() }
             : comment
         )
       );
+
+      setEditingCommentId(null);
     } catch (error) {
       console.error("Error editing comment:", error);
+      // Optionally, you can show an error message to the user here.
     }
   };
 
   const handleDeleteComment = async (commentId: string) => {
+    if (!user || !post) return;
+
     try {
-      await deleteComment(commentId);
+      await deleteComment(post.id, commentId, user.uid);
+
+      // Update local state
       setComments((prevComments) =>
         prevComments.filter((comment) => comment.id !== commentId)
       );
+
+      // Update the post with the new comment count
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+
+        const updatedComments = prevPost.comments.filter(
+          (comment) => comment.id !== commentId
+        );
+
+        return {
+          ...prevPost,
+          comments: updatedComments,
+        };
+      });
     } catch (error) {
       console.error("Error deleting comment:", error);
+      // Handle the error (e.g., show an error message to the user)
     }
   };
 
@@ -206,7 +271,7 @@ const FullPostView: FC = () => {
   };
 
   const handleAddReply = async (commentId: string) => {
-    if (!user || !post) return;
+    if (!user || !post || !newReply.trim()) return;
     try {
       const currentUserName = await fetchAuthorName(user.uid);
       const profilePicture = await getUserProfilePicture(user.uid);
@@ -214,9 +279,9 @@ const FullPostView: FC = () => {
         post.id,
         commentId,
         user.uid,
-        newReply,
+        newReply.trim(),
         currentUserName,
-        profilePicture,
+        profilePicture
       );
       setComments(
         comments.map((comment) =>
@@ -234,12 +299,16 @@ const FullPostView: FC = () => {
           )
         )
       );
-      console.log(newReply);
       setNewReply("");
       setReplyingTo(null);
     } catch (error) {
       console.error("Error adding reply:", error);
     }
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+    setNewReply("");
   };
 
   const handleLikeComment = async (
@@ -269,6 +338,55 @@ const FullPostView: FC = () => {
       console.error("Error liking/unliking comment:", error);
     }
   };
+
+  const handleLikeReply = async (
+    commentId: string,
+    replyId: string,
+    isReplyLiked: boolean
+  ) => {
+    if (!user || !post) return;
+    try {
+      if (isReplyLiked) {
+        await unlikeReply(post.id, commentId, replyId, user.uid);
+      } else {
+        await likeReply(post.id, commentId, replyId, user.uid);
+      }
+      setComments(
+        comments.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: comment.replies.map((reply) =>
+                  reply.id === replyId
+                    ? {
+                        ...reply,
+                        likes: isReplyLiked
+                          ? reply.likes.filter((id) => id !== user.uid)
+                          : [...reply.likes, user.uid],
+                      }
+                    : reply
+                ),
+              }
+            : comment
+        )
+      );
+    } catch (error) {
+      console.error("Error liking/unliking reply:", error);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openMenuCommentId && !(event.target as Element).closest(".comment")) {
+        setOpenMenuCommentId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openMenuCommentId]);
 
   if (loading) return <div>Loading...</div>;
   if (!user) return;
@@ -330,31 +448,36 @@ const FullPostView: FC = () => {
             <span className="font-light">{post.likes.length}</span>
             <span className="like-animation absolute inset-0"></span>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" onClick={handleCommentClick}>
             <FaComment className="text-xl" />
             <span className="font-light">{post.comments.length}</span>
           </div>
           <div className="flex items-center gap-2">
-            <BookmarkButton postId={post.id} userId={user.uid} />
-            <span className="font-light">{post.bookmarks.length}</span>
+            <BookmarkButton postId={post.id} userId={user.uid} onBookmarkChange={updateBookmarkCount} />
+            <span className="font-light">
+              {bookmarkCount}
+            </span>
           </div>
         </div>
-        <div className="absolute z-50 top-[220px] text-[15px] border-teal-700 text-teal-400 right-2 border p-1 rounded-lg">
-          {user && post && !isOwnPost && (
-            <button onClick={handleFollow} className="follow-btn">
-              {isFollowing ? "Unfollow" : "Follow"}
-            </button>
-          )}
-        </div>
+
+        {user && post && !isOwnPost && (
+          <button
+            onClick={handleFollow}
+            className="absolute z-50 top-[220px] text-[15px] border-teal-700 text-teal-400 right-2 border p-1 rounded-lg"
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
+          </button>
+        )}
       </div>
-      <div className="comments-section p-2 mt-2 bg-primary">
-        <h3 className="text-white mb-4 font-semibold">Comments</h3>
+      <div className="comments-section p-2 mt-2 pb-[50px] dark:bg-primary">
+        <h3 className="dark:text-white mb-4 font-semibold">Comments</h3>
         <div className="flex flex-col gap-2 mb-10">
           <textarea
+            ref={commentInputRef}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Add a comment..."
-            className="border border-teal-700 rounded-md p-2"
+            className="border border-teal-700 rounded-md p-2 outline-none"
           />
           <button
             className="w-20 p-1 rounded-lg bg-teal-800"
@@ -380,12 +503,53 @@ const FullPostView: FC = () => {
                       style={{ objectFit: "cover" }}
                     />
                   </div>
-                  <div className="h-10 border-dashed border w-1 ml-2 "></div>
+                  <div className="h-5 border-teal-700 border-dashed border w-0 ml-[9px] mt-[1px] "></div>
                 </div>
-                <div>
-                  <div className="flex flex-col p-[10px] border border-customGray rounded-lg mb-2 -mt-4">
+                <div className="comment-box relative">
+                  <div className="flex relative flex-col p-[10px] border border-customGray rounded-lg mb-2 -mt-6">
+                    {user.uid === comment.authorId && (
+                      <div className="relative ml-auto -mb-3">
+                        <button
+                          className="dark:text-gray-500 hover:text-gray-700"
+                          onClick={() =>
+                            setOpenMenuCommentId(
+                              openMenuCommentId === comment.id
+                                ? null
+                                : comment.id
+                            )
+                          }
+                        >
+                          <FaEllipsis />
+                        </button>
+                        {openMenuCommentId === comment.id && (
+                          <div className="absolute right-0 mt-2 w-48 dark:bg-primary border dark:border-customGray rounded-md shadow-lg z-10">
+                            <div className="py-1">
+                              <button
+                                className="block w-full text-left px-4 py-2 text-sm dark:text-gray-200 hover:bg-gray-800"
+                                onClick={() => {
+                                  setEditingCommentId(comment.id);
+                                  setEditCommentContent(comment.content);
+                                  setOpenMenuCommentId(null);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                                onClick={() => {
+                                  handleDeleteComment(comment.id);
+                                  setOpenMenuCommentId(null);
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <div className="">
-                      <small className="text-gray-400">
+                      <small className="dark:text-gray-400">
                         {comment.author} on{" "}
                         {new Date(comment.createdAt).toLocaleDateString()}
                       </small>
@@ -394,38 +558,87 @@ const FullPostView: FC = () => {
                       </p>
                     </div>
                   </div>
-                  <button
-                    className="mb-4"
-                    onClick={() =>
-                      handleLikeComment(
-                        comment.id,
-                        comment.likes.includes(user?.uid)
-                      )
-                    }
-                  >
-                    {comment.likes.includes(user?.uid) ? "Unlike" : "Like"} (
-                    {comment.likes.length})
-                  </button>
-                  <button onClick={() => setReplyingTo(comment.id)}>
-                    Reply
-                  </button>
+                  <div className="flex mb-4 items-center gap-7">
+                    <button
+                      className={`mb-4 relative flex items-center gap-2 ${
+                        comment.likes.includes(user?.uid) ? "liked-comment" : ""
+                      }`}
+                      onClick={() =>
+                        handleLikeComment(
+                          comment.id,
+                          comment.likes.includes(user?.uid)
+                        )
+                      }
+                    >
+                      <span className="p-1 relative">
+                        {comment.likes.includes(user?.uid) ? (
+                          <FaHeartCircleMinus className="text-red-500 text-[20px]" />
+                        ) : (
+                          <FaHeartCirclePlus className="text-[20px]" />
+                        )}
+                      </span>
+                      <span className="font-light relative top-[0.6px] text-[15px]">
+                        {comment.likes.length}
+                      </span>
+                    </button>
+                    <button
+                      className="relative -top-[6.8px]"
+                      onClick={() => setReplyingTo(comment.id)}
+                    >
+                      <FaComment />
+                    </button>
+                  </div>
+                  {editingCommentId === comment.id && (
+                    <div className=" relative -top-5 w-full">
+                      <textarea
+                        value={editCommentContent}
+                        onChange={(e) => setEditCommentContent(e.target.value)}
+                        className="border border-teal-700 rounded-md p-2 w-full outline-none"
+                      />
+                      <div className="mt-2">
+                        <button
+                          className="bg-teal-800 p-1 rounded-lg mr-2"
+                          onClick={() => {
+                            handleEditComment(comment.id, editCommentContent);
+                            setEditingCommentId(null);
+                          }}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="bg-gray-500 p-1 rounded-lg"
+                          onClick={() => setEditingCommentId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {replyingTo === comment.id && (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col relative -top-9 gap-2">
                   <textarea
                     value={newReply}
                     onChange={(e) => setNewReply(e.target.value)}
                     placeholder="Reply..."
-                    className="border border-teal-700 rounded-md p-2"
+                    className="border border-teal-700 rounded-md p-2 outline-none"
                   />
-                  <button
-                    className="w-20 p-1 rounded-lg bg-teal-800"
-                    onClick={() => handleAddReply(comment.id)}
-                  >
-                    Reply
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      className="w-20 p-1 rounded-lg bg-teal-800"
+                      onClick={() => handleAddReply(comment.id)}
+                    >
+                      Reply
+                    </button>
+                    <button
+                      className="w-20 p-1 rounded-lg bg-gray-600"
+                      onClick={handleCancelReply}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               )}
               {comment.replies.map((reply) => (
@@ -458,16 +671,27 @@ const FullPostView: FC = () => {
                         </div>
                       </div>
                       <button
-                        className="mb-5"
+                        className={`mb-5 flex items-center gap-2 relative ${
+                          reply.likes.includes(user?.uid) ? "liked-reply" : ""
+                        }`}
                         onClick={() =>
-                          handleLikeComment(
+                          handleLikeReply(
+                            comment.id,
                             reply.id,
                             reply.likes.includes(user?.uid)
                           )
                         }
                       >
-                        {reply.likes.includes(user?.uid) ? "Unlike" : "Like"} (
-                        {reply.likes.length})
+                        <span className="p-1 relative">
+                          {reply.likes.includes(user?.uid) ? (
+                            <FaHeartCircleMinus className="text-red-500 text-[20px]" />
+                          ) : (
+                            <FaHeartCirclePlus className="text-[20px]" />
+                          )}
+                        </span>
+                        <span className="font-light text-[15px]">
+                          {reply.likes.length}
+                        </span>
                       </button>
                     </div>
                   </div>

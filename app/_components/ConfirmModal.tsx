@@ -18,17 +18,17 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-primary w-[30%] p-6 rounded-lg shadow-lg">
-        <p className="mb-4 text-center relative"><FaExclamationCircle className='text-red-600 w-10 h-5 absolute left-[24px] top-[2px] '/> {message}</p>
+      <div className="bg-primary w-[75%] p-6 rounded-lg shadow-lg">
+        <p className="mb-4 text-center relative"><FaExclamationCircle className='text-red-600 w-10 h-5 absolute -left-[10px] top-[2px] '/> {message}</p>
         <div className="flex justify-center">
           <button
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded mr-2"
+            className="px-2 py-1 rounded-lg  bg-gray-200 text-gray-800 mr-2"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 bg-red-500 text-white rounded"
+            className="px-2 py-1 bg-red-500 text-white rounded-lg"
             onClick={onConfirm}
           >
             Delete

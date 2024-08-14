@@ -27,6 +27,7 @@ import { Hit } from "@algolia/client-search";
 import {v4 as uuidv4 } from 'uuid'; 
 
 
+
 interface Reply {
   id: string;
   commentId: string;
@@ -616,23 +617,107 @@ export const commentFuncs = () => {
     }
   };
 
-  const updateComment = async (commentId: string, content: string) => {
-    try {
-      const commentRef = doc(firestore, "Comments", commentId);
-      await updateDoc(commentRef, { content });
-    } catch (error) {
-      console.error(`Error updating comment: ${error}`);
-    }
-  };
+ const updateComment = async (
+   postId: string,
+   commentId: string,
+   content: string,
+   userId: string
+ ) => {
+   try {
+     const postRef = doc(firestore, "Posts", postId);
 
-  const deleteComment = async (commentId: string) => {
-    try {
-      const commentRef = doc(firestore, "Comments", commentId);
-      await deleteDoc(commentRef);
-    } catch (error) {
-      console.error(`Error deleting comment: ${error}`);
-    }
-  };
+     await runTransaction(firestore, async (transaction) => {
+       const postDoc = await transaction.get(postRef);
+       if (!postDoc.exists()) {
+         throw new Error("Post not found");
+       }
+
+       const post = postDoc.data() as PostData;
+       const commentIndex = post.comments?.findIndex(
+         (comment) => comment.id === commentId
+       );
+
+       if (commentIndex === undefined || commentIndex === -1) {
+         throw new Error("Comment not found");
+       }
+
+       const comment = post.comments[commentIndex];
+
+       // Check if the current user is the author of the comment
+       if (comment.authorId !== userId) {
+         throw new Error("You don't have permission to update this comment");
+       }
+
+       // Update the comment content
+       const updatedComment = {
+         ...comment,
+         content,
+         updatedAt: new Date().toISOString(),
+       };
+       const updatedComments = [...post.comments];
+       updatedComments[commentIndex] = updatedComment;
+
+       // Update the post with the modified comments array
+       transaction.update(postRef, { comments: updatedComments });
+     });
+
+     console.log("Comment updated successfully");
+   } catch (error) {
+     console.error("Error updating comment:", error);
+     throw error;
+   }
+ };
+
+
+ const deleteComment = async (
+   postId: string,
+   commentId: string,
+   userId: string
+ ) => {
+   try {
+     await runTransaction(firestore, async (transaction) => {
+       const postRef = doc(firestore, "Posts", postId);
+
+       // Get the post document
+       const postDoc = await transaction.get(postRef);
+       if (!postDoc.exists()) {
+         throw new Error("Post does not exist!");
+       }
+
+       const post = postDoc.data() as PostData;
+
+       // Find the comment within the array
+       const commentIndex = post.comments?.findIndex(
+         (comment) => comment.id === commentId
+       );
+
+       if (commentIndex === undefined || commentIndex === -1) {
+         throw new Error("Comment does not exist!");
+       }
+
+       const commentData = post.comments[commentIndex];
+
+       // Check if the current user is the author of the comment
+       if (commentData.authorId !== userId) {
+         throw new Error("You don't have permission to delete this comment");
+       }
+
+       // Remove the comment from the array
+       const updatedComments = post.comments.filter(
+         (comment) => comment.id !== commentId
+       );
+
+       // Update the post document with the new comments array
+       transaction.update(postRef, { comments: updatedComments });
+     });
+
+     console.log("Comment deleted successfully");
+   } catch (error) {
+     console.error("Error deleting comment:", error);
+     throw error;
+   }
+ };
+
 
   const getComments = async (postId: string): Promise<Comment[]> => {
     const commentsRef = collection(firestore, "Comments");
@@ -747,7 +832,68 @@ export const commentFuncs = () => {
     }
   };
 
-  return { addComment, updateComment, deleteComment, getComments, addReply, likeComment, unlikeComment };
+  const likeReply = async (postId: string, commentId: string, replyId: string, userId: string) => {
+    try {
+      const postRef = doc(firestore, "Posts", postId);
+      const postDoc = await getDoc(postRef);
+
+      if (postDoc.exists()) {
+        const post = postDoc.data() as PostData;
+        const updatedComments = post.comments.map(comment => {
+          if (comment.id === commentId) {
+            const updatedReplies = comment.replies.map(reply => 
+              reply.id === replyId ? { ...reply, likes: [...reply.likes, userId] } : reply
+            );
+            return { ...comment, replies: updatedReplies };
+          }
+          return comment;
+        });
+
+        await updateDoc(postRef, { comments: updatedComments });
+      } else {
+        throw new Error('Post not found');
+      }
+    } catch (error) {
+      console.error("Error liking reply:", error);
+      throw error;
+    }
+  };
+
+  const unlikeReply = async (
+    postId: string,
+    commentId: string,
+    replyId: string,
+    userId: string
+  ) => {
+    try {
+      const postRef = doc(firestore, "Posts", postId);
+      const postDoc = await getDoc(postRef);
+
+      if (postDoc.exists()) {
+        const post = postDoc.data() as PostData;
+        const updatedComments = post.comments.map((comment) => {
+          if (comment.id === commentId) {
+            const updatedReplies = comment.replies.map((reply) =>
+              reply.id === replyId
+                ? { ...reply, likes: reply.likes.filter((id) => id !== userId) }
+                : reply
+            );
+            return { ...comment, replies: updatedReplies };
+          }
+          return comment;
+        });
+
+        await updateDoc(postRef, { comments: updatedComments });
+      } else {
+        throw new Error("Post not found");
+      }
+    } catch (error) {
+      console.error("Error unliking reply:", error);
+      throw error;
+    }
+  };
+
+  return { addComment, updateComment, deleteComment, getComments, addReply, likeComment, unlikeComment, likeReply, unlikeReply };
 };
 
 export const bookmarkFuncs = () => {

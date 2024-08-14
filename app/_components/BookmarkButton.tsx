@@ -7,11 +7,13 @@ import { FaBookmark } from "react-icons/fa6";
 interface BookmarkButtonProps {
   userId: string;
   postId: string;
+  onBookmarkChange: (isBookmarked: boolean) => void;
 }
 
  const BookmarkButton: FC<BookmarkButtonProps> = ({
   userId,
-  postId,
+   postId,
+  onBookmarkChange,
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const dispatch = useDispatch();
@@ -41,9 +43,11 @@ interface BookmarkButtonProps {
       if (isBookmarked) {
         await removeBookmark(userId, postId);
         setIsBookmarked(false);
+        onBookmarkChange(false);
       } else {
         await addBookmark(userId, postId);
         setIsBookmarked(true);
+        onBookmarkChange(true);
       }
       dispatch(clearError());
     } catch (error) {
