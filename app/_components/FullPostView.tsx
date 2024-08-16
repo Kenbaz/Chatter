@@ -463,7 +463,7 @@ const FullPostView: FC = () => {
         {user && post && !isOwnPost && (
           <button
             onClick={handleFollow}
-            className="absolute z-50 top-[220px] text-[15px] border-teal-700 text-teal-400 right-2 border p-1 rounded-lg"
+            className="absolute z-50 top-[220px] text-[15px] dark:bg-gray-200 font-semibold text-gray-900 right-2 p-1 rounded-lg"
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </button>

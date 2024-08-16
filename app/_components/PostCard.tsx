@@ -110,7 +110,17 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
         <div className="flex items-center mt-2 gap-2">
           <div className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
             {isLoading ? (
-              <div>...</div>
+              <div>
+                <Image
+                  src={
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt="Avatar"
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             ) : (
               <Image
                 src={
@@ -158,7 +168,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
         ))}
       </small>
       <div className="mt-2 mb-3">
-        <Markdown>{`${post.content.substring(0, 130)}....`}</Markdown>
+        <Markdown>{`${post.content.substring(0, 120)}....`}</Markdown>
       </div>
       <div className="post-actions items-center flex gap-10">
         {likeCount > 0 && (

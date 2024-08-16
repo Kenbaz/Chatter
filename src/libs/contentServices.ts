@@ -1090,16 +1090,22 @@ export const analyticsFuncs = () => {
           userId: profile?.uid,
           username: profile?.username || "Anonymous",
           fullname: profile?.fullname || "Anonymous",
+          profilePicture:
+            profile?.profilePictureUrl || "/images/default-profile-image-2.jpg",
         })),
         commentDetails: commentProfiles.map((profile, index) => ({
           userId: profile?.uid,
           username: profile?.username || "Anonymous",
           fullname: profile?.fullname || "Anonymous",
+          profilePicture:
+            profile?.profilePictureUrl || "/images/default-profile-image-2.jpg",
         })),
         bookmarkDetails: bookmarkProfiles.map((profile) => ({
           userId: profile?.uid,
           username: profile?.username || "Anonymous",
           fullname: profile?.fullname || "Anonymous",
+          profilePicture:
+            profile?.profilePictureUrl || "/images/default-profile-image-2.jpg",
         })),
       };
     } else {

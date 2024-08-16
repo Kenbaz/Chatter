@@ -19,7 +19,7 @@ interface ContentPreviewProps {
   tags?: string[];
   coverImageUrl?: string;
   authorName?: string;
-  authorId: string;
+  authorId?: string;
   publishDate?: string | FieldValue;
 }
 
@@ -40,14 +40,16 @@ const ContentPreview: FC<ContentPreviewProps> = ({
   const fetchAuthorData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const userData = await getUserProfile(authorId);
-      if (userData) {
-        setAuthorProfilePicture(
-          userData.profilePictureUrl || "/images/default-profile-image-2.jpg"
-        );
-      } else {
-        setAuthorProfilePicture("/images/default-profile-image-2.jpg")
-      }
+      if (typeof authorId !== 'undefined') {
+        const userData = await getUserProfile(authorId);
+        if (userData) {
+          setAuthorProfilePicture(
+            userData.profilePictureUrl || "/images/default-profile-image-2.jpg"
+          );
+        } else {
+          setAuthorProfilePicture("/images/default-profile-image-2.jpg");
+        }
+      }   
     } catch (error) {
       console.error('Error fetching user data:', error)
       setAuthorProfilePicture('');

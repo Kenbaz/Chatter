@@ -271,6 +271,17 @@ body {
 
  /* Like animation end*/
  
+ /* Analytics style starts*/
+ .like-history-container::-webkit-scrollbar {
+    background-color: transparent;
+    width: 10px;
+ }
 
+ .like-history-container::-webkit-scrollbar-thumb {
+   background-color: #666;
+   border-radius: 10px;
+ }
+
+ /* Analytics styles end*/
 
 }

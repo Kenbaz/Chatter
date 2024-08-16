@@ -72,7 +72,7 @@ const TagPage: FC = () => {
 
      return (
        <div className="tag-page">
-         <h1 className="text-xl font-bold">#{params.tagName}</h1>
+         <h1 className="text-xl font-bold tracking-wide dark:text-white p-2">#{params.tagName}</h1>
          {!initialLoadComplete ? (
            <div>Loading...</div>
          ) : posts.length > 0 ? (

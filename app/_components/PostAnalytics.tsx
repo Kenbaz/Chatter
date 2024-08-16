@@ -1,9 +1,10 @@
 "use client";
 
 import { FC, useEffect, useState, useCallback, useMemo } from "react";
-import { analyticsFuncs } from "@/src/libs/contentServices";
+import { analyticsFuncs, postFuncs, PostData } from "@/src/libs/contentServices";
 import { Profile } from "@/src/libs/userServices";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import Image from "next/image";
 
 interface PostAnalyticsProps {
   postId: string;
@@ -19,6 +20,7 @@ interface DetailedAnalytics {
     userId: string | undefined;
     username: string;
     fullname: string;
+    profilePicture: string;
   }>;
   commentDetails?: Array<{
     userId: string | undefined;
@@ -29,12 +31,15 @@ interface DetailedAnalytics {
     userId: string | undefined;
     username: string;
     fullname: string;
+    profilePicture: string;
   }>;
 }
 
 const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
   const [analytics, setAnalytics] = useState<DetailedAnalytics | null>(null);
-  const { getPostAnalytics, trackView } = analyticsFuncs();
+  const [posts, setPosts] = useState<PostData | null>(null);
+  const { getPostAnalytics } = analyticsFuncs();
+  const { getPostById } = postFuncs();
   const { getUserProfile } = Profile();
   const { user } = useRequireAuth();
 
@@ -42,10 +47,12 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
     try {
       const data = await getPostAnalytics(postId, isAuthor);
       setAnalytics(data);
+      const postData = await getPostById(postId);
+      setPosts(postData)
     } catch (error) {
       console.error("Error fetching post analytics:", error);
     }
-  }, [postId, isAuthor, getPostAnalytics]);
+  }, [postId, isAuthor, getPostAnalytics, getPostById]);
 
   useEffect(() => {
     fetchAnalytics();
@@ -55,66 +62,100 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
     if (!analytics) return <div>Loading analytics...</div>;
 
     return (
-      <div className="detailed-post-analytics">
-        <h1>Post Analytics</h1>
-        <p>Views: {analytics.views}</p>
-        <p>Likes: {analytics.likes}</p>
-        <p>Comments: {analytics.comments}</p>
-        <p>Bookmarks: {analytics.bookmarks}</p>
+      <div className="detailed-post-analytics p-2 gap-2 grid place-items-center">
+        {posts && (
+          <h1 className="text-center font-bold text-2xl text-teal-700 p-2">
+            {posts.title}
+          </h1>
+        )}
+        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+          <p className="tracking-wide">Readers</p>
+          <p className="font-bold text-2xl">{analytics.views}</p>
+        </div>
+        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+          <p className="tracking-wide">Likes</p>
+          <p className="font-bold text-2xl">{analytics.likes}</p>
+        </div>
+        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+          <p className="tracking-wide">Comments</p>
+          <p className="font-bold text-2xl">{analytics.comments}</p>
+        </div>
+        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+          <p className="tracking-wide">Bookmarks</p>
+          <p className="font-bold text-2xl">{analytics.bookmarks}</p>
+        </div>
 
         {isAuthor && (
-          <>
-            <h4>Likes</h4>
-            {analytics?.likeDetails ? (
-              <ul>
-                {analytics.likeDetails.length > 0 ? (
-                  analytics.likeDetails.map((like) => (
-                    <li key={like.userId}>
-                      {like.fullname} (@{like.username})
-                    </li>
-                  ))
-                ) : (
-                  <li>No likes yet</li>
-                )}
-              </ul>
-            ) : (
-              <p>...</p>
-            )}
-
-            <h4>Comments</h4>
-            {analytics?.commentDetails ? (
-              <ul>
-                {analytics.commentDetails.length > 0 ? (
-                  analytics.commentDetails.map((comment) => (
-                    <li key={comment.userId}>
-                      {comment.fullname} (@{comment.username})
-                    </li>
-                  ))
-                ) : (
-                  <li>No comments yet</li>
-                )}
-              </ul>
-            ) : (
-              <p>...</p>
-            )}
-
-            <h4>Bookmarks</h4>
-            {analytics?.bookmarkDetails ? (
-              <ul>
-                {analytics.bookmarkDetails.length > 0 ? (
-                  analytics.bookmarkDetails.map((bookmark) => (
-                    <li key={bookmark.userId}>
-                      {bookmark.fullname} (@{bookmark.username})
-                    </li>
-                  ))
-                ) : (
-                  <li>No bookmarks yet</li>
-                )}
-              </ul>
-            ) : (
-              <p>...</p>
-            )}
-          </>
+          <div className="w-full mt-2">
+            <div className="dark:bg-primary pb-3 rounded-md w-full">
+              <h4 className="text-xl tracking-wide font-semibold p-2">
+                Like History
+              </h4>
+              {analytics?.likeDetails ? (
+                <div className="like-history-container max-h-60 overflow-y-auto">
+                  <ul className="space-y-2 p-2">
+                    {analytics.likeDetails.length > 0 ? (
+                      analytics.likeDetails.map((like) => (
+                        <li
+                          key={like.userId}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+                            <Image
+                              src={like.profilePicture}
+                              alt="Avatar"
+                              width={30}
+                              height={30}
+                              style={{ objectFit: "cover" }}
+                            />
+                          </div>
+                          {like.fullname}
+                        </li>
+                      ))
+                    ) : (
+                      <li>No likes yet</li>
+                    )}
+                  </ul>
+                </div>
+              ) : (
+                <p>...</p>
+              )}
+            </div>
+            <div className="dark:bg-primary pb-3 mt-3 rounded-md w-full">
+              <h4 className="text-xl tracking-wide font-semibold p-2">
+                Bookmark History
+              </h4>
+              {analytics?.bookmarkDetails ? (
+                <div className="like-history-container max-h-60 overflow-y-auto">
+                  <ul className="space-y-2 p-2">
+                    {analytics.bookmarkDetails.length > 0 ? (
+                      analytics.bookmarkDetails.map((bookmark) => (
+                        <li
+                          key={bookmark.userId}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+                            <Image
+                              src={bookmark.profilePicture}
+                              alt="Avatar"
+                              width={30}
+                              height={30}
+                              style={{ objectFit: "cover" }}
+                            />
+                          </div>
+                          {bookmark.fullname}
+                        </li>
+                      ))
+                    ) : (
+                      <li>No bookmarks yet</li>
+                    )}
+                  </ul>
+                </div>
+              ) : (
+                <p>...</p>
+              )}
+            </div>
+          </div>
         )}
       </div>
     );
