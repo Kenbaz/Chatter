@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FC, ChangeEvent, FormEvent, useRef } from "react";
+import { useState, useEffect, FC, ChangeEvent, FormEvent } from "react";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { Profile, UserData } from "@/src/libs/userServices";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -48,6 +48,16 @@ const EditProfile: FC = () => {
     setUserProfilePicture,
   } = Profile();
 
+   const maxLengths = {
+     username: 50,
+     fullname: 50,
+     bio: 200,
+     work: 200,
+     location: 100,
+     education: 150,
+   };
+
+
   const dispatch = useDispatch();
   const { getAllTags, getTagNames } = tagFuncs();
 
@@ -55,6 +65,14 @@ const EditProfile: FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+   const [charCounts, setCharCounts] = useState({
+     username: 0,
+     fullname: 0,
+     bio: 0,
+     work: 0,
+     location: 0,
+     education: 0,
+   });
 
   const [profileData, setProfileData] = useState<ProfileData>({
     username: "",
@@ -73,6 +91,16 @@ const EditProfile: FC = () => {
     education: "",
   });
 
+  useEffect(() => {
+    // Initialize character counts when profile data is loaded
+    Object.keys(charCounts).forEach((field) => {
+      const value = profileData[field as keyof typeof profileData];
+      if (typeof value === "string") {
+        updateCharCount(field as keyof typeof charCounts, value);
+      }
+    });
+  }, [profileData]);
+  
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -136,6 +164,10 @@ const EditProfile: FC = () => {
     }));
   };
 
+  const updateCharCount = (field: keyof typeof charCounts, value: string) => {
+    setCharCounts((prev) => ({ ...prev, [field]: value.length }));
+  };
+
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -149,14 +181,16 @@ const EditProfile: FC = () => {
         ...prevData,
         [name]: newValue,
       }));
-
-      validateClientField(name as keyof ProfileData, newValue);
     } else {
       setProfileData((prevData) => ({
         ...prevData,
         [name]: value,
       }));
+      if (name in charCounts) {
+        updateCharCount(name as keyof typeof charCounts, value);
+      }
     }
+    validateClientField(name as keyof ProfileData, value);
   };
 
   const handleSocialLinkChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -236,7 +270,7 @@ const EditProfile: FC = () => {
       {successMessage && <p className="text-green-600">{successMessage}</p>}
 
       <form onSubmit={handleSubmit} className="">
-        <div className="p-2 dark:bg-primary dark:text-white mt-2">
+        <div className="p-2 pb-8 dark:bg-primary dark:text-white mt-2">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Basic Info</h1>
           <label htmlFor="profilePicture">Profile Picture</label>
           <div className="mt-2 flex items-center w-full mb-3">
@@ -264,14 +298,19 @@ const EditProfile: FC = () => {
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={profileData.username}
-              onChange={handleInputChange}
-              className="dark:text-white p-2 border border-customGray1 rounded-md outline-none text-gray-800"
-            />
+            <div className="relative w-full">
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={profileData.username}
+                onChange={handleInputChange}
+                className="dark:text-white p-2 w-full border border-customGray1 rounded-md outline-none text-gray-800"
+              />
+              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                {charCounts.username}/{maxLengths.username}
+              </span>
+            </div>
             {validationErrors.username && (
               <ul className="text-red-500">
                 {validationErrors.username.map((error, index) => (
@@ -280,16 +319,22 @@ const EditProfile: FC = () => {
               </ul>
             )}
           </div>
-          <div className="flex flex-col gap-2 mt-3">
+          <div className="flex flex-col gap-2 mt-7">
             <label htmlFor="fullname">Name</label>
-            <input
-              type="text"
-              id="fullname"
-              name="fullname"
-              value={profileData.fullname}
-              onChange={handleInputChange}
-              className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
-            />
+            <div className="relative w-full">
+              <input
+                type="text"
+                id="fullname"
+                name="fullname"
+                value={profileData.fullname}
+                onChange={handleInputChange}
+                className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+              />
+              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                {charCounts.fullname}/{maxLengths.fullname}
+              </span>
+            </div>
+
             {validationErrors.fullname && (
               <ul className="text-red-500">
                 {validationErrors.fullname.map((error, index) => (
@@ -298,15 +343,21 @@ const EditProfile: FC = () => {
               </ul>
             )}
           </div>
-          <div className="flex flex-col gap-2 mt-3">
+          <div className="flex flex-col gap-2 mt-7">
             <label htmlFor="bio">Bio</label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={profileData.bio}
-              onChange={handleInputChange}
-              className="dark:text-white border dark:border-customGray1 rounded-md p-2 outline-none text-gray-900"
-            />
+            <div className="relative w-full">
+              <textarea
+                id="bio"
+                name="bio"
+                value={profileData.bio}
+                onChange={handleInputChange}
+                className="dark:text-white border dark:border-customGray1 rounded-md p-2 w-full outline-none text-gray-900"
+              />
+              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                {charCounts.bio}/{maxLengths.bio}
+              </span>
+            </div>
+
             {validationErrors.bio && (
               <ul className="text-red-500">
                 {validationErrors.bio.map((error, index) => (
@@ -316,18 +367,24 @@ const EditProfile: FC = () => {
             )}
           </div>
         </div>
-        <div className="mt-3 dark:bg-primary p-2 dark:text-white">
+        <div className="mt-3 dark:bg-primary p-2 pb-8 dark:text-white">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Personal</h1>
           <div className="flex flex-col gap-2">
             <label htmlFor="location">Location</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={profileData.location}
-              onChange={handleInputChange}
-              className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
-            />
+            <div className="relative w-full">
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value={profileData.location}
+                onChange={handleInputChange}
+                className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+              />
+              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                {charCounts.location}/{maxLengths.location}
+              </span>
+            </div>
+
             {validationErrors.location && (
               <ul className="text-red-500">
                 {validationErrors.location.map((error, index) => (
@@ -337,17 +394,23 @@ const EditProfile: FC = () => {
             )}
           </div>
         </div>
-        <div className="mt-3 dark:bg-primary dark:text-white p-2">
+        <div className="mt-3 dark:bg-primary dark:text-white pb-8 p-2">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Career</h1>
           <div className="flex flex-col gap-2">
             <label htmlFor="work">Work</label>
-            <textarea
-              id="work"
-              name="work"
-              value={profileData.work}
-              onChange={handleInputChange}
-              className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
-            />
+            <div className="relative w-full">
+              <textarea
+                id="work"
+                name="work"
+                value={profileData.work}
+                onChange={handleInputChange}
+                className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+              />
+              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                {charCounts.work}/{maxLengths.work}
+              </span>
+            </div>
+
             {validationErrors.work && (
               <ul className="text-red-500">
                 {validationErrors.work.map((error, index) => (
@@ -412,17 +475,23 @@ const EditProfile: FC = () => {
             </div>
           </div>
         </div>
-        <div className="dark:bg-primary flex flex-col gap-2 p-2 dark:text-white">
+        <div className="dark:bg-primary flex flex-col gap-2 pb-8 p-2 dark:text-white">
           <label htmlFor="education" className="font-bold">
             Education
           </label>
-          <textarea
-            id="education"
-            name="education"
-            value={profileData.education}
-            onChange={handleInputChange}
-            className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
-          />
+          <div className="relative w-full">
+            <textarea
+              id="education"
+              name="education"
+              value={profileData.education}
+              onChange={handleInputChange}
+              className="dark:text-white p-2 w-full border dark:border-customGray1 rounded-md outline-none text-gray-800"
+            />
+            <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+              {charCounts.education}/{maxLengths.education}
+            </span>
+          </div>
+
           {validationErrors.education && (
             <ul className="text-red-500">
               {validationErrors.education.map((error, index) => (

@@ -61,11 +61,11 @@ export const Profile = () => {
     },
     username: { type: "string", maxLength: 50 },
     fullname: { type: "string", maxLength: 50 },
-    bio: { type: "string", maxLength: 500 },
+    bio: { type: "string", maxLength: 200 },
     profilePictureUrl: { type: "string", pattern: /^https?:\/\/.*$/ },
     interests: { type: "array", maxLength: 20 },
     languages: { type: "array", maxLength: 10 },
-    work: { type: 'string', maxLength: 400},
+    work: { type: 'string', maxLength: 200},
     location: { type: "string", maxLength: 100 },
     education: { type: "string", maxLength: 150 },
     socialLinks: {
