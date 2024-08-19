@@ -640,7 +640,7 @@ const FullPostView: FC = () => {
                 <FaEllipsis />
               </button>
               {showShareButtons && (
-                <div className="share-buttons-container w-[95.5%] h-[25%] top-[64%] fixed z-20 right-[10px] mt-2 bg-white dark:bg-primary border rounded shadow-lg p-2">
+                <div className="share-buttons-container w-[95.5%] h-[25%] top-[64%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2">
                   <ShareButtons postId={post.id} postTitle={post.title} coverImageUrl={post.coverImage} />
                 </div>
               )}
