@@ -101,7 +101,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-[250px] p-2">
+    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2">
       <div
         className="profile-picture-container"
         onMouseEnter={handleMouseEnter}

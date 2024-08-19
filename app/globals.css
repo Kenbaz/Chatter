@@ -128,13 +128,14 @@ body {
  .custom-editor .rc-md-editor .rc-md-navigation {
    background-color: #262626;
    border: none;
-   position: fixed;
+   border-bottom: 1px solid #555;
+   /* position: fixed;
    top: 258px;
    left: 245px;
    z-index: 99;
-   width: 110px;
+   width: 110px; */
    padding: 10px;
-   border-radius: 10px;
+   /* border-radius: 10px; */
  }
 
  .custom-editor .rc-md-editor .rc-md-navigation:hover {
@@ -257,14 +258,10 @@ body {
    position: absolute;
    top: 50%;
    left: 10px;
-   /* Adjust this value to center the effect around the icon */
    width: 25px;
-   /* Match the icon size */
    height: 25px;
-   /* Match the icon size */
    border-radius: 50%;
    background: rgba(255, 0, 0, 0.3);
-   /* Red with opacity */
    transform: translate(-50%, -50%);
    animation: circleReflection 0.5s ease-out;
  }

@@ -1,15 +1,13 @@
 'use client';
 
-import React, { FC, useState, useEffect, useCallback } from "react";
+import React, { FC } from "react";
 import Markdown, {Components} from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
 import { FieldValue } from "firebase/firestore";
-import {
-  Profile,
-} from "@/src/libs/userServices";
+import Link from "next/link";
 
 
 
@@ -32,35 +30,6 @@ const ContentPreview: FC<ContentPreviewProps> = ({
   authorId,
   publishDate,
 }) => {
-  const [authorProfilePicture, setAuthorProfilePicture] = useState("");
-   const [isLoading, setIsLoading] = useState(false);
-
-  const { getUserProfile } = Profile();
-
-  const fetchAuthorData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      if (typeof authorId !== 'undefined') {
-        const userData = await getUserProfile(authorId);
-        if (userData) {
-          setAuthorProfilePicture(
-            userData.profilePictureUrl || "/images/default-profile-image-2.jpg"
-          );
-        } else {
-          setAuthorProfilePicture("/images/default-profile-image-2.jpg");
-        }
-      }   
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-      setAuthorProfilePicture('');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [authorId]);
-
-  useEffect(() => {
-    fetchAuthorData()
-  }, [fetchAuthorData]);
 
   const components: Components = {
     h1: ({ node, ...props }) => (
@@ -125,7 +94,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
   return (
     <article className="max-w-4xl bg-primary mx-auto">
       {coverImageUrl && (
-        <div className="relative w-full h-52 mb-10">
+        <div className="relative w-full aspect-[16/8] mb-10">
           <Image
             src={coverImageUrl}
             alt="Cover"
@@ -133,38 +102,20 @@ const ContentPreview: FC<ContentPreviewProps> = ({
             priority
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectFit: "cover" }}
-            className="rounded-lg"
+            className="md:rounded-md"
           />
         </div>
       )}
       <div className="p-2">
         {authorName && publishDate && (
           <div className="mb-4 text-sm flex gap-2 items-center">
-            {isLoading ? (
-              <div className="w-[40px] h-[40px] rounded-[50%] overflow-hidden flex justify-center items-center">
-                <Image
-                  src={"/images/default-profile-image-2.jpg"}
-                  alt="avatar"
-                  width={40}
-                  height={40}
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            ) : authorProfilePicture ? (
-              <div className="w-[40px] h-[40px] rounded-[50%] overflow-hidden flex justify-center items-center">
-                <Image
-                  src={authorProfilePicture}
-                  alt="avatar"
-                  width={40}
-                  height={40}
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            ) : null}
+            
             <div className="flex flex-col">
-              <p className="text-tinWhite font-semibold text-base tracking-wide">
-                {authorName}
-              </p>
+              <Link href={`/profile/${authorId}`}>
+                <p className="text-tinWhite font-semibold text-base tracking-wide">
+                  {authorName}
+                </p>
+              </Link>
               <small className="text-gray-600 text-[14px]">
                 Published on {formattedDate}
               </small>
@@ -185,7 +136,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                className="inline-block rounded-full bg-gray-200 mr-2 px-3 py-1 text-sm font-semibold text-gray-800 mb-2"
               >
                 <span className="text-teal-700">#</span>
                 {tag}

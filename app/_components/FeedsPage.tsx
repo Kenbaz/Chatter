@@ -4,7 +4,6 @@ import { useEffect, FC, useState, useCallback, useMemo, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import ContentsNavigation from "./ContentsNav";
-import PostCard from "./PostCard";
 import PostCardWithComments from "./PostCardWithComments";
 import { feeds, PostData } from "@/src/libs/contentServices";
 import { useSearchParams } from "next/navigation";
@@ -12,7 +11,6 @@ import SearchBar from "./SearchBar";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
-
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -40,7 +38,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     sortBy: "recent",
     dateRange: "all",
   });
-   const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
+  const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
 
@@ -113,7 +111,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   ]);
 
   const toggleSearchBar = () => {
-      setIsSearchBarVisible((prev) => !prev);
+    setIsSearchBarVisible((prev) => !prev);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -187,8 +185,8 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   return (
     <div className="feed-container h-full">
-      <header className="h-14 bg-primary -ml-7 flex justify-around items-center">
-        <div className="text-outline-teal p-1 text-black text-xl font-bold tracking-wide">
+      <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor top-0 z-10 w-full flex justify-around items-center">
+        <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
         </div>
         <div
@@ -201,19 +199,19 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
         <div className="flex z-50 items-center gap-20">
           <button
-              className="w-32 rounded-lg hidden border text-center relative py-2"
-              onClick={handleCreatePostNavigation}
-            >
-              <FaPlus className="absolute top-3 left-4" /> Create
-            </button>
-          
+            className="w-32 rounded-lg hidden border text-center relative py-2"
+            onClick={handleCreatePostNavigation}
+          >
+            <FaPlus className="absolute top-3 left-4" /> Create
+          </button>
+
           <MenuButton />
         </div>
       </header>
       {isSearchBarVisible && (
         <div
           ref={searchBarRef}
-          className={`w-11/12 m-auto md:hidden mt-3 transition-all duration-300 ease-in-out ${
+          className={`w-11/12 m-auto -mb-14 md:hidden mt-20 transition-all duration-300 ease-in-out ${
             isSearchBarVisible
               ? "translate-y-0 opacity-100"
               : "-translate-y-full opacity-0"
@@ -222,7 +220,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           <SearchBar />
         </div>
       )}
-      <div className="mt-3 p-2">
+      <div className="mt-[65px] p-2">
         <ContentsNavigation />
       </div>
       <div

@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
       <div className={`${inter.className} overflow-y-scroll h-screen`}>
-        <header className="h-14 bg-headerColor"></header>
+        <header className="h-14 bg-headerColor hidden"></header>
         <Providers>{children}</Providers>
       </div>
   );

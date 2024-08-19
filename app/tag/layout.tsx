@@ -24,7 +24,7 @@ export default function RootLayout({
 
   return (
     <div className={`${inter.className} overflow-y-scroll h-screen`}>
-      <header className="h-14 dark:bg-primary flex justify-around items-center">
+      <header className="h-14 dark:bg-primary flex justify-around items-center fixed top-0 w-full border border-t-0 border-l-0 border-r-0 border-headerColor z-50">
         <Link href="/feeds">
           <div className="text-outline-teal p-1 -ml-16 text-black text-xl font-bold tracking-wide">
             Chatter

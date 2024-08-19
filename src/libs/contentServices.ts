@@ -1075,14 +1075,20 @@ export const analyticsFuncs = () => {
       }
 
       // Detailed analytics for the author
-      const [likeProfiles, commentProfiles, bookmarkProfiles] =
-        await Promise.all([
-          Promise.all(data.likes.map((userId) => getUserProfile(userId))),
-          Promise.all(
-            data.comments.map((comment) => getUserProfile(comment.authorId))
-          ),
-          Promise.all(data.bookmarks.map((userId) => getUserProfile(userId))),
-        ]);
+       const [likeProfiles, commentProfiles, bookmarkProfiles] =
+         await Promise.all([
+           Promise.all(
+             (data.likes || []).map((userId) => getUserProfile(userId))
+           ),
+           Promise.all(
+             (data.comments || []).map((comment) =>
+               getUserProfile(comment.authorId)
+             )
+           ),
+           Promise.all(
+             (data.bookmarks || []).map((userId) => getUserProfile(userId))
+           ),
+         ]);
       
       return {
         ...basicAnalytics,

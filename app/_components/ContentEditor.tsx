@@ -32,6 +32,7 @@ import "react-markdown-editor-lite/lib/index.css";
 import { tagFuncs } from "@/src/libs/contentServices";
 import { Comment } from "@/src/libs/contentServices";
 import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
+import { useRouter } from "next/navigation";
 
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
   ssr: false,
@@ -107,6 +108,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const {isLoading} = useSelector((state: RootState) => state.loading);
 
   const { signOutUser } = useAuth();
+  const router = useRouter();
 
   const [localContent, setLocalContent] = useLocalStorage<LocalContent>(
     `content_${userId} `,
@@ -139,7 +141,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const INITIAL_EDITOR_HEIGHT = "300px";
+  const INITIAL_EDITOR_HEIGHT = "370px";
   const FULL_SCREEN_THRESHOLD = 0;
 
   const [editorHeight, setEditorHeight] = useState(INITIAL_EDITOR_HEIGHT);
@@ -290,10 +292,13 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     });
   };
 
-  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     setLocalContent((prev) => ({ ...prev, title: newTitle }));
+
+     e.target.style.height = "auto";
+     e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
   const validateForm = (): boolean => {
@@ -362,6 +367,11 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       );
       dispatch(setLoading(false));
       dispatch(clearError());
+
+      if (publish) {
+        router.push(`/post/${postRef.id}`);
+      };
+
     } catch (error) {
       dispatch(setError("Error saving post"));
       console.error("Error saving post:", error);
@@ -442,180 +452,193 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   }, [isFullScreen, scrollToBottom]);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      {isPreview ? (
-        <div className="fixed inset-0 z-50 overflow-auto">
-          <ContentPreview
-            title={title}
-            content={content}
-            tags={selectedTagNames}
-            coverImageUrl={coverImageUrl}
-            authorName={authorName}
-            publishDate={publishDate}
-          />
-          <button
-            onClick={togglePreview}
-            className="fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Edit
-          </button>
-        </div>
-      ) : (
-        <>
-          <div
-            ref={contentRef}
-            className="mr-4 mb-4 overflow-y-auto content-ref h-[610px]"
-          >
-            {successMessage && (
-              <div className=" px-4 py-3 rounded relative mb-2" role="alert">
-                <span className="block sm:inline">{successMessage}</span>
-              </div>
-            )}
-            {error && <p className="text-red-500 mt-2">{error}</p>}
+    <>
+      <header className="h-14 flex items-center justify-end bg-headerColor fixed w-full top-0 z-50">
+        <button
+          onClick={togglePreview}
+          className="text-tinWhite z-50 text-[15px] px-2 mr-4 py-2 rounded-lg preview-btn hover:bg-teal-700 hover:opacity-95"
+        >
+          Preview
+        </button>
+      </header>
+      <div className="max-w-4xl mt-14 relative mx-auto p-4">
+        {isPreview ? (
+          <div className="fixed inset-0 z-50 overflow-auto">
+            <ContentPreview
+              title={title}
+              content={content}
+              tags={selectedTagNames}
+              coverImageUrl={coverImageUrl}
+              authorName={authorName}
+              publishDate={publishDate}
+            />
             <button
-              onClick={handleSetCoverImage}
-              className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4"
-              disabled={isUploading}
+              onClick={togglePreview}
+              className="absolute top-48 right-4 hover:bg-teal-700 hover:opacity-95 text-white px-4 py-2 rounded"
             >
-              Set cover image
+              Edit
             </button>
-            {isUploading && (
-              <div className="flex items-center text-sm space-x-2 mb-4">
-                <span className="text-[14px]">Uploading</span>
-                <div className="animate-spin rounded-[50%] h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
-              </div>
-            )}
-            {coverImageUrl && (
-              <div className="relative w-[150px] h-[70px] mb-4">
-                <Image
-                  src={coverImageUrl}
-                  alt="Cover"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  style={{ objectFit: "cover" }}
-                  className="rounded-lg"
-                />
-                <button
-                  onClick={handleRemoveCoverImage}
-                  className="absolute top-2 left-44 px-3 text-sm bg-red-500 text-white rounded-full py-1"
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-            <div className="mb-6">
-              <input
-                type="text"
-                placeholder="Title..."
-                value={title}
-                onChange={handleTitleChange}
-                className="w-full bg-headerColor text-4xl -mb-7 font-bold text-tinWhite p-2 border-none outline-none rounded focus:ring-0 placeholder-gray-300"
-              />
-            </div>
-            <div className="mb-6 relative">
-              <div 
-                onClick={toggleTagDropdown}
-                className="w-full p-2 mb-4  rounded bg-headerColor outline-none cursor-pointer text-tinWhite"
-              >
-                {selectedTags.length > 0 ? (
-                  <div className="flex flex-wrap gap-2 ">
-                    {selectedTags.map((tagId) => {
-                      const tag = availableTags.find(t => t.id === tagId);
-                      return tag ? (
-                        <span key={tag.id} className="bg-gray-800 rounded-full px-2 py-1 text-sm">
-                          <span style={{ color: tagColors[tag.id] }}>#</span>{tag.name}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                ) : (
-                  "Select Tags (max 3)"
-                )}
-              </div>
-              {isTagDropdownOpen && (
-                  <div className="tag-dropdown w-full mt-1 h-[250px] overflow-y-scroll border-none rounded shadow-lg">
-                    <div className="mb-4 border p-2 border-t-0 border-l-0 border-r-0 border-gray-800 text-cyan-800">Tags</div>
-                  {availableTags.map((tag) => (
-                    <div
-                      key={tag.id}
-                      onClick={() => handleTagSelect(tag)}
-                      className={`p-2 mb-2 rounded-lg hover:rounded-lg hover:text-cyan-800 hover:bg-gray-800 cursor-pointer ${
-                        selectedTags.includes(tag.id) ? "bg-gray-800 text-cyan-800" : ""
-                      } text-tinWhite`}
-                    >
-                      <span style={{ color: tagColors[tag.id] }}>#</span>{tag.name}
-                    </div>
-                  ))}
+          </div>
+        ) : (
+          <>
+            <div
+              ref={contentRef}
+              className="mr-4 mb-4 overflow-y-auto w-full content-ref h-[610px]"
+            >
+              {successMessage && (
+                <div className=" px-4 py-3 rounded relative mb-2" role="alert">
+                  <span className="block sm:inline">{successMessage}</span>
                 </div>
               )}
+              {error && <p className="text-red-500 mt-2">{error}</p>}
+              <button
+                onClick={handleSetCoverImage}
+                className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4"
+                disabled={isUploading}
+              >
+                Set cover image
+              </button>
+              {isUploading && (
+                <div className="flex items-center text-sm space-x-2 mb-4">
+                  <span className="text-[14px]">Uploading</span>
+                  <div className="animate-spin rounded-[50%] h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
+                </div>
+              )}
+              {coverImageUrl && (
+                <div className="relative w-[150px] h-[70px] mb-4">
+                  <Image
+                    src={coverImageUrl}
+                    alt="Cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    style={{ objectFit: "cover" }}
+                    className="rounded-lg"
+                  />
+                  <button
+                    onClick={handleRemoveCoverImage}
+                    className="absolute top-2 left-44 px-3 text-sm bg-red-500 text-white rounded-full py-1"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+              <div className="mb-6 w-full p-2 pb-4">
+                <textarea
+                  placeholder="Title..."
+                    value={title}
+                  onChange={handleTitleChange}
+                  className="w-full bg-headerColor text-2xl border-none -mb-7 font-bold text-tinWhite outline-none focus:ring-0 placeholder-gray-300 resize-none h-full overflow-hidden"
+                />
+              </div>
+              <div className="mb-6 relative">
+                <div
+                  onClick={toggleTagDropdown}
+                  className="w-full p-2 mb-4  rounded bg-headerColor outline-none cursor-pointer text-tinWhite"
+                >
+                  {selectedTags.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 ">
+                      {selectedTags.map((tagId) => {
+                        const tag = availableTags.find((t) => t.id === tagId);
+                        return tag ? (
+                          <span
+                            key={tag.id}
+                            className="bg-gray-800 rounded-full px-2 py-1 text-sm"
+                          >
+                            <span style={{ color: tagColors[tag.id] }}>#</span>
+                            {tag.name}
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  ) : (
+                    "Select Tags (max 3)"
+                  )}
+                </div>
+                {isTagDropdownOpen && (
+                  <div className="tag-dropdown w-full mt-1 h-[250px] overflow-y-scroll border-none rounded shadow-lg">
+                    <div className="mb-4 border p-2 border-t-0 border-l-0 border-r-0 border-gray-800 text-cyan-800">
+                      Tags
+                    </div>
+                    {availableTags.map((tag) => (
+                      <div
+                        key={tag.id}
+                        onClick={() => handleTagSelect(tag)}
+                        className={`p-2 mb-2 rounded-lg hover:rounded-lg hover:text-cyan-800 hover:bg-gray-800 cursor-pointer ${
+                          selectedTags.includes(tag.id)
+                            ? "bg-gray-800 text-cyan-800"
+                            : ""
+                        } text-tinWhite`}
+                      >
+                        <span style={{ color: tagColors[tag.id] }}>#</span>
+                        {tag.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div
+                ref={editorRef}
+                className={`w-full mb-4 relative rounded-lg  custom-editor ${
+                  isFullScreen ? "full-screen" : ""
+                }`}
+                style={{ height: editorHeight }}
+              >
+                <MdEditor
+                  style={{ height: "100%" }}
+                  placeholder="Write contents with markdown.."
+                  renderHTML={(text) => <ContentPreview content={text} />}
+                  onChange={handleEditorChange}
+                  value={content}
+                  onImageUpload={handleImageUpload}
+                  config={{
+                    view: {
+                      menu: true,
+                      md: true,
+                      html: false,
+                    },
+                    canView: {
+                      menu: true,
+                      md: true,
+                      html: false,
+                      fullScreen: false,
+                      hideMenu: false,
+                    },
+                    markdownClass: "custom-markdown",
+                    htmlClass: "custom-html",
+                  }}
+                />
+              </div>
             </div>
 
-            <div
-              ref={editorRef}
-              className={`w-full mb-4 relative rounded-lg custom-editor ${
-                isFullScreen ? "full-screen" : ""
-              }`}
-              style={{ height: editorHeight }}
-            >
-              <MdEditor
-                style={{ height: "100%" }}
-                placeholder="Write contents with markdown.."
-                renderHTML={(text) => <ContentPreview content={text} />}
-                onChange={handleEditorChange}
-                value={content}
-                onImageUpload={handleImageUpload}
-                config={{
-                  view: {
-                    menu: true,
-                    md: true,
-                    html: false,
-                  },
-                  canView: {
-                    menu: true,
-                    md: true,
-                    html: false,
-                    fullScreen: false,
-                    hideMenu: false,
-                  },
-                  markdownClass: "custom-markdown",
-                  htmlClass: "custom-html",
-                }}
-              />
-            </div>
-          </div>
-          <button
-            onClick={togglePreview}
-            className="text-tinWhite absolute top-3 text-[15px] right-96 px-2 py-2 rounded-lg preview-btn hover:bg-teal-700 hover:opacity-95"
-          >
-            Preview
-          </button>
-          <div className="flex justify-between">
-            <div className="flex gap-4">
-              <button
-                onClick={() => savePost(true)}
-                disabled={isLoading}
-                className="bg-teal-800 w-[100px] hover:bg-teal-900 text-white px-3 py-2 rounded-lg"
-              >
-                {isLoading ? 'Publishing' : 'Publish'}
-              </button>
-              <button
-                onClick={() => savePost(false)}
-                disabled={isLoading}
-                className=" text-white px-2 py-1 rounded-lg hover:bg-teal-800 hover:opacity-60"
-              >
-                {isLoading ? 'Saving draft' : 'Save draft'}
-              </button>
-            </div>
-            {/* <button
+            <div className="flex justify-between">
+              <div className="flex gap-4">
+                <button
+                  onClick={() => savePost(true)}
+                  disabled={isLoading}
+                  className="bg-teal-800 w-[80px] hover:bg-teal-900 text-white px-2 py-2 rounded-md"
+                >
+                  {isLoading ? "Publishing" : "Publish"}
+                </button>
+                <button
+                  onClick={() => savePost(false)}
+                  disabled={isLoading}
+                  className=" text-white px-2 py-1 rounded-md hover:bg-teal-800 hover:opacity-60"
+                >
+                  {isLoading ? "Saving" : "Save"}
+                </button>
+              </div>
+              {/* <button
               onClick={discardPost}
               className="bg-red-500 text-white px-2 hover:bg-red-600 py-1 rounded"
             >
               Discard
             </button> */}
-          </div>
-        </>
-      )}
-    </div>
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -88,7 +88,7 @@ const SearchBar: FC = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search..."
-          className=" w-full p-2 rounded-lg"
+          className=" w-full p-2 rounded-lg outline-none"
         />
       </div>
       {/* {isLoading && <div className="loading-indicator">Loading...</div>} */}
@@ -100,14 +100,14 @@ const SearchBar: FC = () => {
           {results.length > 0 ? (
             results.map((post) => (
               <Link key={post.id} href={`/post/${post.id}`}>
-                <div className="search-result-item mb-2 dark:hover:bg-lightGray2 p-1">
+                <div className="search-result-item mb-2 dark:hover:bg-lightGray2 tracking-wide">
                   <small className="font-bold text-gray-400" dangerouslySetInnerHTML={{ __html: post.author }} />
                   <h3 dangerouslySetInnerHTML={{ __html: post.title }} />
                 </div>
               </Link>
             ))
           ) : (
-            <div className="no-results">No results found</div>
+            <div className="no-results tracking-wide">No results found</div>
           )}
         </div>
       )}

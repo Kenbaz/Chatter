@@ -4,7 +4,7 @@ import { useEffect, useState, FC, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { tagFuncs, PostData } from "@/src/libs/contentServices";
-import PostCard from "./PostCard";
+import PostCard from "./PostCard3";
 import { setLoading } from "../_store/loadingSlice";
 import { clearError, setError } from "../_store/errorSlice";
 import { RootState } from "../_store/store";
@@ -71,7 +71,7 @@ const TagPage: FC = () => {
 
 
      return (
-       <div className="tag-page">
+       <div className="tag-page mt-14">
          <h1 className="text-xl font-bold tracking-wide dark:text-white p-2">#{params.tagName}</h1>
          {!initialLoadComplete ? (
            <div>Loading...</div>

@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { FaExclamationCircle } from 'react-icons/fa';
 
 interface ConfirmModalProps {
     isOpen: boolean;
@@ -8,7 +7,7 @@ interface ConfirmModalProps {
     message: string;
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
+const ConfirmModal: FC<ConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
@@ -19,7 +18,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-primary w-[75%] p-6 rounded-lg shadow-lg">
-        <p className="mb-4 text-center relative"><FaExclamationCircle className='text-red-600 w-10 h-5 absolute -left-[10px] top-[2px] '/> {message}</p>
+        <p className="mb-4 text-center relative">{message}</p>
         <div className="flex justify-center">
           <button
             className="px-2 py-1 rounded-lg  bg-gray-200 text-gray-800 mr-2"

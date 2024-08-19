@@ -265,7 +265,7 @@ const EditProfile: FC = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="profile-edit-container text-tinWhite">
+    <div className="profile-edit-container mt-[70px] text-tinWhite">
       {error && <p className="text-red-600">{error}</p>}
       {successMessage && <p className="text-green-600">{successMessage}</p>}
 
@@ -428,7 +428,7 @@ const EditProfile: FC = () => {
             <textarea
               id="languages"
               name="languages"
-              value={profileData.languages.join(",")}
+              value={profileData.languages.join(", ")}
               onChange={handleInputChange}
               className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
             />

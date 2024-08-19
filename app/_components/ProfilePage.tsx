@@ -145,21 +145,21 @@ const ProfilePage: FC = () => {
   const isCurrentUser = user && user.uid === params.userId;
 
   return (
-    <div className="user-profile-page h-full bg-primary">
+    <div className="user-profile-page mt-[70px] h-full bg-primary">
       {error && <p className="text-red-600">{error}</p>}
 
       <div className="profile-header pb-4 p-2 mt-5 relative dark:bg-primary mb-4">
         {!isOwnProfile && (
           <button
             onClick={handleFollow}
-            className="follow-btn absolute right-4 p-1 rounded-md dark:bg-gray-200 dark:text-gray-900"
+            className="follow-btn absolute right-4 py-1 px-3 rounded-md dark:bg-gray-200 dark:text-gray-900"
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </button>
         )}
         {isCurrentUser && (
           <Link href="/profile/edit">
-            <button className="absolute right-4 p-1 rounded-md dark:bg-gray-200 dark:text-gray-900">
+            <button className="absolute right-4 p-1 px-3 rounded-md dark:bg-gray-200 dark:text-gray-900">
               Edit Profile
             </button>
           </Link>

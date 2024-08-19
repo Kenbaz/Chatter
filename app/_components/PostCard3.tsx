@@ -1,8 +1,7 @@
 "use client";
 
-import { FC, useState, useEffect} from "react";
+import { FC, useState, useEffect } from "react";
 import { PostData } from "@/src/libs/contentServices";
-import Markdown from "react-markdown";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,21 +14,18 @@ import {
   UserData,
 } from "@/src/libs/userServices";
 
-
 interface PostCardProps {
   post: PostData;
   authorId: string;
 }
 
-
-const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
+const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
   const { user } = useRequireAuth();
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
   const [commentCount, setCommentCount] = useState(post.comments.length);
   const [showProfileHover, setShowProfileHover] = useState(false);
-    const [authorName, setAuthorName] = useState("");
-    const [comments, setComments] = useState(post.comments);
+  const [authorName, setAuthorName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shouldShowDropdown, setShouldShowDropdown] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -85,7 +81,6 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
     checkFollowStatus();
     fetchPostAnalytics();
   }, [authorId, user]);
-    
 
   const handleMouseEnter = () => {
     setShowProfileHover(true);
@@ -100,21 +95,27 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
     setShouldShowDropdown(false);
   };
 
-    const limitedComments = comments.slice(0, 2);
-
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 p-2 h-auto ">
+    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2">
       <div
         className="profile-picture-container"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div className="flex items-center mt-2 gap-2">
-          <div className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 cursor-pointer overflow-hidden flex justify-center items-center">
+          <div className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
             {isLoading ? (
-              <div>...</div>
+              <div>
+                <Image
+                  src={"/images/default-profile-image-2.jpg"}
+                  alt="Avatar"
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             ) : (
               <Image
                 src={
@@ -147,7 +148,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
         )}
       </div>
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2">
+        <h1 className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2">
           {post.title}
         </h1>
       </Link>
@@ -155,16 +156,13 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
             <span className="p-1 font-light rounded-lg hover:bg-gray-700">
-              <span className="text-teal-700">#</span>
+              <span className="text-gray-400">#</span>
               {tag}
             </span>
           </Link>
         ))}
       </small>
-      <div className="mt-2 mb-3">
-        <Markdown>{`${post.content.substring(0, 130)}....`}</Markdown>
-      </div>
-      <div className="post-actions items-center flex gap-10">
+      <div className="post-actions mt-3 items-center flex gap-10">
         {likeCount > 0 && (
           <button className="text-sm p-1 rounded-lg font-light">
             <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}
@@ -180,37 +178,8 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
           </span>
         )}
       </div>
-      {comments.length > 0 && (
-        <div className="comments-preview mt-4">
-          {limitedComments.map((comment) => (
-            <div
-              key={comment.id}
-              className="comment flex gap-3 mb-2 p-2 rounded"
-            >
-              <div>
-                <div className="w-[20px] h-[20px] border border-teal-700 rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
-                  <Image
-                    src={
-                      comment.profilePicture ||
-                      "/images/default-profile-image-2.jpg"
-                    }
-                    alt="avatar"
-                    width={20}
-                    height={20}
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              </div>
-              <div className="bg-customGray p-[10px] rounded-lg">
-                <small className="text-customWhite">{comment.author}</small>
-                <p className="text-sm mt-2 text-white">{comment.content}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
 
-export default PostCardWithComments;
+export default PostCard;

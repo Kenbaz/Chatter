@@ -4,7 +4,7 @@ import { useState, useEffect, FC } from "react";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { postFuncs, PostData } from "@/src/libs/contentServices";
 import { useBookmarkFuncs, BookmarkWithId } from "@/src/libs/bookmark";
-import PostCard from "./PostCard";
+import PostCard from "./PostCard3";
 
 const ReadingListPage: FC = () => {
   const { user } = useRequireAuth();
@@ -30,8 +30,8 @@ const ReadingListPage: FC = () => {
   if (!user) return <div>Please log in to view your reading list.</div>;
 
   return (
-    <div>
-      <h1>Your Reading List</h1>
+    <div className="mt-14">
+      <h1 className="px-2 py-4 font-bold text-white">Your Reading List</h1>
       {bookmarkedPosts.map((post) => (
         <PostCard key={post.id} post={post} authorId={post.authorId} />
       ))}

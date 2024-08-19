@@ -25,12 +25,12 @@ export default function RootLayout({
 
   return (
     <div className={`${inter.className} overflow-y-scroll h-screen`}>
-      <header className="h-14 dark:bg-primary flex justify-around items-center">
+      <header className="h-14 dark:bg-primary fixed top-0 z-40 w-full flex justify-around items-center border border-t-0 border-l-0 border-r-0 border-headerColor">
         <Link href="/feeds">
-        <div className="text-outline-teal p-1 -ml-16 text-black text-xl font-bold tracking-wide">
-          Chatter
-        </div>
-        </Link>      
+          <div className="text-outline-teal p-1 -ml-16 text-black text-xl font-bold tracking-wide">
+            Chatter
+          </div>
+        </Link>
         <div className="hidden md:block">
           <SearchBar />
         </div>
