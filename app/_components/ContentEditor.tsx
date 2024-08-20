@@ -461,7 +461,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
           Preview
         </button>
       </header>
-      <div className="max-w-4xl mt-14 relative mx-auto p-4">
+      <div className="max-w-4xl mt-14 pb-10 relative mx-auto p-4">
         {isPreview ? (
           <div className="fixed inset-0 z-50 overflow-auto">
             <ContentPreview

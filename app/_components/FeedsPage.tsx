@@ -184,7 +184,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   };
 
   return (
-    <div className="feed-container h-full">
+    <div className="feed-container h-auto pb-10">
       <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor top-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter

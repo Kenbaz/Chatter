@@ -265,7 +265,7 @@ const EditProfile: FC = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="profile-edit-container mt-[70px] text-tinWhite">
+    <div className="profile-edit-container mt-[70px] pb-14 text-tinWhite">
       {error && <p className="text-red-600">{error}</p>}
       {successMessage && <p className="text-green-600">{successMessage}</p>}
 

@@ -145,7 +145,7 @@ const FullPostView: FC = () => {
     u: ({ node, ...props }) => <u className="underline" {...props} />,
     blockquote: ({ node, ...props }) => (
       <blockquote
-        className="border-l-4 border-gray-300 pl-4 py-2 my-2 "
+        className="border-l-4 dark:border-lightGray border-gray-900 pl-4 py-2 my-2 "
         {...props}
       />
     ),
@@ -172,14 +172,15 @@ const FullPostView: FC = () => {
   };
 
   const toggleShareButtons = () => {
-    setShowShareButtons(!showShareButtons);
+   setShowShareButtons(!showShareButtons)
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         showShareButtons &&
-        !(event.target as Element).closest(".share-buttons-container")
+        !(event.target as Element).closest(".share-buttons-container") &&
+        !(event.target as Element).closest(".ellipsis-button")
       ) {
         setShowShareButtons(false);
       }
@@ -510,7 +511,7 @@ const FullPostView: FC = () => {
         />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <div className="full-post-container mt-14 relative h-screen">
+      <div className="full-post-container mt-14 relative h-auto pb-10">
         <Link href="/feeds">
           <button className="back-btn hidden lg:block">Back to feed</button>
         </Link>
@@ -548,7 +549,7 @@ const FullPostView: FC = () => {
             {user && post && !isOwnPost && (
               <button
                 onClick={handleFollow}
-                className="text-[15px] relative dark:bg-gray-200 px-3 font-semibold text-gray-900 left-[78%] p-1 rounded-md"
+                className="text-[15px] relative dark:bg-gray-200 px-2 w-[23%] font-semibold text-gray-900 left-[75%] p-1 rounded-md"
               >
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
@@ -635,13 +636,17 @@ const FullPostView: FC = () => {
               />
               <span className="font-light">{bookmarkCount}</span>
             </div>
-            <div className="relative">
+            <div className="relative ellipsis-button">
               <button onClick={toggleShareButtons} className="text-2xl">
                 <FaEllipsis />
               </button>
               {showShareButtons && (
-                <div className="share-buttons-container w-[95.5%] h-[25%] top-[64%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2">
-                  <ShareButtons postId={post.id} postTitle={post.title} coverImageUrl={post.coverImage} />
+                <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2">
+                  <ShareButtons
+                    postId={post.id}
+                    postTitle={post.title}
+                    coverImageUrl={post.coverImage}
+                  />
                 </div>
               )}
             </div>

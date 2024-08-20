@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { shareFuncs } from '@/src/libs/sharing';
 import { FaCopy } from 'react-icons/fa';
 
@@ -11,7 +11,7 @@ interface ShareButtonsProps {
 }
 
 const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, coverImageUrl }) => {
-    const [successMessage, setSuccessMessage] = useState("");
+  const [copyButtonText, setCopyButtonText] = useState("Copy Link");
 
     const { shareOnLinkedIn, shareOnTwitter } = shareFuncs();
 
@@ -19,39 +19,41 @@ const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, coverImageUrl 
        try {
          const postUrl = `${window.location.origin}/post/${postId}`;
          navigator.clipboard.writeText(postUrl);
-           setSuccessMessage('Copied to Clipboard');
+           setCopyButtonText("Copied to Clipboard!");
          console.log("Link copied to clipboard");
        } catch (error) {
          console.error("Failed to copy link: ", error);
        }
-     };
+  };
+  
+  useEffect(() => {
+    if (copyButtonText !== "Copy Link") {
+      const timer = setTimeout(() => {
+        setCopyButtonText("Copy Link");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [copyButtonText]);
 
     return (
-      <div className="share-buttons grid place-items-start w-full gap-2 h-full">
-        <div className="flex items-center justify-between hover:dark:bg-teal-800 rounded-md hover:opacity-50 w-full h-full">
-          <button
-            className="dark:text-white font-semibold border h-full tracking-wide"
-            onClick={() => copyLinkToClipboard(postId)}
-          >
-            <span> Copy Link</span>
-            <span>
-              <FaCopy />
-            </span>
-          </button>
-        </div>
-        {successMessage && (
-          <div className=" px-4 py-1 rounded relative mb-2" role="alert">
-            <span className="block sm:inline">{successMessage}</span>
-          </div>
-        )}
+      <div className="share-buttons flex flex-col w-full gap-2 h-full">
         <button
-          className="tracking-wide hover:dark:bg-gray-200"
+          className="dark:text-white flex items-center p-2 justify-between w-full hover:dark:bg-teal-800 rounded-md hover:opacity-50 font-semibold tracking-wide"
+          onClick={() => copyLinkToClipboard(postId)}
+        >
+          <span>{copyButtonText}</span>
+          <span>
+            <FaCopy />
+          </span>
+        </button>
+        <button
+          className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:opacity-50 text-start w-full"
           onClick={() => shareOnTwitter(postId, postTitle, coverImageUrl)}
         >
           Share on Twitter
         </button>
         <button
-          className="tracking-wide hover:dark:bg-gray-200"
+          className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:opacity-50 text-start w-full"
           onClick={() => shareOnLinkedIn(postId, coverImageUrl)}
         >
           Share on LinkedIn

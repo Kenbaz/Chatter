@@ -109,7 +109,7 @@ const SignUpModal: FC = () => {
   if (!showSignupModal) return null;
 
   return (
-    <div className="modal text-gray-900">
+    <div className="modal text-gray-900 dark:text-white">
       <div className="modal-content text-white">
         <span className="close-modal" onClick={close}>
           &times;
@@ -123,7 +123,7 @@ const SignUpModal: FC = () => {
               <div className="flex flex-col w-72 mb-6">
                 <label htmlFor="email"></label>
                 <input
-                  className="h-8 rounded-full p-2 text-gray-900 outline-none text-base placeholder:text-sm"
+                  className="h-8 rounded-full p-2 text-gray-900 dark:text-white outline-none text-base placeholder:text-sm"
                   type="email"
                   ref={emailInput}
                   id="email"
@@ -136,7 +136,7 @@ const SignUpModal: FC = () => {
               <div className="flex flex-col">
                 <label htmlFor="password"></label>
                 <input
-                  className="h-8 rounded-full p-2 text-gray-900 outline-none text-base placeholder:text-sm"
+                  className="h-8 rounded-full p-2 text-gray-900 dark:text-white outline-none text-base placeholder:text-sm"
                   type="password"
                   id="password"
                   value={password}

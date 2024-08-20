@@ -59,7 +59,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
     u: ({ node, ...props }) => <u className="underline" {...props} />,
     blockquote: ({ node, ...props }) => (
       <blockquote
-        className="border-l-4 border-gray-300 pl-4 py-2 my-2 "
+        className="border-l-4 dark:border-lightGray border-gray-900 pl-4 py-2 my-2 "
         {...props}
       />
     ),
