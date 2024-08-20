@@ -652,7 +652,7 @@ const FullPostView: FC = () => {
             </div>
           </div>
         </div>
-        <div className="comments-section p-2 mt-2 pb-[50px] dark:bg-primary">
+        <div className="comments-section p-2 mt-2 pb-[57px] dark:bg-primary">
           <h3 className="dark:text-white mb-4 font-semibold">Comments</h3>
           <div className="flex flex-col gap-2 mb-10">
             <textarea
