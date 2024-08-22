@@ -263,7 +263,7 @@ const FullPostView: FC = () => {
       setSuccessMessage("Draft post deleted");
       setTimeout(() => {
         setSuccessMessage("");
-        router.push("/profile");
+        router.push(`/profile/${user.uid}`);
       }, 1000);
     } catch (error) {
       console.error("Error deleting draft post:", error);
@@ -607,6 +607,12 @@ const FullPostView: FC = () => {
             </div>
           </div>
         </div>
+        <ConfirmModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleDeleteDraftPost}
+          message="Are you sure you want to delete this post?"
+        />
       </div>
     );
   }
@@ -627,7 +633,7 @@ const FullPostView: FC = () => {
         />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <div className="full-post-container mt-14 relative h-auto pb-10">
+      <div className="full-post-container mt-14 relative h-auto pb-12">
         <Link href="/feeds">
           <button className="back-btn hidden lg:block">Back to feed</button>
         </Link>
