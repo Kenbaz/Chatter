@@ -223,33 +223,6 @@ export const postFuncs = () => {
       (doc) => ({ id: doc.id, ...doc.data() } as PostData)
     );
   };
-
-   const updatePost = async (
-     postId: string,
-     updatedPostData: {
-       title?: string;
-       content?: string;
-       coverImage?: string;
-       tags?: string[];
-       status?: "published" | "draft";
-     }
-   ): Promise<void> => {
-     try {
-       await runTransaction(firestore, async (transaction) => {
-         const postRef = doc(firestore, "Posts", postId);
-         const postDoc = await transaction.get(postRef);
-
-         if (!postDoc.exists()) {
-           throw new Error("Post not found");
-         }
-
-         transaction.update(postRef, updatedPostData);
-       });
-     } catch (error) {
-       console.error("Error updating post:", error);
-       throw error;
-     }
-   };
   
   const searchPosts = async (
     searchQuery: string,
@@ -394,7 +367,7 @@ export const feeds = () => {
         content: doc.data().content as string,
         authorId: doc.data().authorId as string,
         author: doc.data().author as string,
-        status: doc.data().status as "published | draft",
+        status: doc.data().status as "published" | "draft",
         coverImage: doc.data().coverImage as string,
         updatedAt: doc.data().updatedAt as string | FieldValue,
         createdAt: doc.data().createdAt as string | FieldValue,
