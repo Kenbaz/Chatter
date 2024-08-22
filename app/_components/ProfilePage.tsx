@@ -163,7 +163,7 @@ const ProfilePage: FC = () => {
   const isCurrentUser = user && user.uid === params.userId;
 
   return (
-    <div className="user-profile-page mt-[70px] h-auto pb-14 bg-primary">
+    <div className="user-profile-page mt-[70px] h-auto pb-16 bg-primary">
       {error && <p className="text-red-600">{error}</p>}
 
       <div className="profile-header pb-4 p-2 mt-5 relative dark:bg-primary mb-4">
