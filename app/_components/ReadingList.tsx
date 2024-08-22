@@ -4,7 +4,7 @@ import { useState, useEffect, FC } from "react";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { postFuncs, PostData } from "@/src/libs/contentServices";
 import { useBookmarkFuncs, BookmarkWithId } from "@/src/libs/bookmark";
-import PostCard from "./PostCard3";
+import PostCard from "./PostCardWithNoPreview";
 
 const ReadingListPage: FC = () => {
   const { user } = useRequireAuth();

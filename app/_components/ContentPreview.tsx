@@ -8,7 +8,8 @@ import remarkGfm from "remark-gfm";
 import Image from "next/image";
 import { FieldValue } from "firebase/firestore";
 import Link from "next/link";
-
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
 
 
 interface ContentPreviewProps {
@@ -67,7 +68,10 @@ const ContentPreview: FC<ContentPreviewProps> = ({
       <p className="mb-4 whitespace-pre-wrap" {...props} />
     ),
     pre: ({ node, children, ...props }) => (
-      <pre className="whitespace-pre-wrap break-words" {...props}>
+      <pre
+        className="whitespace-pre-wrap break-words bg-black text-white p-4 rounded-md"
+        {...props}
+      >
         {children}
       </pre>
     ),
@@ -109,7 +113,6 @@ const ContentPreview: FC<ContentPreviewProps> = ({
       <div className="p-2">
         {authorName && publishDate && (
           <div className="mb-4 text-sm flex gap-2 items-center">
-            
             <div className="flex flex-col">
               <Link href={`/profile/${authorId}`}>
                 <p className="text-tinWhite font-semibold text-base tracking-wide">
@@ -146,7 +149,11 @@ const ContentPreview: FC<ContentPreviewProps> = ({
         )}
         <div className="prose max-w-none">
           <Markdown
-            rehypePlugins={[rehypeRaw, rehypeHighlight]}
+            rehypePlugins={[
+              rehypeRaw,
+              [rehypeHighlight,
+              { detectLanguage: true, alias: {} }],
+            ]}
             remarkPlugins={[remarkGfm]}
             components={components}
           >

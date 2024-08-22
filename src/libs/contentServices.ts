@@ -92,7 +92,7 @@ export interface PostData {
   content: string;
   authorId: string;
   author: string;
-  status: "published | draft";
+  status: "published" | "draft";
   coverImage: string;
   updatedAt: string | FieldValue | Timestamp;
   createdAt?: string | FieldValue | Timestamp;
@@ -184,6 +184,72 @@ export const postFuncs = () => {
        (doc) => ({ id: doc.id, ...doc.data() } as PostData)
      );
   };
+
+  const getDraftedPostById = async (
+    postId: string,
+    authorId: string
+  ): Promise<PostData | null> => {
+    try {
+      const postRef = doc(firestore, "Posts", postId);
+      const postDoc = await getDoc(postRef);
+
+      if (
+        postDoc.exists() &&
+        postDoc.data().status === "draft" &&
+        postDoc.data().authorId === authorId
+      ) {
+        return { id: postDoc.id, ...postDoc.data() } as PostData;
+      } else {
+        console.error("No such drafted post");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching drafted post by ID:", error);
+      return null;
+    }
+  };
+
+  const getDraftedPosts = async (authorId: string): Promise<PostData[]> => {
+    const postsRef = collection(firestore, "Posts");
+    let q = query(
+      postsRef,
+      where("authorId", "==", authorId),
+      where("status", "==", "draft"),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() } as PostData)
+    );
+  };
+
+   const updatePost = async (
+     postId: string,
+     updatedPostData: {
+       title?: string;
+       content?: string;
+       coverImage?: string;
+       tags?: string[];
+       status?: "published" | "draft";
+     }
+   ): Promise<void> => {
+     try {
+       await runTransaction(firestore, async (transaction) => {
+         const postRef = doc(firestore, "Posts", postId);
+         const postDoc = await transaction.get(postRef);
+
+         if (!postDoc.exists()) {
+           throw new Error("Post not found");
+         }
+
+         transaction.update(postRef, updatedPostData);
+       });
+     } catch (error) {
+       console.error("Error updating post:", error);
+       throw error;
+     }
+   };
   
   const searchPosts = async (
     searchQuery: string,
@@ -206,7 +272,7 @@ export const postFuncs = () => {
         tags: hit.tags,
         authorId: hit.authorId,
         author: hit.author,
-        status: hit.status,
+        status: 'published',
         coverImage: hit.coverImage,
         updatedAt: hit.updatedAt,
         createdAt: hit.createdAt,
@@ -249,7 +315,7 @@ export const postFuncs = () => {
     }
   };
 
-  return { getPostsByAuthor, searchPosts, getPostById, deletePost };
+  return { getPostsByAuthor, searchPosts, getPostById, deletePost, getDraftedPostById, getDraftedPosts };
 };
 
 

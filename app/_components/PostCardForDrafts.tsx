@@ -5,9 +5,7 @@ import { PostData } from "@/src/libs/contentServices";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Image from "next/image";
 import Link from "next/link";
-import { FaComment } from "react-icons/fa6";
 import { analyticsFuncs } from "@/src/libs/contentServices";
-import ProfileHoverDropdown from "./ProfileHoverDropdown";
 import {
   Profile,
   ImplementFollowersFuncs,
@@ -19,7 +17,7 @@ interface PostCardProps {
   authorId: string;
 }
 
-const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
+const PostCardForDrafts: FC<PostCardProps> = ({ post, authorId }) => {
   const { user } = useRequireAuth();
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
@@ -98,7 +96,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2">
+    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 relative">
       <div
         className="profile-picture-container"
         onMouseEnter={handleMouseEnter}
@@ -130,22 +128,6 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
           </div>
           <small className="text-[14px]">{authorName}</small>
         </div>
-
-        {showProfileHover && shouldShowDropdown && authorData && (
-          <ProfileHoverDropdown
-            authorData={authorData}
-            isCurrentUser={isCurrentUser}
-            isFollowing={isFollowing}
-            onFollow={async () => {
-              await followUser(user.uid, authorId);
-              setIsFollowing(true);
-            }}
-            onUnfollow={async () => {
-              await unfollowUser(user.uid, authorId);
-              setIsFollowing(false);
-            }}
-          />
-        )}
       </div>
       <Link href={`/post/${post.id}`}>
         <h1 className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2">
@@ -162,24 +144,13 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
           </Link>
         ))}
       </small>
-      <div className="post-actions mt-3 items-center flex gap-10">
-        {likeCount > 0 && (
-          <button className="text-sm p-1 rounded-lg font-light">
-            <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}
-          </button>
-        )}
-
-        {commentCount > 0 && (
-          <span className="comment-button rounded-lg flex gap-2 items-center text-sm font-light relative">
-            <span className="rounded-lg p-1 bg-gray-700">
-              <FaComment />
-            </span>{" "}
-            <span>{commentCount}</span>
-          </span>
-        )}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-[-20deg]">
+        <p className="border-2 border-red-500 text-red-500 px-4 py-2 rounded-md text-xl font-bold opacity-70">
+          Drafted Post
+        </p>
       </div>
     </div>
   );
 };
 
-export default PostCard;
+export default PostCardForDrafts;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FC } from "react";
+import { useState, useEffect, FC, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Profile } from "@/src/libs/userServices";
 import { setLoading } from "../_store/loadingSlice";
@@ -8,6 +8,7 @@ import { setError, clearError } from "../_store/errorSlice";
 import { postFuncs, PostData } from "@/src/libs/contentServices";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../_store/store";
+import PostCardForDrafts from "./PostCardForDrafts";
 import Image from "next/image";
 import Link from "next/link";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
@@ -15,6 +16,7 @@ import PostCard from "./PostCard";
 import { ImplementFollowersFuncs } from "@/src/libs/userServices";
 import { MdLocationOn } from "react-icons/md";
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
+import PostCardWithNoPreview from "./PostCardWithNoPreview";
 
 
 interface UserProfileData {
@@ -45,12 +47,13 @@ const ProfilePage: FC = () => {
 
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [userPosts, setUserPosts] = useState<PostData[]>([]);
+  const [draftedPosts, setDraftedPosts] = useState<PostData[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [lastPostId, setLastPostId] = useState<string | null>(null);
-  const { getPostsByAuthor } = postFuncs();
+  const { getPostsByAuthor, getDraftedPosts } = postFuncs();
   const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
 
@@ -67,6 +70,21 @@ const ProfilePage: FC = () => {
     };
     checkFollowStatus();
   }, [user, params.userId]);
+
+  const fetchDraftedPosts = useCallback(async () => {
+    if (!user) return;
+    try {
+      const draftPosts = await getDraftedPosts(user.uid);
+      setDraftedPosts(draftPosts);
+    } catch (error) {
+      dispatch(setError("Failed to load drafted posts"));
+      console.error("Error fetching drafted posts:", error);
+    };
+  }, [user]);
+
+  useEffect(() => {
+    fetchDraftedPosts()
+  }, [fetchDraftedPosts]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -299,6 +317,17 @@ const ProfilePage: FC = () => {
         {hasMorePosts && (
           <button onClick={loadMorePosts}>Load More Posts</button>
         )}
+
+        {draftedPosts &&
+          draftedPosts.map((post, index) => (
+            <>
+              <PostCardForDrafts
+                key={`${index}-${post.id}`}
+                post={post}
+                authorId={post.authorId}
+              />
+            </>
+          ))}
       </div>
     </div>
   );

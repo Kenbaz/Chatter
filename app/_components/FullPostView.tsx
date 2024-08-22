@@ -30,6 +30,7 @@ import {
 } from "react-icons/fa6";
 import Head from "next/head";
 import ShareButtons from "./ShareButtons";
+import "prismjs/themes/prism-tomorrow.css";
 
 
 const FullPostView: FC = () => {
@@ -153,7 +154,10 @@ const FullPostView: FC = () => {
       <p className="mb-4 whitespace-pre-wrap" {...props} />
     ),
     pre: ({ node, children, ...props }) => (
-      <pre className="whitespace-pre-wrap break-words" {...props}>
+      <pre
+        className="whitespace-pre-wrap break-words  bg-black text-white p-4 rounded-md"
+        {...props}
+      >
         {children}
       </pre>
     ),
@@ -245,6 +249,25 @@ const FullPostView: FC = () => {
     } catch (error) {
       console.error("Error deleting Post:", error);
       setError("Failed to delete");
+      setTimeout(() => {
+        setError("");
+      }, 1000);
+    }
+  };
+
+  const handleDeleteDraftPost = async () => {
+    if (!user || !post) return;
+
+    try {
+      await deletePost(post.id);
+      setSuccessMessage("Draft post deleted");
+      setTimeout(() => {
+        setSuccessMessage("");
+        router.push("/profile");
+      }, 1000);
+    } catch (error) {
+      console.error("Error deleting draft post:", error);
+      setError("Failed to delete draft post");
       setTimeout(() => {
         setError("");
       }, 1000);
@@ -476,6 +499,10 @@ const FullPostView: FC = () => {
     } else {
       return "Unknown date";
     }
+  };
+
+  const handleEditPost = (postId: string) => {
+    router.push(`/create-post/${postId}`)
   }
 
   useEffect(() => {
@@ -494,6 +521,95 @@ const FullPostView: FC = () => {
   if (loading) return <div>Loading...</div>;
   if (!user) return;
   if (!post) return <div>Post not found</div>;
+
+
+  if (post.status === "draft") {
+    return (
+      <div className="full-post-container mt-14 relative h-auto pb-10">
+        <div className="full-post-content dark:bg-primary max-w-4xl mx-auto">
+          <div className="p-2">
+            {post.coverImage && (
+              <div className="relative w-full aspect-[16/8] mb-5">
+                <Image
+                  src={post.coverImage}
+                  alt="Cover"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                  className="md:rounded-md"
+                />
+              </div>
+            )}
+            {user && post && user.uid === post.authorId && (
+              <div className=" p-2 -top-[15px] relative justify-end font-light text-[15px] -mb-4 flex gap-4">
+                <button
+                  className="text-white hover:text-gold4"
+                  onClick={() => handleEditPost(post.id)}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={openDeleteModal}
+                  className="delete-post-btn text-white hover:text-red-600"
+                >
+                  Delete post
+                </button>
+              </div>
+            )}
+            <div className="mb-4 text-sm flex gap-2 items-center">
+              <div className="w-[40px] h-[40px] rounded-[50%] overflow-hidden flex justify-center items-center">
+                <Image
+                  src={
+                    authorProfilePicture ||
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt="avatar"
+                  width={40}
+                  height={40}
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              <div className="flex flex-col">
+                <Link href={`/profile/${post.authorId}`}>
+                  <p className="text-tinWhite font-semibold text-base tracking-wide">
+                    {authorName}
+                  </p>
+                </Link>
+                <small className="text-red-600 text-[14px]">
+                  This draft can only be seen by you.
+                </small>
+              </div>
+            </div>
+            <h1 className="text-3xl text-white font-bold mb-4">{post.title}</h1>
+            <div className="mb-4">
+              {post.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-block rounded-full bg-gray-200 mr-2 px-3 py-1 text-sm font-semibold text-gray-800 mb-2"
+                >
+                  <span className="text-teal-700">#</span>
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <div className="prose max-w-none">
+              <Markdown
+                rehypePlugins={[
+                  rehypeRaw,
+                  [rehypeHighlight, { detectLanguage: true, alias: {} }],
+                ]}
+                remarkPlugins={[remarkGfm]}
+                components={markdownComponents}
+              >
+                {post.content}
+              </Markdown>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -532,6 +648,9 @@ const FullPostView: FC = () => {
             )}
             {user && post && user.uid === post.authorId && (
               <div className=" p-2 -top-[15px] relative justify-end font-light text-[15px] -mb-4 flex gap-4">
+                <button className="text-white hover:text-gold4" onClick={() => handleEditPost(post.id)}>
+                  Edit
+                </button>
                 <button
                   onClick={openDeleteModal}
                   className="delete-post-btn text-white hover:text-red-600"
@@ -595,7 +714,10 @@ const FullPostView: FC = () => {
               </div>
               <div className="prose max-w-none">
                 <Markdown
-                  rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                  rehypePlugins={[
+                    rehypeRaw,
+                    [rehypeHighlight, { detectLanguage: true, alias: {} }],
+                  ]}
                   remarkPlugins={[remarkGfm]}
                   components={markdownComponents}
                 >
@@ -652,7 +774,7 @@ const FullPostView: FC = () => {
             </div>
           </div>
         </div>
-        <div className="comments-section p-2 mt-2 pb-[57px] dark:bg-primary">
+        <div className="comments-section p-2 mt-2 pb-[60px] dark:bg-primary">
           <h3 className="dark:text-white mb-4 font-semibold">Comments</h3>
           <div className="flex flex-col gap-2 mb-10">
             <textarea

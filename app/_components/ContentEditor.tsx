@@ -28,6 +28,7 @@ import { useAuth } from "@/src/libs/authServices";
 import { auth } from "@/src/libs/firebase";
 import { setError, clearError } from "../_store/errorSlice";
 import ContentPreview from "./ContentPreview";
+import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import "react-markdown-editor-lite/lib/index.css";
 import { tagFuncs } from "@/src/libs/contentServices";
 import { Comment } from "@/src/libs/contentServices";
@@ -41,6 +42,7 @@ const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
 interface ContentEditorProps {
   userId: string;
   postId?: string;
+  postStatus?: "draft" | "published";
 }
 
 interface LocalContent {
@@ -102,7 +104,7 @@ const useLocalStorage = <T,>(
   return [storedValue, setValue];
 };
 
-const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
+const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) => {
   const dispatch = useDispatch();
   const { error } = useSelector((state: RootState) => state.error);
   const {isLoading} = useSelector((state: RootState) => state.loading);
@@ -133,13 +135,19 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [publishDate, setPublishDate] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isSavingChanges, setIsSavingChanges] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+  const [isDraft, setIsDraft] = useState(postStatus === "draft");
    const [tagColors, setTagColors] = useState<Record<string, string>>({});
 
   const editorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useRequireAuth();
 
   const INITIAL_EDITOR_HEIGHT = "370px";
   const FULL_SCREEN_THRESHOLD = 0;
@@ -198,10 +206,21 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
 
         if (docSnap.exists()) {
           const postData = docSnap.data();
+
+          // Convert tag names to IDs
+        const tagIds = postData.tags
+          .map((tagName: string) => {
+            const tag = availableTags.find((t) => t.name === tagName);
+            return tag ? tag.id : null;
+          })
+          .filter((tagId: string): tagId is string => tagId !== null);
+          
           setTitle(postData.title);
           setContent(postData.content);
-          setSelectedTags(postData.tags);
+          setSelectedTags(tagIds);
+          console.log('selected Tags:', postData.tags);
           setCoverImageUrl(postData.coverImage);
+           setIsDraft(postData.status === "draft");
           dispatch(clearError());
         } else {
           console.log("No such document");
@@ -225,7 +244,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
     };
     fetchAuthorName();
     setPublishDate(new Date().toLocaleDateString());
-  }, [postId, dispatch, userId]);
+  }, [postId, userId]);
 
   const clearLocalStorage = useCallback(() => {
     setLocalContent({
@@ -318,46 +337,61 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       dispatch(setError("Sign in to save a post"));
       return;
     }
+
+     if (publish) {
+    setIsPublishing(true);
+  } else if (isDraft || !postId) {
+    setIsSavingDraft(true);
+  } else {
+    setIsSavingChanges(true);
+    }
+    
+
     dispatch(setLoading(true));
     if (!validateForm()) {
       dispatch(setLoading(false));
+      setIsPublishing(false);
+      setIsSavingDraft(false);
+      setIsSavingChanges(false);
       return;
     }
 
-    const postData: PostData = {
-      title,
-      tags: selectedTagNames,
-      content,
-      authorId: userId,
-      author: authorName,
-      status: publish ? "published" : "draft",
-      coverImage: coverImageUrl,
-      updatedAt: Timestamp.now(),
-      likes: [],
-      comments: [],
-    };
-
     try {
+      let postData: PostData = {
+        title,
+        tags: selectedTagNames,
+        content,
+        authorId: userId,
+        author: authorName,
+        status: publish ? "published" : "draft",
+        coverImage: coverImageUrl,
+        updatedAt: Timestamp.now(),
+        likes: [],
+        comments: [],
+      };
+
       const postRef = postId
         ? doc(firestore, "Posts", postId)
         : doc(collection(firestore, "Posts"));
 
-      if (!postId) {
+      if (postId) {
+        // Fetch the existing post data
+        const postSnapshot = await getDoc(postRef);
+        if (postSnapshot.exists()) {
+          const existingPostData = postSnapshot.data() as PostData;
+          // Merge the new changes with the existing data
+          postData = {
+            ...existingPostData,
+            ...postData,
+            likes: existingPostData.likes || [],
+            comments: existingPostData.comments || [],
+          };
+        }
+      } else {
         postData.createdAt = Timestamp.now();
       }
 
       await setDoc(postRef, postData, { merge: true });
-
-      // sync with algolia
-      const algoliaObject = {
-        objectID: postRef.id,
-        title: postData.title,
-        authorId: postData.authorId,
-        author: postData.author,
-        updatedAt: new Date().toISOString(),
-        createdAt: postData.createdAt ? new Date().toISOString() : undefined,
-      };
-      await algoliaPostsIndex.saveObject(algoliaObject);
 
       // Clear local storage after a successful save
       clearLocalStorage();
@@ -369,13 +403,31 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
       dispatch(clearError());
 
       if (publish) {
+        // sync with algolia
+        if (!postId || isDraft) {
+          const algoliaObject = {
+            objectID: postRef.id,
+            title: postData.title,
+            authorId: postData.authorId,
+            author: postData.author,
+            updatedAt: new Date().toISOString(),
+            createdAt: postData.createdAt
+              ? new Date().toISOString()
+              : undefined,
+          };
+          await algoliaPostsIndex.saveObject(algoliaObject);
+        }
         router.push(`/post/${postRef.id}`);
-      };
-
+      } else {
+        router.push(`/profile/${userId}`);
+      }
     } catch (error) {
       dispatch(setError("Error saving post"));
       console.error("Error saving post:", error);
     } finally {
+      setIsPublishing(false);
+      setIsSavingDraft(false);
+      setIsSavingChanges(false);
       dispatch(setLoading(false));
     }
   };
@@ -525,7 +577,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
               <div className="mb-6 w-full p-2 pb-4">
                 <textarea
                   placeholder="Title..."
-                    value={title}
+                  value={title}
                   onChange={handleTitleChange}
                   className="w-full bg-headerColor text-2xl border-none -mb-7 font-bold text-tinWhite outline-none focus:ring-0 placeholder-gray-300 resize-none h-full overflow-hidden"
                 />
@@ -612,22 +664,55 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId }) => {
             </div>
 
             <div className="flex justify-between">
-              <div className="flex gap-4">
-                <button
-                  onClick={() => savePost(true)}
-                  disabled={isLoading}
-                  className="bg-teal-800 w-[80px] hover:bg-teal-900 text-white px-2 py-2 rounded-md"
-                >
-                  {isLoading ? "Publishing" : "Publish"}
-                </button>
-                <button
-                  onClick={() => savePost(false)}
-                  disabled={isLoading}
-                  className=" text-white px-2 py-1 rounded-md hover:bg-teal-800 hover:opacity-60"
-                >
-                  {isLoading ? "Saving" : "Save"}
-                </button>
-              </div>
+              {postId ? (
+                // Editing an existing post
+                <div className="flex gap-4">
+                  {isDraft ? (
+                    <>
+                      <button
+                        onClick={() => savePost(true)}
+                        disabled={isPublishing || isSavingDraft}
+                        className="bg-teal-800 hover:bg-teal-900 text-white px-2 py-2 rounded-md"
+                      >
+                        {isPublishing ? "Publishing" : "Publish"}
+                      </button>
+                      <button
+                        onClick={() => savePost(false)}
+                        disabled={isPublishing || isSavingDraft}
+                        className="text-white px-2 py-1 rounded-md hover:bg-teal-800 hover:opacity-60"
+                      >
+                        {isSavingDraft ? "Saving" : "Save Draft"}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => savePost(true)}
+                      disabled={isSavingChanges}
+                      className="text-white px-2 py-1 rounded-md bg-teal-800"
+                    >
+                      {isSavingChanges ? "Saving" : "Save Changes"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                // Creating a new post
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => savePost(true)}
+                    disabled={isPublishing || isSavingDraft}
+                    className="bg-teal-800 w-[100%] hover:bg-teal-900 text-white px-2 py-2 rounded-md"
+                  >
+                    {isPublishing ? "Publishing" : "Publish"}
+                  </button>
+                  <button
+                    onClick={() => savePost(false)}
+                    disabled={isPublishing || isSavingDraft}
+                    className=" text-white px-2 py-1 rounded-md hover:bg-teal-800 hover:opacity-60"
+                  >
+                    {isSavingDraft ? "Saving" : "Save"}
+                  </button>
+                </div>
+              )}
               {/* <button
               onClick={discardPost}
               className="bg-red-500 text-white px-2 hover:bg-red-600 py-1 rounded"

@@ -4,7 +4,8 @@ import { useEffect, useState, FC, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { tagFuncs, PostData } from "@/src/libs/contentServices";
-import PostCard from "./PostCard3";
+import PostCardWithNoPreview from "./PostCardWithNoPreview";
+// import PostCard from "./PostCard3";
 import { setLoading } from "../_store/loadingSlice";
 import { clearError, setError } from "../_store/errorSlice";
 import { RootState } from "../_store/store";
@@ -78,7 +79,7 @@ const TagPage: FC = () => {
          ) : posts.length > 0 ? (
            <>
              {posts.map((post) => (
-               <PostCard key={post.id} post={post} authorId={post.authorId} />
+               <PostCardWithNoPreview key={post.id} post={post} authorId={post.authorId} />
              ))}
              {hasMore && (
                <div ref={ref}>{isLoading && <div>Loading...</div>}</div>
