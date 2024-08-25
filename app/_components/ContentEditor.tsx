@@ -152,7 +152,35 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
   const INITIAL_EDITOR_HEIGHT = "370px";
   const FULL_SCREEN_THRESHOLD = 0;
 
+  // const getInitialEditorHeight = () => {
+  //   if (typeof window !== "undefined") {
+  //     const screenHeight = window.innerHeight;
+  //     if (screenHeight < 600) {
+  //       return "200px";
+  //     } else if (screenHeight < 900) {
+  //       return "400px";
+  //     } else {
+  //       return "600px";
+  //     }
+  //   }
+  //   return "370px"; // Default fallback
+  // };
+
   const [editorHeight, setEditorHeight] = useState(INITIAL_EDITOR_HEIGHT);
+
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setEditorHeight(getInitialEditorHeight());
+  //   };
+
+  //   window.addEventListener("resize", handleResize);
+
+  //   return () => {
+  //     window.removeEventListener("resize", handleResize);
+  //   };
+  // }, []);
+
+
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -505,15 +533,15 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
 
   return (
     <>
-      <header className="h-14 flex items-center justify-end bg-headerColor fixed w-full top-0 z-50">
+      <header className="h-14 flex items-center justify-end bg-headerColor fixed w-full top-0 z-50 lg:landscape:h-10 xl:w-[70%] xl:ml-[12rem]">
         <button
           onClick={togglePreview}
-          className="text-tinWhite z-50 text-[15px] px-2 mr-4 py-2 rounded-lg preview-btn hover:bg-teal-700 hover:opacity-95"
+          className="text-tinWhite z-50 text-[15px] px-2 mr-4 py-2 rounded-lg preview-btn hover:bg-teal-700 hover:opacity-95 lg:landscape:relative lg:landscape:right-36 lg:relative lg:right-28 xl:-left-28"
         >
           Preview
         </button>
       </header>
-      <div className="max-w-4xl mt-14 pb-14 relative mx-auto p-4">
+      <div className="max-w-4xl mt-14 pb-14 relative mx-auto p-4 md:w-[90%] md:m-auto md:mt-14 lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-10 lg:landscape:p-2 lg:landscape:pb-0">
         {isPreview ? (
           <div className="fixed inset-0 z-50 overflow-auto">
             <ContentPreview
@@ -526,7 +554,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
             />
             <button
               onClick={togglePreview}
-              className="absolute top-48 right-4 hover:bg-teal-700 hover:opacity-95 text-white px-4 py-2 rounded"
+              className="absolute top-2 right-28 text-[15px] rouned-lg w-20 hover:bg-teal-700 hover:opacity-95 text-white px-4 py-[7px] rounded md:top-2 md:right-28 lg:landscape:right-60 lg:landscape:top-0 lg:right-56 xl:left-[63%] xl:mt-[1px]"
             >
               Edit
             </button>
@@ -535,7 +563,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
           <>
             <div
               ref={contentRef}
-              className="mr-4 mb-4 overflow-y-auto w-full content-ref h-[610px]"
+              className="mr-4 mb-4 overflow-y-auto w-full content-ref h-[610px] md:h-[84vh] lg:landscape:h-[81vh]"
             >
               {successMessage && (
                 <div className=" px-4 py-3 rounded relative mb-2" role="alert">
@@ -545,7 +573,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
               {error && <p className="text-red-500 mt-2">{error}</p>}
               <button
                 onClick={handleSetCoverImage}
-                className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4"
+                className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4 lg:landscape:mb-6"
                 disabled={isUploading}
               >
                 Set cover image
@@ -574,12 +602,12 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   </button>
                 </div>
               )}
-              <div className="mb-6 w-full p-2 pb-4">
+              <div className="mb-6 w-full p-2 pb-4 lg:landscape:-mb-3">
                 <textarea
                   placeholder="Title..."
                   value={title}
                   onChange={handleTitleChange}
-                  className="w-full bg-headerColor text-2xl border-none -mb-7 font-bold text-tinWhite outline-none focus:ring-0 placeholder-gray-300 resize-none h-full overflow-hidden"
+                  className="w-full bg-headerColor text-2xl border-none -mb-7 font-bold text-tinWhite outline-none focus:ring-0 placeholder-gray-300 resize-none h-full overflow-hidden md:text-3xl"
                 />
               </div>
               <div className="mb-6 relative">
@@ -631,7 +659,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
 
               <div
                 ref={editorRef}
-                className={`w-full mb-4 relative rounded-lg  custom-editor ${
+                className={`w-full mb-4 relative rounded-lg md:h-[]  custom-editor ${
                   isFullScreen ? "full-screen" : ""
                 }`}
                 style={{ height: editorHeight }}
@@ -713,12 +741,12 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   </button>
                 </div>
               )}
-              {/* <button
+              <button
               onClick={discardPost}
               className="bg-red-500 text-white px-2 hover:bg-red-600 py-1 rounded"
             >
               Discard
-            </button> */}
+            </button>
             </div>
           </>
         )}

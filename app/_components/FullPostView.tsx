@@ -525,7 +525,7 @@ const FullPostView: FC = () => {
 
   if (post.status === "draft") {
     return (
-      <div className="full-post-container mt-14 relative h-auto pb-10">
+      <div className="full-post-container mt-14 relative h-auto pb-10 md:w-[91%] md:m-auto md:mt-14">
         <div className="full-post-content dark:bg-primary max-w-4xl mx-auto">
           <div className="p-2">
             {post.coverImage && (
@@ -633,10 +633,7 @@ const FullPostView: FC = () => {
         />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <div className="full-post-container mt-14 relative h-auto pb-12">
-        <Link href="/feeds">
-          <button className="back-btn hidden lg:block">Back to feed</button>
-        </Link>
+      <div className="full-post-container mt-14 relative h-auto pb-12 md:w-[91%] md:m-auto md:mt-14">
         {post && (
           <div className="full-post-content dark:bg-primary max-w-4xl mx-auto">
             {post.coverImage && (
@@ -679,7 +676,7 @@ const FullPostView: FC = () => {
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
             )}
-            <div className="p-2">
+            <div className="p-2 md:pr-10 md:pl-10">
               <div className="mb-4 text-sm flex gap-2 items-center">
                 <div className="w-[40px] h-[40px]  rounded-[50%] overflow-hidden flex justify-center items-center">
                   <Image
@@ -734,7 +731,7 @@ const FullPostView: FC = () => {
           </div>
         )}
         <div className="post-actions">
-          <div className="flex items-center w-full p-4 bg-headerColor justify-around fixed z-50 bottom-0">
+          <div className="flex items-center w-full p-4 bg-headerColor justify-around fixed z-50 bottom-0 md:w-[91%]">
             <button
               className="like-button relative flex items-center gap-2"
               onClick={handleLike}
@@ -769,7 +766,7 @@ const FullPostView: FC = () => {
                 <FaEllipsis />
               </button>
               {showShareButtons && (
-                <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2">
+                <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[73%] md:w-[30%] md:right-12 md:h-[20%]">
                   <ShareButtons
                     postId={post.id}
                     postTitle={post.title}
@@ -780,7 +777,7 @@ const FullPostView: FC = () => {
             </div>
           </div>
         </div>
-        <div className="comments-section p-2 mt-2 pb-[60px] dark:bg-primary">
+        <div className="comments-section p-2 mt-2 pb-[60px] dark:bg-primary md:pr-20 md:pl-20">
           <h3 className="dark:text-white mb-4 font-semibold">Comments</h3>
           <div className="flex flex-col gap-2 mb-10">
             <textarea

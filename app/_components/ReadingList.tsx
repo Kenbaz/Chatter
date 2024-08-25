@@ -31,7 +31,7 @@ const ReadingListPage: FC = () => {
 
   return (
     <div className="mt-14">
-      <h1 className="px-2 py-4 font-bold text-white">Your Reading List</h1>
+      <h1 className="px-2 py-4 font-bold text-xl md:text-2xl text-white">Your Reading List</h1>
       {bookmarkedPosts.map((post) => (
         <PostCard key={post.id} post={post} authorId={post.authorId} />
       ))}

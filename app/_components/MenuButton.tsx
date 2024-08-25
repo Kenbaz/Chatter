@@ -77,7 +77,7 @@ const MenuButton: FC = () => {
     <div className="relative" ref={dropdownRef}>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="focus:outline-teal-800 hover:border-teal-800 hover:border-2 border-2 border-teal-700 cursor-pointer w-[40px] h-[40px] rounded-[50%] overflow-hidden flex justify-center items-center"
+        className="focus:outline-teal-800 hover:border-teal-800 hover:border-3 border-3 border-teal-700 cursor-pointer w-[40px] h-[40px] rounded-[50%] overflow-hidden flex justify-center items-center"
       >
         <Image
           src={
@@ -85,16 +85,16 @@ const MenuButton: FC = () => {
             "/images/default-profile-image-2.jpg"
           }
           alt="menu"
-          width={50}
-          height={50}
+          width={40}
+          height={40}
           style={{ objectFit: "cover" }}
         />
       </div>
       {isOpen && (
-        <div className="absolute -right-[29px] mt-2 border border-customGray1 w-[90vw] bg-primary rounded-md shadow-lg py-1 transition-all duration-300 ease-out">
+        <div className="absolute -right-[29px] mt-2 border border-customGray1 w-[90vw] bg-primary rounded-md shadow-lg py-1 transition-all duration-300 ease-out md:w-[30vw] md:right-[13px] md:top-[42px]">
           <div
             onClick={() => router.push(`/profile/${user.uid}`)}
-            className=" px-4 flex items-center gap-2 cursor-pointer py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
+            className=" px-4 flex items-center gap-2 md:gap-3 cursor-pointer py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left border border-t-0 border-r-0 border-l-0 border-customGray1"
           >
             <span className="w-[30px] h-[30px] rounded-[50%] overflow-hidden flex justify-center items-center border-2 border-teal-700">
               <Image
@@ -112,7 +112,7 @@ const MenuButton: FC = () => {
           </div>
           <button
             onClick={() => router.push("/reading-list")}
-            className="flex items-center gap-2 px-4 py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
+            className="flex items-center gap-2 md:gap-3 px-4 py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
           >
             <span>
               <FaBookmark />
@@ -120,7 +120,7 @@ const MenuButton: FC = () => {
             <span>Reading List</span>
           </button>
           <button
-            className="flex items-center gap-2 px-4 py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
+            className="flex items-center gap-2 md:gap-3 px-4 py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
             onClick={handleCreatePostNavigation}
           >
             <span>
