@@ -337,7 +337,7 @@ const ProfilePage: FC = () => {
         </div>
       </div>
 
-      <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-16 md:w-[95%] md:m-auto md:mt-28 md:h-full">
+      <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-16 md:w-[95%] md:m-auto md:mt-28 md:h-full lg:w-[92%] 2xl:w-[70%]">
         <div className="profile-header rounded-md pb-4 p-2 mt-5 relative dark:bg-primary mb-4 text-center">
           {error && <p className="text-red-600">{error}</p>}
           {!isOwnProfile && (
@@ -356,7 +356,7 @@ const ProfilePage: FC = () => {
             </Link>
           )}
           <div className=" pt-6">
-            <div className="w-[100px] h-[100px] rounded-[50%] overflow-hidden flex justify-center items-center md:absolute md:-top-[50px] md:left-[43%]">
+            <div className="w-[100px] h-[100px] rounded-[50%] overflow-hidden flex justify-center items-center md:absolute md:-top-[50px] md:left-[45%] lg:left-[45%]">
               <Image
                 src={
                   profileData.profilePictureUrl ||

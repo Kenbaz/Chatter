@@ -31,7 +31,7 @@ const MyInterests: FC = () => {
     }, [fetchInterests]);
 
      if (loading) {
-       return <div className="text-sm text-white">Loading interests</div>;
+       return <div className="text-sm text-white">Loading interests...</div>;
     }
     
     return (

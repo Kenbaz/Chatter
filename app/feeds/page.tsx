@@ -13,13 +13,13 @@ export default function Feeds({
   return (
     <>
       <div className="grid-style hidden md:grid lg:grid-style2 2xl:grid-style3 xl:grid-style4">
-        <aside className=" mt-14">
+        <aside className=" mt-14 hidden md:block">
           <SideBarContent />
         </aside>
-        <main className="">
+        <main className=" md:pr-4">
           <FeedsPage initialFeedType={feedType} />
         </main>
-        <aside className=" mt-14">
+        <aside className=" mt-14 hidden lg:block">
           <SideBar/>
         </aside>
       </div>

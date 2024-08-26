@@ -30,7 +30,7 @@ const MyLanguages: FC = () => {
   }, [fetchLanguages]);
 
   if (loading) {
-    return <div>Loading languages</div>;
+    return <div className="text-white text-[14px]">Loading languages...</div>;
   }
 
   return (

@@ -181,7 +181,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
         )}
       </div>
       {comments.length > 0 && (
-        <div className="comments-preview mt-4">
+        <div className="comments-preview mt-4 md:pr-10 2xl:pr-14">
           {limitedComments.map((comment) => (
             <div
               key={comment.id}
