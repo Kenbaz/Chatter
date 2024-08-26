@@ -18,7 +18,6 @@ import { MdLocationOn } from "react-icons/md";
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
 import PostCardWithNoPreview from "./PostCardWithNoPreview";
 
-
 interface UserProfileData {
   username: string;
   fullname: string;
@@ -79,11 +78,11 @@ const ProfilePage: FC = () => {
     } catch (error) {
       dispatch(setError("Failed to load drafted posts"));
       console.error("Error fetching drafted posts:", error);
-    };
+    }
   }, [user]);
 
   useEffect(() => {
-    fetchDraftedPosts()
+    fetchDraftedPosts();
   }, [fetchDraftedPosts]);
 
   useEffect(() => {
@@ -337,7 +336,7 @@ const ProfilePage: FC = () => {
         </div>
       </div>
 
-      <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-16 md:w-[95%] md:m-auto md:mt-28 md:h-full">
+      <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-16 md:w-[95%] md:m-auto md:mt-28 md:h-full lg:w-[92%] 2xl:w-[70%]">
         <div className="profile-header rounded-md pb-4 p-2 mt-5 relative dark:bg-primary mb-4 text-center">
           {error && <p className="text-red-600">{error}</p>}
           {!isOwnProfile && (
@@ -356,7 +355,7 @@ const ProfilePage: FC = () => {
             </Link>
           )}
           <div className=" pt-6">
-            <div className="w-[100px] h-[100px] rounded-[50%] overflow-hidden flex justify-center items-center md:absolute md:-top-[50px] md:left-[43%]">
+            <div className="w-[100px] h-[100px] rounded-[50%] overflow-hidden flex justify-center items-center md:absolute md:-top-[50px] md:left-[45%] lg:left-[45%]">
               <Image
                 src={
                   profileData.profilePictureUrl ||
@@ -386,7 +385,7 @@ const ProfilePage: FC = () => {
               )}
             </div>
             <div className="flex items-center justify-center gap-1 border border-t-0 border-l-0 border-r-0 pb-4 dark:border-customGray1 text-gray-400 text-center">
-                <MdLocationOn className="text-2xl text-center text-gray-400" />
+              <MdLocationOn className="text-2xl text-center text-gray-400" />
               <span>
                 {profileData.location && (
                   <p className="text-center">{profileData.location}</p>

@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import { FC } from "react";
 
 interface ConfirmModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm: () => void;
-    message: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  message: string;
 }
 
 const ConfirmModal: FC<ConfirmModalProps> = ({
@@ -17,7 +17,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-primary w-[75%] p-6 rounded-lg shadow-lg md:w-[50%]">
+      <div className="bg-primary w-[75%] p-6 rounded-lg shadow-lg md:w-[50%] lg:w-[20%] xl:w-[30%] 2xl:w-[20%]">
         <p className="mb-4 text-center relative">{message}</p>
         <div className="flex justify-center">
           <button

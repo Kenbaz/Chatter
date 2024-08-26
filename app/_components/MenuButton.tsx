@@ -91,7 +91,7 @@ const MenuButton: FC = () => {
         />
       </div>
       {isOpen && (
-        <div className="absolute -right-[29px] mt-2 border border-customGray1 w-[90vw] bg-primary rounded-md shadow-lg py-1 transition-all duration-300 ease-out md:w-[30vw] md:right-[13px] md:top-[42px]">
+        <div className="absolute -right-[29px] mt-2 border border-customGray1 w-[90vw] bg-primary rounded-md shadow-lg py-1 transition-all duration-300 ease-out md:w-[30vw] md:right-[13px] md:top-[42px] lg:w-[25vw] 2xl:w-[17vw]">
           <div
             onClick={() => router.push(`/profile/${user.uid}`)}
             className=" px-4 flex items-center gap-2 md:gap-3 cursor-pointer py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left border border-t-0 border-r-0 border-l-0 border-customGray1"
