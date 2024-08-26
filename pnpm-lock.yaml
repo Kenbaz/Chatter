@@ -83,6 +83,9 @@ dependencies:
   turndown:
     specifier: ^7.2.0
     version: 7.2.0
+  undici:
+    specifier: ^6.19.8
+    version: 6.19.8
   uuid:
     specifier: ^10.0.0
     version: 10.0.0
@@ -5985,6 +5988,11 @@ packages:
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.1.1
+    dev: false
+
+  /undici@6.19.8:
+    resolution: {integrity: sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==}
+    engines: {node: '>=18.17'}
     dev: false
 
   /unified@11.0.5:
