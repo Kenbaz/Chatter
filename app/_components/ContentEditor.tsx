@@ -152,35 +152,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
   const INITIAL_EDITOR_HEIGHT = "370px";
   const FULL_SCREEN_THRESHOLD = 0;
 
-  // const getInitialEditorHeight = () => {
-  //   if (typeof window !== "undefined") {
-  //     const screenHeight = window.innerHeight;
-  //     if (screenHeight < 600) {
-  //       return "200px";
-  //     } else if (screenHeight < 900) {
-  //       return "400px";
-  //     } else {
-  //       return "600px";
-  //     }
-  //   }
-  //   return "370px"; // Default fallback
-  // };
-
   const [editorHeight, setEditorHeight] = useState(INITIAL_EDITOR_HEIGHT);
-
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     setEditorHeight(getInitialEditorHeight());
-  //   };
-
-  //   window.addEventListener("resize", handleResize);
-
-  //   return () => {
-  //     window.removeEventListener("resize", handleResize);
-  //   };
-  // }, []);
-
-
 
   useEffect(() => {
     const fetchTags = async () => {
