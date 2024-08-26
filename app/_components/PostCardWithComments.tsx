@@ -92,7 +92,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
 
     setTimeout(() => {
       setShouldShowDropdown(true);
-    }, 1000);
+    }, 3000);
   };
 
   const handleMouseLeave = () => {
@@ -105,7 +105,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 p-2 h-auto ">
+    <div className="post-card bg-primary mb-2 p-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10">
       <div
         className="profile-picture-container"
         onMouseEnter={handleMouseEnter}
@@ -147,11 +147,11 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
         )}
       </div>
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2">
+        <h1 className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8">
           {post.title}
         </h1>
       </Link>
-      <small className="flex gap-2 text-sm ">
+      <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
             <span className="p-1 font-light rounded-lg hover:bg-gray-700">
@@ -161,10 +161,10 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
           </Link>
         ))}
       </small>
-      <div className="mt-2 mb-3">
+      <div className="mt-2 mb-3 md:pl-8">
         <Markdown>{`${post.content.substring(0, 130)}....`}</Markdown>
       </div>
-      <div className="post-actions items-center flex gap-10">
+      <div className="post-actions items-center flex gap-10 md:pl-8">
         {likeCount > 0 && (
           <button className="text-sm p-1 rounded-lg font-light">
             <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}

@@ -80,7 +80,7 @@ const SearchBar: FC = () => {
   }, []);
 
   return (
-    <div className="search-bar-container border outline-none relative w-full rounded-lg border-teal-600 z-50">
+    <div className="search-bar-container border outline-none relative w-full rounded-lg border-secondary z-50">
       {error && <p className="text-red-600">{error}</p>}
       <div className="relative">
         <input
@@ -95,7 +95,7 @@ const SearchBar: FC = () => {
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="search-results-dropdown w-full border border-t-0 rounded-t-sm border-secondary rounded-b-lg dark:bg-customGray1 p-1"
+          className="search-results-dropdown md:absolute w-full border border-t-0 rounded-t-sm dark:border-customGray1 rounded-b-lg dark:bg-customGray1 p-1"
         >
           {results.length > 0 ? (
             results.map((post) => (

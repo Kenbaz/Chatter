@@ -27,19 +27,19 @@ export default function RootLayout({
     <div className={`${inter.className} overflow-y-scroll h-screen`}>
       <header className="h-14 dark:bg-primary fixed top-0 z-40 w-full flex justify-around items-center border border-t-0 border-l-0 border-r-0 border-headerColor">
         <Link href="/feeds">
-          <div className="text-outline-teal p-1 -ml-16 text-black text-xl font-bold tracking-wide">
+          <div className="text-outline-teal p-1 -ml-16 md:ml-0 text-black text-xl font-bold tracking-wide">
             Chatter
           </div>
         </Link>
-        <div className="hidden md:block">
+        <div className="hidden md:block w-[50%]">
           <SearchBar />
         </div>
-        <div className="md:flex hidden items-center gap-20">
+        <div className="md:flex hidden items-center gap-10">
           <button
-            className="w-32 rounded-lg hidden md:block border text-center relative py-2"
+            className="w-32 rounded-lg hidden md:block border border-teal-800 text-teal-700 text-center relative py-2"
             onClick={handleCreatePostNavigation}
           >
-            <FaPlus className="absolute top-3 left-4" /> Create
+             Create
           </button>
           <MenuButton />
         </div>

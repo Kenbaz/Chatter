@@ -271,6 +271,11 @@ export const Profile = () => {
     return userData?.interests || [];
   };
 
+  const getUserLanguages = async (userId: string): Promise<string[]> => {
+    const userData = await getUserProfile(userId);
+    return userData?.languages || [];
+  };
+
   const getUserProfilePicture = async (
     userId: string
   ): Promise<string | undefined> => {
@@ -339,6 +344,7 @@ export const Profile = () => {
     updateUserInterests,
     getUserInterests,
     updateUserBio,
+    getUserLanguages,
     validateUserData,
     getUserProfilePicture,
     validateField,

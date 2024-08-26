@@ -265,12 +265,12 @@ const EditProfile: FC = () => {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="profile-edit-container mt-[70px] pb-[5rem] text-tinWhite">
+    <div className="profile-edit-container mt-[70px] pb-[5rem] text-tinWhite md:w-[80%] md:m-auto md:mt-16">
       {error && <p className="text-red-600">{error}</p>}
       {successMessage && <p className="text-green-600">{successMessage}</p>}
 
       <form onSubmit={handleSubmit} className="">
-        <div className="p-2 pb-8 dark:bg-primary dark:text-white mt-2">
+        <div className="p-2 pb-8 dark:bg-primary dark:text-white mt-2 md:pl-5 md:pr-5">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Basic Info</h1>
           <label htmlFor="profilePicture">Profile Picture</label>
           <div className="mt-2 flex items-center w-full mb-3">
@@ -367,7 +367,7 @@ const EditProfile: FC = () => {
             )}
           </div>
         </div>
-        <div className="mt-3 dark:bg-primary p-2 pb-8 dark:text-white">
+        <div className="mt-3 dark:bg-primary p-2 pb-8 dark:text-white md:pl-5 md:pr-5">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Personal</h1>
           <div className="flex flex-col gap-2">
             <label htmlFor="location">Location</label>
@@ -394,7 +394,7 @@ const EditProfile: FC = () => {
             )}
           </div>
         </div>
-        <div className="mt-3 dark:bg-primary dark:text-white pb-8 p-2">
+        <div className="mt-3 dark:bg-primary dark:text-white pb-8 p-2 md:pl-5 md:pr-5">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Career</h1>
           <div className="flex flex-col gap-2">
             <label htmlFor="work">Work</label>
@@ -420,7 +420,7 @@ const EditProfile: FC = () => {
             )}
           </div>
         </div>
-        <div className="mt-3 dark:bg-primary dark:text-white p-2">
+        <div className="mt-3 dark:bg-primary dark:text-white p-2 md:pl-5 md:pr-5">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Coding</h1>
           <div className="flex flex-col gap-2">
             <label htmlFor="Languages">Skills/Languages</label>
@@ -442,7 +442,7 @@ const EditProfile: FC = () => {
           </div>
         </div>
 
-        <div className="mb-4 mt-3 dark:bg-primary p-2 dark:text-white">
+        <div className="mb-4 mt-3 dark:bg-primary p-2 dark:text-white md:pl-5 md:pr-5">
           <h1 className="font-bold dark:text-white mb-4 text-xl">Interests</h1>
           <div className="flex flex-col gap-2">
             <label htmlFor="Interests">Interests</label>
@@ -475,7 +475,7 @@ const EditProfile: FC = () => {
             </div>
           </div>
         </div>
-        <div className="dark:bg-primary flex flex-col gap-2 pb-8 p-2 dark:text-white">
+        <div className="dark:bg-primary flex flex-col gap-2 pb-8 p-2 dark:text-white md:pl-5 md:pr-5">
           <label htmlFor="education" className="font-bold">
             Education
           </label>
@@ -500,7 +500,7 @@ const EditProfile: FC = () => {
             </ul>
           )}
         </div>
-        <div className="mt-3 dark:bg-primary dark:text-white p-2">
+        <div className="mt-3 dark:bg-primary dark:text-white p-2 md:pl-5 md:pr-5">
           <h3 className="font-bold dark:text-white mb-4 text-xl">
             Social Links
           </h3>
@@ -578,7 +578,7 @@ const EditProfile: FC = () => {
             </div>
           </div>
         </div>
-        <div className="p-2 mt-3 dark:bg-primary">
+        <div className="p-2 mt-3 dark:bg-primary md:pl-5 md:pr-5">
           <button
             className="p-2 w-full rounded-md text-center dark:bg-teal-800 dark:text-white"
             type="submit"

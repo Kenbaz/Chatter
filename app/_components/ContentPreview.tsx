@@ -96,7 +96,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
   
 
   return (
-    <article className="max-w-4xl bg-primary mx-auto">
+    <article className="max-w-4xl mt-14 bg-primary mx-auto md:w-11/12 md:m-auto md:mt-14 lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-14">
       {coverImageUrl && (
         <div className="relative w-full aspect-[16/8] mb-10">
           <Image
@@ -110,7 +110,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
           />
         </div>
       )}
-      <div className="p-2">
+      <div className="p-2 md:pl-4 md:pr-4">
         {authorName && publishDate && (
           <div className="mb-4 text-sm flex gap-2 items-center">
             <div className="flex flex-col">

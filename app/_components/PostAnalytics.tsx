@@ -62,7 +62,7 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
     if (!analytics) return <div>Loading analytics...</div>;
 
     return (
-      <div className="detailed-post-analytics mt-14 pb-16 p-2 gap-2 grid place-items-center">
+      <div className="detailed-post-analytics mt-14 pb-16 p-2 gap-2 grid place-items-center md:w-11/12 md:m-auto md:mt-14">
         {posts && (
           <h1 className="text-center font-bold text-2xl text-teal-700 p-2">
             {posts.title}
