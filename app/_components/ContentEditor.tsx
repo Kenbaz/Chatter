@@ -513,7 +513,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
           Preview
         </button>
       </header>
-      <div className="max-w-4xl mt-14 pb-14 relative mx-auto p-4 md:w-[90%] md:m-auto md:mt-14 lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-10 lg:landscape:p-2 lg:landscape:pb-0">
+      <div className="max-w-4xl mt-14 pb-[5rem] relative mx-auto p-4 md:w-[90%] md:m-auto md:mt-14 md:pb-[6rem] lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-10 lg:landscape:p-2 lg:landscape:pb-7">
         {isPreview ? (
           <div className="fixed inset-0 z-50 overflow-auto">
             <ContentPreview

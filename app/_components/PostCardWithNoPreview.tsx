@@ -98,14 +98,14 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 md:pl-5 md:pr-5">
-      <div
-        className="profile-picture-container"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 md:pl-5 md:pr-5 md:rounded-md">
+      <div className="profile-picture-container">
         <div className="flex items-center mt-2 gap-2">
-          <div className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
+          <div
+            className="w-[30px] h-[30px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             {isLoading ? (
               <div>
                 <Image
@@ -128,7 +128,11 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
               />
             )}
           </div>
-          <small className="text-[14px]">{authorName}</small>
+          <Link href={`/profile/${authorId}`}>
+            <small className="text-[14px] cursor-pointer hover:text-white">
+              {authorName}
+            </small>
+          </Link>
         </div>
 
         {showProfileHover && shouldShowDropdown && authorData && (
@@ -162,22 +166,6 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
           </Link>
         ))}
       </small>
-      <div className="post-actions mt-3 items-center flex gap-10 md:pl-8">
-        {likeCount > 0 && (
-          <button className="text-sm p-1 rounded-lg font-light">
-            <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}
-          </button>
-        )}
-
-        {commentCount > 0 && (
-          <span className="comment-button rounded-lg flex gap-2 items-center text-sm font-light relative">
-            <span className="rounded-lg p-1 bg-gray-700">
-              <FaComment />
-            </span>{" "}
-            <span>{commentCount}</span>
-          </span>
-        )}
-      </div>
     </div>
   );
 };

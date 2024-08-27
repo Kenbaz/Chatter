@@ -184,16 +184,28 @@ const ProfilePage: FC = () => {
           )}
           <div className="flex items-center gap-3 pt-6">
             <div className="w-[100px] h-[100px] rounded-[50%] overflow-hidden flex justify-center items-center">
-              <Image
-                src={
-                  profileData.profilePictureUrl ||
-                  "/images/default-profile-image-2.jpg"
-                }
-                alt={`${profileData.username}'s profile picture`}
-                width={100}
-                height={100}
-                style={{ objectFit: "cover" }}
-              />
+              {isLoading ? (
+                <div>
+                  <Image
+                    src={"/images/default-profile-image-2.jpg"}
+                    alt={`${profileData.username}'s profile picture`}
+                    width={100}
+                    height={100}
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={
+                    profileData.profilePictureUrl ||
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt={`${profileData.username}'s profile picture`}
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "cover" }}
+                />
+              )}
             </div>
             <div>
               {profileData.fullname && (
@@ -336,7 +348,7 @@ const ProfilePage: FC = () => {
         </div>
       </div>
 
-      <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-16 md:w-[95%] md:m-auto md:mt-28 md:h-full lg:w-[92%] 2xl:w-[70%]">
+      <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-[4rem] md:w-[95%] md:m-auto md:mt-28 md:h-full lg:w-[92%] 2xl:w-[70%]">
         <div className="profile-header rounded-md pb-4 p-2 mt-5 relative dark:bg-primary mb-4 text-center">
           {error && <p className="text-red-600">{error}</p>}
           {!isOwnProfile && (
@@ -356,16 +368,28 @@ const ProfilePage: FC = () => {
           )}
           <div className=" pt-6">
             <div className="w-[100px] h-[100px] rounded-[50%] overflow-hidden flex justify-center items-center md:absolute md:-top-[50px] md:left-[45%] lg:left-[45%]">
-              <Image
-                src={
-                  profileData.profilePictureUrl ||
-                  "/images/default-profile-image-2.jpg"
-                }
-                alt={`${profileData.username}'s profile picture`}
-                width={100}
-                height={100}
-                style={{ objectFit: "cover" }}
-              />
+              {isLoading ? (
+                <div>
+                  <Image
+                    src={"/images/default-profile-image-2.jpg"}
+                    alt={`${profileData.username}'s profile picture`}
+                    width={100}
+                    height={100}
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={
+                    profileData.profilePictureUrl ||
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt={`${profileData.username}'s profile picture`}
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "cover" }}
+                />
+              )}
             </div>
             <div>
               {profileData.fullname && (

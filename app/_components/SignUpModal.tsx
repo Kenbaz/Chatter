@@ -20,7 +20,6 @@ const SignUpModal: FC = () => {
   const { showSignupModal } = useSelector((state: RootState) => state.modal);
   const { error } = useSelector((state: RootState) => state.error);
   const { isLoading } = useSelector((state: RootState) => state.loading);
-
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isEmailSignupLoading, setIsEmailSignupLoading] = useState(false);

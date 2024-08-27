@@ -106,13 +106,13 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
 
   return (
     <div className="post-card bg-primary mb-2 p-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10">
-      <div
-        className="profile-picture-container"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div className="profile-picture-container">
         <div className="flex items-center mt-2 gap-2">
-          <div className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 cursor-pointer overflow-hidden flex justify-center items-center">
+          <div
+            className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 cursor-pointer overflow-hidden flex justify-center items-center"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             {isLoading ? (
               <div>...</div>
             ) : (
@@ -127,7 +127,9 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
               />
             )}
           </div>
-          <small className="text-[14px]">{authorName}</small>
+          <Link href={`/profile/${authorId}`}>
+            <small className="text-[14px] hover:text-white">{authorName}</small>
+          </Link>
         </div>
 
         {showProfileHover && shouldShowDropdown && authorData && (

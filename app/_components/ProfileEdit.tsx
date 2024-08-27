@@ -266,7 +266,7 @@ const EditProfile: FC = () => {
 
   return (
     <>
-      <div className="profile-edit-container mt-[70px] pb-[5rem] text-tinWhite md:w-[70%] md:m-auto md:mt-16 lg:landscape:w-[60%] lg:landscape:pb-2 md:pb-7 2xl:hidden">
+      <div className="profile-edit-container mt-[70px] pb-[5rem] text-tinWhite md:w-[70%] md:m-auto md:mt-16 lg:landscape:w-[60%] lg:landscape:pb-2 md:pb-[7rem] 2xl:hidden">
         {error && <p className="text-red-600">{error}</p>}
         {successMessage && <p className="text-green-600">{successMessage}</p>}
 
