@@ -11,6 +11,7 @@ import SearchBar from "./SearchBar";
 import { FaSearch, FaPlus, FaArrowDown } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
+import { throttle } from "lodash";
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -35,12 +36,12 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const [loading, setLoading] = useState(false);
   const [authorName, setAuthorName] = useState("");
   const [error, setError] = useState("");
-  const [isPulling, setIsPulling] = useState(false);
-  const [pullStartY, setPullStartY] = useState(0);
-  const [pullMoveY, setPullMoveY] = useState(0);
+  // const [isPulling, setIsPulling] = useState(false);
+  // const [pullStartY, setPullStartY] = useState(0);
+  // const [pullMoveY, setPullMoveY] = useState(0);
   const [feedType, setFeedType] = useState(initialFeedType);
   const [hasMore, setHasMore] = useState(true);
-  const [arrowRotation, setArrowRotation] = useState(0);
+  // const [arrowRotation, setArrowRotation] = useState(0);
   const [isInitialMount, setIsInitialMount] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     sortBy: "recent",
@@ -49,10 +50,9 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setFeedType(searchParams.get("feedType") as string | undefined);
-  }, [searchParams]);
+  const containerRef = useRef<HTMLDivElement>(null)
+  const pullRef = useRef({ startY: 0, moveY: 0, scrolling: false });
+  const [pullState, setPullState] = useState({ isPulling: false, rotation: 0 });
 
   const { getPersonalizedFeed, getFollowingFeed, getLatestFeed } = feeds();
 
@@ -60,49 +60,48 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   const router = useRouter();
 
-  const handleTouchStart = (e: TouchEvent) => {
-    if (window.scrollY === 0) {
-      setPullStartY(e.touches[0].clientY);
-    }
-  };
+  useEffect(() => {
+    setFeedType(searchParams.get("feedType") as string | undefined);
+  }, [searchParams]);
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (pullStartY === 0) return;
+  const isAtTop = useCallback(() => {
+    return window.scrollY <= 5;
+  }, []);
 
-    const touch = e.touches[0];
-    const pullDistance = touch.clientY - pullStartY;
-
-    if (pullDistance > 0) {
-      setPullMoveY(pullDistance);
-      setIsPulling(true);
-
-      // Calculate arrow rotation (max 180 degrees)
-      const newRotation = Math.min(180, (pullDistance / 40) * 180);
-      setArrowRotation(newRotation);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (pullMoveY > 40) {
-      refreshFeed();
-    };
-    setPullStartY(0);
-    setPullMoveY(0);
-    setIsPulling(false);
-    setArrowRotation(0);
-  };
-
-  const RefreshArrow: FC<RefreshArrowProps> = ({ rotation }) => (
-    <div
-      style={{
-        transform: `rotate(${rotation}deg)`,
-        transition: "transform 0.2s ease",
-      }}
-    >
-      <FaArrowDown size={14} />
-    </div>
-  );
   
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (isAtTop()) {
+        pullRef.current.startY = e.touches[0].clientY;
+        pullRef.current.scrolling = false;
+      }
+    },
+    [isAtTop]
+  );
+
+ const handleTouchMove = useCallback(
+   throttle((e: React.TouchEvent) => {
+     if (pullRef.current.startY === 0 || pullRef.current.scrolling) return;
+     const touch = e.touches[0];
+     const pullDistance = touch.clientY - pullRef.current.startY;
+
+     if (pullDistance > 0 && isAtTop()) {
+       pullRef.current.moveY = pullDistance;
+       const newRotation = Math.min(180, (pullDistance / 40) * 180);
+       setPullState({ isPulling: true, rotation: newRotation });
+
+       // Prevent scrolling by adjusting the scroll position
+       if (containerRef.current) {
+         containerRef.current.scrollTop = 0;
+       }
+     } else {
+       pullRef.current.scrolling = true;
+       resetPullState();
+     }
+   }, 16),
+   [isAtTop]
+  );
 
   const fetchMorePosts = useCallback(async () => {
     if (!user || !hasMore) return;
@@ -151,28 +150,46 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     } finally {
       setLoading(false);
     }
-  }, [
-    user,
-    getPersonalizedFeed,
-    getFollowingFeed,
-    getLatestFeed,
-    feedType,
-    hasMore,
-    filters,
-    posts,
-  ]);
+  }, [user, feedType, posts, hasMore, filters]);
 
   const refreshFeed = useCallback(() => {
     setPosts([]);
     setHasMore(true);
     fetchMorePosts();
   }, [fetchMorePosts]);
+  
+  const resetPullState = useCallback(() => {
+    pullRef.current = { startY: 0, moveY: 0, scrolling: false };
+    setPullState({ isPulling: false, rotation: 0 });
+  }, []);
+
+ const handleTouchEnd = useCallback(() => {
+   if (pullRef.current.moveY > 40 && !pullRef.current.scrolling) {
+     refreshFeed();
+   }
+   resetPullState();
+ }, [refreshFeed, resetPullState]);
+  
+  const handleTouchCancel = useCallback(() => {
+    resetPullState();
+  }, [resetPullState]);
+
+  const RefreshArrow: FC<RefreshArrowProps> = ({ rotation }) => (
+    <div
+      style={{
+        transform: `rotate(${rotation}deg)`,
+        transition: "transform 0.2s ease",
+      }}
+    >
+      <FaArrowDown size={14} />
+    </div>
+  );
 
   const toggleSearchBar = () => {
     setIsSearchBarVisible((prev) => !prev);
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
       searchBarRef.current &&
       !searchBarRef.current.contains(event.target as Node) &&
@@ -181,14 +198,14 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     ) {
       setIsSearchBarVisible(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [handleClickOutside]);
 
   const handleCreatePostNavigation = () => {
     router.push("/create-post");
@@ -243,10 +260,12 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   return (
     <div
+      ref={containerRef}
       className="feed-container h-auto pb-10 md:pl-4"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
     >
       <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
@@ -271,10 +290,10 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           <MenuButton />
         </div>
       </header>
-      {isPulling && (
+      {pullState.isPulling && (
         <div
           style={{
-            height: `${pullMoveY}px`,
+            height: `${pullRef.current.moveY}px`,
             maxHeight: "100px",
             transition: "height 0.3s ease",
             display: "flex",
@@ -282,15 +301,15 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
             alignItems: "center",
             justifyContent: "center",
             marginBlockStart: "20px",
-            marginBlockEnd: "-35px"
+            marginBlockEnd: "-35px",
           }}
         >
           <div className="mt-10 flex items-center gap-1">
+            <RefreshArrow rotation={pullState.rotation} />
             <span>
-              <RefreshArrow rotation={arrowRotation} />
-            </span>
-            <span>
-              {pullMoveY > 40 ? "Release to refresh" : "Pull down to refresh"}
+              {pullRef.current.moveY > 40
+                ? "Release to refresh"
+                : "Pull down to refresh"}
             </span>
           </div>
         </div>
