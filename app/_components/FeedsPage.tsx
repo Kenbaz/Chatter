@@ -11,6 +11,7 @@ import SearchBar from "./SearchBar";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
+import FeedsPageSkeleton from "./skeletons/FeedsPageSkeleton";
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -258,7 +259,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
             authorId={post.authorId}
           />
         ))}
-        {hasMore && <div ref={ref}>{loading && <div>Loading...</div>}</div>}
+        {hasMore && <div ref={ref}>{loading && <FeedsPageSkeleton/>}</div>}
         {!hasMore && <div>No more posts</div>}
       </div>
     </div>

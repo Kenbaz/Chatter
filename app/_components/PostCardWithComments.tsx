@@ -114,7 +114,17 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
             onMouseLeave={handleMouseLeave}
           >
             {isLoading ? (
-              <div>...</div>
+              <div>
+                <Image
+                  src={
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt="Avatar"
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
             ) : (
               <Image
                 src={
