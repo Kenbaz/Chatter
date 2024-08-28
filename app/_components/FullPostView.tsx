@@ -631,9 +631,9 @@ const FullPostView: FC = () => {
         />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <div className="full-post-container mt-14 relative h-auto pb-12 md:w-[75%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[67%]">
+      <div className="full-post-container mt-14 relative h-auto pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
         {post && (
-          <div className="full-post-content dark:bg-primary max-w-4xl mx-auto rounded-md xl:w-[70%] 2xl:w-[60%]">
+          <div className="full-post-content dark:bg-primary max-w-4xl mx-auto rounded-md xl:w-[80%] 2xl:w-[80%]">
             {post.coverImage && (
               <div className="relative w-full aspect-[17/8] lg:landscape:aspect-[12/4] mb-5">
                 <Image
@@ -733,7 +733,7 @@ const FullPostView: FC = () => {
           </div>
         )}
         <div className="post-actions">
-          <div className="flex items-center w-full p-4 bg-headerColor justify-around fixed z-50 bottom-0 md:w-[10%] md:flex-col md:h-[30%] md:left-3 md:top-16 lg:landscape:w-[10%] lg:landscape:flex-col lg:landscape:h-[50%] lg:landscape:left-10 lg:landscape:top-14 lg:w-[10%] lg:flex-col lg:h-[30%] lg:left-7 lg:top-16 xl:hidden">
+          <div className="flex items-center w-full p-4 bg-headerColor justify-around fixed z-50 bottom-0 md:w-[10%] md:flex-col md:h-[30%] md:left-0 md:top-16 lg:landscape:w-[10%] lg:landscape:flex-col lg:landscape:h-[50%] lg:landscape:left-10 lg:landscape:top-14 lg:w-[10%] lg:flex-col lg:h-[30%] lg:left-7 lg:top-16 xl:hidden">
             <button
               className="like-button relative flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleLike}
@@ -788,7 +788,7 @@ const FullPostView: FC = () => {
             </div>
           </div>
 
-          <div className="hidden xl:flex xl:fixed xl:w-[10%] xl:h-[45%] xl:justify-around xl:z-50 xl:left-[11rem] xl:top-[5rem] xl:flex-col xl:items-center xl:p-4 2xl:left-[23.5rem] 2xl:top-[6rem] 2xl:w-[5%] bg-headerColor">
+          <div className="hidden xl:flex xl:fixed xl:w-[10%] xl:h-[45%] xl:justify-around xl:z-50 xl:left-[9rem] xl:top-[5rem] xl:flex-col xl:items-center xl:p-4 2xl:left-[14rem] 2xl:top-[6rem] 2xl:w-[5%] bg-headerColor">
             <button
               className="like-button relative flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleLike}
@@ -831,7 +831,7 @@ const FullPostView: FC = () => {
                       coverImageUrl={post.coverImage}
                     />
                   </div>
-                  <div className="share-buttons-container rounded-md hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[16rem] xl:top-[24.5rem] 2xl:left-[28rem] 2xl:top-[23.5rem] border border-customGray rouned-md bg-primary shadow-lg p-2 ">
+                  <div className="share-buttons-container rounded-md hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[14.3rem] xl:top-[24.5rem] 2xl:left-[18rem] 2xl:top-[23.5rem] border border-customGray rouned-md bg-primary shadow-lg p-2 ">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
@@ -844,7 +844,7 @@ const FullPostView: FC = () => {
           </div>
         </div>
 
-        <div className="comments-section p-2 mt-2 pb-[60px] dark:bg-primary md:pr-36 md:pl-10 xl:w-[70%] xl:m-auto xl:mt-3 2xl:w-[60%] 2xl:rounded-md ">
+        <div className="comments-section p-2 mt-2 pb-[60px] dark:bg-primary md:pr-36 md:pl-10 xl:w-[80%] xl:m-auto xl:mt-3 2xl:w-[80%] 2xl:rounded-md ">
           <h3 className="dark:text-white xl:text-xl xl:pb-2 mb-4 font-semibold">
             Comments
           </h3>
