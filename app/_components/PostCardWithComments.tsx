@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState, useEffect} from "react";
+import { FC, useState, useEffect, useRef} from "react";
 import { PostData } from "@/src/libs/contentServices";
 import Markdown from "react-markdown";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
@@ -35,10 +35,16 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [authorProfilePicture, setAuthorProfilePicture] = useState("");
 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverRef = useRef<HTMLDivElement>(null);
+   const isHoveringRef = useRef(false);
+
   const { getPostAnalytics } = analyticsFuncs();
   const { getUserProfile } = Profile();
   const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
+  
+   
 
   const isCurrentUser = user?.uid === authorId;
 
@@ -87,18 +93,42 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   }, [authorId, user]);
     
 
-  const handleMouseEnter = () => {
-    setShowProfileHover(true);
-
-    setTimeout(() => {
-      setShouldShowDropdown(true);
-    }, 3000);
-  };
+ const handleMouseEnter = () => {
+   isHoveringRef.current = true;
+   if (timeoutRef.current) clearTimeout(timeoutRef.current);
+   timeoutRef.current = setTimeout(() => {
+     if (isHoveringRef.current) {
+       setShowProfileHover(true);
+     }
+   }, 500); // 500ms delay before showing the dropdown
+ };
 
   const handleMouseLeave = () => {
-    setShowProfileHover(false);
-    setShouldShowDropdown(false);
+    isHoveringRef.current = false;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      if (!isHoveringRef.current) {
+        setShowProfileHover(false);
+      }
+    }, 300); // 300ms delay before hiding the dropdown
   };
+  
+   useEffect(() => {
+     const handleClickOutside = (event: MouseEvent) => {
+       if (
+         hoverRef.current &&
+         !hoverRef.current.contains(event.target as Node)
+       ) {
+         setShowProfileHover(false);
+       }
+     };
+
+     document.addEventListener("mousedown", handleClickOutside);
+     return () => {
+       document.removeEventListener("mousedown", handleClickOutside);
+       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+     };
+   }, []);
 
     const limitedComments = comments.slice(0, 2);
 
@@ -106,17 +136,27 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
 
   return (
     <div className="post-card bg-primary mb-2 p-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10">
-      <div className="profile-picture-container">
-        <div className="flex items-center mt-2 gap-2">
-          <div
-            className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 cursor-pointer overflow-hidden flex justify-center items-center"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            {isLoading ? (
-              <div>
+      <div className="flex items-center mt-2 gap-2">
+        <div
+          ref={hoverRef}
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 cursor-pointer overflow-hidden flex justify-center items-center">
+              {isLoading ? (
+                <Image
+                  src="/images/default-profile-image-2.jpg"
+                  alt="Avatar"
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
                 <Image
                   src={
+                    authorProfilePicture ||
                     "/images/default-profile-image-2.jpg"
                   }
                   alt="Avatar"
@@ -124,40 +164,42 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
                   height={30}
                   style={{ objectFit: "cover" }}
                 />
-              </div>
-            ) : (
-              <Image
-                src={
-                  authorProfilePicture || "/images/default-profile-image-2.jpg"
-                }
-                alt="Avatar"
-                width={30}
-                height={30}
-                style={{ objectFit: "cover" }}
-              />
-            )}
+              )}
+            </div>
+            <Link href={`/profile/${authorId}`}>
+              <small className="text-[14px] hover:text-white">
+                {authorName}
+              </small>
+            </Link>
           </div>
-          <Link href={`/profile/${authorId}`}>
-            <small className="text-[14px] hover:text-white">{authorName}</small>
-          </Link>
-        </div>
 
-        {showProfileHover && shouldShowDropdown && authorData && (
-          <ProfileHoverDropdown
-            authorData={authorData}
-            isCurrentUser={isCurrentUser}
-            isFollowing={isFollowing}
-            onFollow={async () => {
-              await followUser(user.uid, authorId);
-              setIsFollowing(true);
-            }}
-            onUnfollow={async () => {
-              await unfollowUser(user.uid, authorId);
-              setIsFollowing(false);
-            }}
-          />
-        )}
+          {showProfileHover && authorData && (
+            <div
+              className="absolute left-0 mt-2 z-10"
+              onMouseEnter={() => {
+                isHoveringRef.current = true;
+                if (timeoutRef.current) clearTimeout(timeoutRef.current);
+              }}
+              onMouseLeave={handleMouseLeave}
+            >
+              <ProfileHoverDropdown
+                authorData={authorData}
+                isCurrentUser={isCurrentUser}
+                isFollowing={isFollowing}
+                onFollow={async () => {
+                  await followUser(user.uid, authorId);
+                  setIsFollowing(true);
+                }}
+                onUnfollow={async () => {
+                  await unfollowUser(user.uid, authorId);
+                  setIsFollowing(false);
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
+
       <Link href={`/post/${post.id}`}>
         <h1 className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8">
           {post.title}

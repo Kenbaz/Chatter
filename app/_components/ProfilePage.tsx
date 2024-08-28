@@ -164,9 +164,8 @@ const ProfilePage: FC = () => {
   return (
     <>
       <div className="user-profile-page mt-[70px] md:hidden h-auto pb-16 bg-primary">
-        {error && <p className="text-red-600">{error}</p>}
-
         <div className="profile-header pb-4 p-2 mt-5 relative dark:bg-primary mb-4">
+          {error && <p className="text-red-600 absolute top-20 left-[50%] z-10">{error}</p>}
           {!isOwnProfile && (
             <button
               onClick={handleFollow}
@@ -350,7 +349,7 @@ const ProfilePage: FC = () => {
 
       <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-[4rem] md:w-[95%] md:m-auto md:mt-28 md:h-full lg:w-[92%] 2xl:w-[70%]">
         <div className="profile-header rounded-md pb-4 p-2 mt-5 relative dark:bg-primary mb-4 text-center">
-          {error && <p className="text-red-600">{error}</p>}
+          {error && <p className="text-red-600 absolute top-20 left-[50%] z-10">{error}</p>}
           {!isOwnProfile && (
             <button
               onClick={handleFollow}

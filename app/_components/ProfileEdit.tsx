@@ -291,14 +291,14 @@ const EditProfile: FC = () => {
                   </div>
                 )}
               </div>
-            <input
-              type="file"
-              id="profilePicture"
-              accept="image/*"
-              onChange={handleProfilePictureUpload}
-              className=" border w-full px-2 py-[10.2px] outline-none rounded-md border-customGray1"
-            />
-          </div>
+              <input
+                type="file"
+                id="profilePicture"
+                accept="image/*"
+                onChange={handleProfilePictureUpload}
+                className=" border w-full px-2 py-[10.2px] outline-none rounded-md border-customGray1"
+              />
+            </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="username">Username</label>
               <div className="relative w-full">
@@ -532,7 +532,8 @@ const EditProfile: FC = () => {
                     )}
                   </ul>
                 )}
-        
+              </div>
+              <div>
                 <div className="flex items-center gap-2">
                   <label htmlFor="linkedIn">LinkedIn</label>
                   <input
@@ -595,7 +596,7 @@ const EditProfile: FC = () => {
       {/** BIG LAPTOP SCREEN VIEW || 1536px and above */}
 
       <div className="profile-edit-container hidden 2xl:block 2xl:w-[45%] 2xl:m-auto 2xl:mt-16 2xl:pb-7">
-       {error && <p className="text-red-600">{error}</p>}
+        {error && <p className="text-red-600">{error}</p>}
         {successMessage && <p className="text-green-600">{successMessage}</p>}
 
         <form onSubmit={handleSubmit} className="">
@@ -619,14 +620,14 @@ const EditProfile: FC = () => {
                   </div>
                 )}
               </div>
-            <input
-              type="file"
-              id="profilePicture"
-              accept="image/*"
-              onChange={handleProfilePictureUpload}
-              className=" border w-full px-2 py-[10.2px] outline-none rounded-md border-customGray1"
-            />
-          </div>
+              <input
+                type="file"
+                id="profilePicture"
+                accept="image/*"
+                onChange={handleProfilePictureUpload}
+                className=" border w-full px-2 py-[10.2px] outline-none rounded-md border-customGray1"
+              />
+            </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="username">Username</label>
               <div className="relative w-full">
@@ -860,6 +861,8 @@ const EditProfile: FC = () => {
                     )}
                   </ul>
                 )}
+              </div>
+              <div>
                 <div className="flex items-center gap-2">
                   <label htmlFor="linkedIn">LinkedIn</label>
                   <input

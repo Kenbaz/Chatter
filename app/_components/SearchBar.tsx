@@ -81,7 +81,7 @@ const SearchBar: FC = () => {
 
   return (
     <div className="search-bar-container border outline-none relative w-full rounded-lg border-secondary z-50">
-      {error && <p className="text-red-600">{error}</p>}
+      {error && <p className="text-red-600 absolute top-20 left-[50%] z-10">{error}</p>}
       <div className="relative">
         <input
           type="text"
