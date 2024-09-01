@@ -63,6 +63,7 @@ const EditProfile: FC = () => {
 
   const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [interestSearchTerm, setInterestSearchTerm] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
    const [charCounts, setCharCounts] = useState({
@@ -90,6 +91,10 @@ const EditProfile: FC = () => {
     },
     education: "",
   });
+
+  const filteredTags = tags.filter((tag) =>
+    tag.name.toLowerCase().includes(interestSearchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     // Initialize character counts when profile data is loaded
@@ -138,13 +143,11 @@ const EditProfile: FC = () => {
   }, [user]);
 
   const handleTagSelection = (tagName: string) => {
-    setSelectedTags((prevTags) => {
-      if (prevTags.includes(tagName)) {
-        return prevTags.filter((tag) => tag !== tagName);
-      } else {
-        return [...prevTags, tagName];
-      }
-    });
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tagName)
+        ? prevTags.filter((tag) => tag !== tagName)
+        : [...prevTags, tagName]
+    );
   };
 
   const toggleDropdown = (e: React.MouseEvent) => {
@@ -451,30 +454,63 @@ const EditProfile: FC = () => {
             </h1>
             <div className="flex flex-col gap-2">
               <label htmlFor="Interests">Interests</label>
-              <div className="relative" onClick={toggleDropdown}>
-                <div className="dark:bg-headerColor dark:border-customGray1 border px-4 py-2 rounded-md cursor-pointer">
-                  {selectedTags.length > 0
-                    ? selectedTags.map((tag) => tag).join(", ")
-                    : "Select Interests"}
+              <div className="relative">
+                <div
+                  className="dark:bg-headerColor dark:border-customGray1 border px-4 py-2 rounded-md cursor-pointer"
+                  onClick={toggleDropdown}
+                >
+                  {selectedTags.length > 0 ? (
+                    <div className="flex flex-wrap gap-3">
+                      {selectedTags.map((tag) => (
+                        <div
+                          key={tag}
+                          className="flex items-center gap-1 text-white"
+                        >
+                          {tag}
+                          <span
+                            className="cursor-pointer ml-1 relative top-[1px] text-sm hover:text-teal-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTagSelection(tag);
+                            }}
+                          >
+                            &#x2715;
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    "Select Interests"
+                  )}
                 </div>
                 {showTagsDropdown && (
-                  <div className=" interest-dropdown shadow-lg rounded-md p-3 max-h-56 overflow-y-auto w-full flex flex-wrap gap-3">
-                    {tags.map((tag) => (
-                      <div
-                        key={tag.id}
-                        className={`px-2 py-2 rounded-full cursor-pointer hover:bg-teal-800 hover:scale-110 border border-teal-800 ${
-                          selectedTags.includes(tag.name)
-                            ? "bg-teal-800 opacity-65 text-tinWhite"
-                            : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTagSelection(tag.name);
-                        }}
-                      >
-                        {tag.name}
-                      </div>
-                    ))}
+                  <div className="interest-dropdown shadow-lg rounded-md p-3 max-h-56 overflow-y-auto w-full">
+                    <input
+                      type="text"
+                      placeholder="Search interests..."
+                      value={interestSearchTerm}
+                      onChange={(e) => setInterestSearchTerm(e.target.value)}
+                      className="p-2 w-full outline-none bg-white dark:bg-headerColor border dark:border-customGray1 rounded-md mb-2"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <div className="flex flex-wrap gap-3">
+                      {filteredTags.map((tag) => (
+                        <div
+                          key={tag.id}
+                          className={`px-2 py-1 rounded-full cursor-pointer hover:bg-teal-800 hover:scale-110 hover:text-white transition-colors duration-200 border border-teal-800 ${
+                            selectedTags.includes(tag.name)
+                              ? "bg-teal-800 opacity-65 text-tinWhite"
+                              : ""
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTagSelection(tag.name);
+                          }}
+                        >
+                          {tag.name}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -780,30 +816,63 @@ const EditProfile: FC = () => {
             </h1>
             <div className="flex flex-col gap-2">
               <label htmlFor="Interests">Interests</label>
-              <div className="relative" onClick={toggleDropdown}>
-                <div className="dark:bg-headerColor dark:border-customGray1 border px-4 py-2 rounded-md cursor-pointer">
-                  {selectedTags.length > 0
-                    ? selectedTags.map((tag) => tag).join(", ")
-                    : "Select Interests"}
+              <div className="relative">
+                <div
+                  className="dark:bg-headerColor dark:border-customGray1 border px-4 py-2 rounded-md cursor-pointer"
+                  onClick={toggleDropdown}
+                >
+                  {selectedTags.length > 0 ? (
+                    <div className="flex flex-wrap gap-3">
+                      {selectedTags.map((tag) => (
+                        <div
+                          key={tag}
+                          className="flex items-center gap-1 text-white"
+                        >
+                          {tag}
+                          <span
+                            className="cursor-pointer ml-1 relative top-[1px] text-sm hover:text-teal-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTagSelection(tag);
+                            }}
+                          >
+                            &#x2715;
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    "Select Interests"
+                  )}
                 </div>
                 {showTagsDropdown && (
-                  <div className=" interest-dropdown shadow-lg rounded-md p-3 max-h-56 overflow-y-auto w-full flex flex-wrap gap-3">
-                    {tags.map((tag) => (
-                      <div
-                        key={tag.id}
-                        className={`px-2 py-2 rounded-full cursor-pointer hover:bg-teal-800 hover:scale-110 border border-teal-800 ${
-                          selectedTags.includes(tag.name)
-                            ? "bg-teal-800 opacity-65 text-tinWhite"
-                            : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTagSelection(tag.name);
-                        }}
-                      >
-                        {tag.name}
-                      </div>
-                    ))}
+                  <div className="interest-dropdown shadow-lg rounded-md p-3 max-h-56 overflow-y-auto w-full">
+                    <input
+                      type="text"
+                      placeholder="Search interests..."
+                      value={interestSearchTerm}
+                      onChange={(e) => setInterestSearchTerm(e.target.value)}
+                      className="p-2 w-full outline-none bg-white dark:bg-headerColor border dark:border-customGray1 rounded-md mb-2"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <div className="flex flex-wrap gap-3">
+                      {filteredTags.map((tag) => (
+                        <div
+                          key={tag.id}
+                          className={`px-2 py-1 rounded-full cursor-pointer hover:bg-teal-800 hover:scale-110 hover:text-white transition-colors duration-200 border border-teal-800 ${
+                            selectedTags.includes(tag.name)
+                              ? "bg-teal-800 opacity-65 text-tinWhite"
+                              : ""
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTagSelection(tag.name);
+                          }}
+                        >
+                          {tag.name}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

@@ -36,7 +36,7 @@ const SignUpModal: FC = () => {
     try {
       setIsEmailSignupLoading(true);
       await registerUser(email, password);
-      await initializeDefaultTags()
+      // await initializeDefaultTags()
       setSuccessMessage("User creation successful");
 
       setTimeout(() => {
@@ -59,7 +59,7 @@ const SignUpModal: FC = () => {
     try {
       setIsGoogleSignupLoading(true);
       await signInWithGoogle();
-      await initializeDefaultTags()
+      // await initializeDefaultTags()
       setSuccessMessage("Signed in with Google succesfully");
       setTimeout(() => {
         router.push("/feeds");

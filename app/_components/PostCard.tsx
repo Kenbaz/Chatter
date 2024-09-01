@@ -84,6 +84,14 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
     fetchPostAnalytics()
   }, [authorId, user]);
 
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.currentTarget;
+    target.style.color = "rgba(15, 118, 110, 0.5)";
+    setTimeout(() => {
+      target.style.color = "";
+    }, 150);
+  };
+
   const handleMouseEnter = () => {
     setShowProfileHover(true);
 
@@ -102,18 +110,13 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
 
   return (
     <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 md:pl-4 md:rounded-md">
-      <div
-        className="profile-picture-container"
-        
-      >
+      <div className="profile-picture-container">
         <div className="flex items-center mt-2 gap-2">
           <div className="w-[30px] h-[30px] rounded-[50%] overflow-hidden flex justify-center items-center">
             {isLoading ? (
               <div>
                 <Image
-                  src={
-                    "/images/default-profile-image-2.jpg"
-                  }
+                  src={"/images/default-profile-image-2.jpg"}
                   alt="Avatar"
                   width={30}
                   height={30}
@@ -132,12 +135,21 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
               />
             )}
           </div>
-          <small className="text-[14px]">{authorName}</small>
+          <small
+            className="text-[14px]"
+            onClick={handleClick}
+            style={{ position: "relative" }}
+          >
+            {authorName}
+          </small>
         </div>
-
       </div>
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-9">
+        <h1
+          className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-9"
+          onClick={handleClick}
+          style={{ position: "relative" }}
+        >
           {post.title}
         </h1>
       </Link>

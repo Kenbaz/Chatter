@@ -103,6 +103,14 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
    }, 500); // 500ms delay before showing the dropdown
  };
 
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.currentTarget;
+    target.style.color = "rgba(15, 118, 110, 0.5)";
+    setTimeout(() => {
+      target.style.color = '';
+    }, 150);
+  };
+
   const handleMouseLeave = () => {
     isHoveringRef.current = false;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -135,7 +143,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 p-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10">
+    <div className="post-card bg-primary mb-2 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10">
       <div className="flex items-center mt-2 gap-2">
         <div
           ref={hoverRef}
@@ -167,7 +175,11 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
               )}
             </div>
             <Link href={`/profile/${authorId}`}>
-              <small className="text-[14px] hover:text-white">
+              <small
+                className="text-[14px] hover:text-white"
+                onClick={handleClick}
+                style={{ position: "relative" }}
+              >
                 {authorName}
               </small>
             </Link>
@@ -201,7 +213,11 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       </div>
 
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8">
+        <h1
+          className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8"
+          onClick={handleClick}
+          style={{ position: "relative" }}
+        >
           {post.title}
         </h1>
       </Link>

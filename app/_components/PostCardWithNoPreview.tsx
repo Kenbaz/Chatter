@@ -82,6 +82,16 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
     fetchPostAnalytics();
   }, [authorId, user]);
 
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.currentTarget;
+    target.style.color = "rgba(15, 118, 110, 0.5)";
+    setTimeout(() => {
+      target.style.color = "";
+    }, 150);
+  };
+
+
   const handleMouseEnter = () => {
     setShowProfileHover(true);
 
@@ -129,7 +139,11 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
             )}
           </div>
           <Link href={`/profile/${authorId}`}>
-            <small className="text-[14px] cursor-pointer hover:text-white">
+            <small
+              className="text-[14px] cursor-pointer hover:text-white"
+              onClick={handleClick}
+              style={{ position: "relative" }}
+            >
               {authorName}
             </small>
           </Link>
@@ -152,7 +166,11 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
         )}
       </div>
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-8">
+        <h1
+          className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-8"
+          onClick={handleClick}
+          style={{ position: "relative" }}
+        >
           {post.title}
         </h1>
       </Link>

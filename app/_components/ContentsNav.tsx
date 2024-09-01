@@ -19,26 +19,32 @@ const ContentsNavigation: FC = () => {
   return (
     <nav>
       <ul className="flex space-x-4">
-        <li>
+        <li className="hover:text-teal-800">
           <Link
             href={`${pathname}?${createQueryString("feedType", "forYou")}`}
-            className={feedType === "forYou" ? "font-bold text-white" : "font-light"}
+            className={
+              feedType === "forYou" ? "font-bold text-white" : "font-light"
+            }
           >
             For You
           </Link>
         </li>
-        <li>
+        <li className="hover:text-teal-800">
           <Link
             href={`${pathname}?${createQueryString("feedType", "following")}`}
-            className={feedType === "following" ? "font-bold text-white" : "font-light"}
+            className={
+              feedType === "following" ? "font-bold text-white" : "font-light"
+            }
           >
             Following
           </Link>
         </li>
-        <li>
+        <li className="hover:text-teal-700">
           <Link
             href={`${pathname}?${createQueryString("feedType", "latest")}`}
-            className={feedType === "latest" ? "font-bold text-white" : "font-light"}
+            className={
+              feedType === "latest" ? "font-bold text-white" : "font-light"
+            }
           >
             Latest
           </Link>

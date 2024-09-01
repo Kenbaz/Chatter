@@ -2,12 +2,13 @@
 
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import ContentEditor from "../_components/ContentEditor";
+import ContentEditorSkeleton from "../_components/skeletons/ContentEditorSkeleton";
 
 const CreatePost = () => {
     const { user, loading } = useRequireAuth();
 
     if (loading) {
-        return <div>Loading...</div>
+        return <ContentEditorSkeleton/>
     }
 
   if (!user) {

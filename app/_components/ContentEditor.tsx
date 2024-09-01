@@ -34,6 +34,8 @@ import { tagFuncs } from "@/src/libs/contentServices";
 import { Comment } from "@/src/libs/contentServices";
 import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 import { useRouter } from "next/navigation";
+import { Search, XIcon } from "lucide-react";
+
 
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
   ssr: false,
@@ -137,9 +139,11 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
   const [publishDate, setPublishDate] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isSavingChanges, setIsSavingChanges] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
+   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   const [isDraft, setIsDraft] = useState(postStatus === "draft");
    const [tagColors, setTagColors] = useState<Record<string, string>>({});
@@ -170,6 +174,10 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
     fetchTags();
   }, []);
 
+   const filteredTags = availableTags.filter((tag) =>
+     tag.name.toLowerCase().includes(searchTerm.toLowerCase())
+   );
+
   const handleTagSelect = (tag: Tag) => {
     setSelectedTags((prev) => {
       let newTags;
@@ -186,9 +194,22 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
     });
   };
 
+  const handleTagRemove = (tagId: string) => {
+    setSelectedTags((prev) => {
+      const newTags = prev.filter((id) => id !== tagId);
+      setLocalContent((prevContent) => ({ ...prevContent, tags: newTags }));
+      return newTags;
+    });
+  };
+
+
   const toggleTagDropdown = () => {
     setIsTagDropdownOpen(!isTagDropdownOpen);
+    if (!isTagDropdownOpen) {
+      setSearchTerm("");
+    }
   };
+
 
   useEffect(() => {
     const tagNames = selectedTags
@@ -320,6 +341,20 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
      e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
+  useEffect(() => {
+    if (error) {
+      setIsErrorVisible(true);
+      const timer = setTimeout(() => {
+        setIsErrorVisible(false);
+        setTimeout(() => {
+          dispatch(clearError());
+        }, 300); // Wait for fade out animation to complete before clearing the error
+      }, 5000); // Error message will start to disappear after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const validateForm = (): boolean => {
     if (!title.trim()) {
       dispatch(setError("Please enter a title for your post"));
@@ -327,6 +362,10 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
     }
     if (!content.trim()) {
       dispatch(setError("Please enter some content for your post"));
+      return false;
+    }
+    if (selectedTags.length === 0) {
+      dispatch(setError("Please select atleast one tag for your post"));
       return false;
     }
     return true;
@@ -513,6 +552,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
           Preview
         </button>
       </header>
+      {}
       <div className="max-w-4xl mt-14 pb-[5rem] relative mx-auto p-4 md:w-[90%] md:m-auto md:mt-14 md:pb-[6rem] lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-10 lg:landscape:p-2 lg:landscape:pb-7">
         {isPreview ? (
           <div className="fixed inset-0 z-50 overflow-auto">
@@ -535,14 +575,29 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
           <>
             <div
               ref={contentRef}
-              className="mr-4 mb-4 overflow-y-auto w-full content-ref h-[610px] md:h-[84vh] lg:landscape:h-[81vh]"
+              className="mr-4 mb-4 overflow-y-auto w-full content-ref h-[720px] md:h-[84vh] lg:landscape:h-[81vh]"
             >
               {successMessage && (
                 <div className=" px-4 py-3 rounded relative mb-2" role="alert">
-                  <span className="block sm:inline">{successMessage}</span>
+                  <span className="block sm:inline text-green-700">
+                    {successMessage}
+                  </span>
                 </div>
               )}
-              {error && <p className="text-red-500 mt-2">{error}</p>}
+              <div
+                className={`
+            bg-red-900 text-red-500 px-4 py-3 rounded relative mb-4
+            transition-all duration-300 ease-in-out
+            ${
+              isErrorVisible
+                ? "opacity-100 max-h-20"
+                : "opacity-0 max-h-0 overflow-hidden"
+            }
+          `}
+                role="alert"
+              >
+                <span className="block sm:inline">{error}</span>
+              </div>
               <button
                 onClick={handleSetCoverImage}
                 className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4 lg:landscape:mb-6"
@@ -574,7 +629,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   </button>
                 </div>
               )}
-              <div className="mb-6 w-full p-2 pb-4 lg:landscape:-mb-3">
+              <div className=" w-full p-2 pb-4 lg:landscape:-mb-3">
                 <textarea
                   placeholder="Title..."
                   value={title}
@@ -585,19 +640,27 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
               <div className="mb-6 relative">
                 <div
                   onClick={toggleTagDropdown}
-                  className="w-full p-2 mb-4  rounded bg-headerColor outline-none cursor-pointer text-tinWhite"
+                  className="w-full p-2 mb-4 rounded bg-headerColor outline-none cursor-pointer text-tinWhite"
                 >
                   {selectedTags.length > 0 ? (
-                    <div className="flex flex-wrap gap-2 ">
+                    <div className="flex flex-wrap gap-2">
                       {selectedTags.map((tagId) => {
                         const tag = availableTags.find((t) => t.id === tagId);
                         return tag ? (
                           <span
                             key={tag.id}
-                            className="bg-gray-800 rounded-full px-2 py-1 text-sm"
+                            className="bg-gray-800 rounded-full px-2 py-1 text-sm flex items-center tracking-wide"
                           >
                             <span style={{ color: tagColors[tag.id] }}>#</span>
                             {tag.name}
+                            <XIcon
+                              className="ml-1 cursor-pointer hover:text-teal-300"
+                              size={16}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent dropdown from toggling
+                                handleTagRemove(tag.id);
+                              }}
+                            />
                           </span>
                         ) : null;
                       })}
@@ -607,24 +670,39 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   )}
                 </div>
                 {isTagDropdownOpen && (
-                  <div className="tag-dropdown w-full mt-1 h-[250px] overflow-y-scroll border-none rounded shadow-lg">
-                    <div className="mb-4 border p-2 border-t-0 border-l-0 border-r-0 border-gray-800 text-cyan-800">
-                      Tags
-                    </div>
-                    {availableTags.map((tag) => (
-                      <div
-                        key={tag.id}
-                        onClick={() => handleTagSelect(tag)}
-                        className={`p-2 mb-2 rounded-lg hover:rounded-lg hover:text-cyan-800 hover:bg-gray-800 cursor-pointer ${
-                          selectedTags.includes(tag.id)
-                            ? "bg-gray-800 text-cyan-800"
-                            : ""
-                        } text-tinWhite`}
-                      >
-                        <span style={{ color: tagColors[tag.id] }}>#</span>
-                        {tag.name}
+                  <div className="tag-dropdown w-full mt-1 max-h-[250px] overflow-y-auto border-none rounded shadow-lg bg-headerColor">
+                    <div className="sticky top-0 bg-headerColor z-10 p-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          placeholder="Search tags..."
+                          className="w-full p-2 rounded bg-headerColor border border-customGray1 outline-none text-white"
+                        />
+                        <Search
+                          className="absolute right-2 top-2 text-gray-400"
+                          size={20}
+                        />
                       </div>
-                    ))}
+                    </div>
+                    <div className="p-2">
+                      {filteredTags.map((tag) => (
+                        <div
+                          key={tag.id}
+                          onClick={() => handleTagSelect(tag)}
+                          className={`p-2 mb-2 rounded-md hover:bg-gray-800 cursor-pointer ${
+                            selectedTags.includes(tag.id) ? "bg-gray-800" : ""
+                          } text-tinWhite`}
+                        >
+                          <span style={{ color: tagColors[tag.id] }}>#</span>
+                          {tag.name}
+                        </div>
+                      ))}
+                      {filteredTags.length === 0 && (
+                        <div className="p-2 text-gray-400">No tags found</div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -714,11 +792,11 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                 </div>
               )}
               <button
-              onClick={discardPost}
-              className="bg-red-500 text-white px-2 hover:bg-red-600 py-1 rounded"
-            >
-              Discard
-            </button>
+                onClick={discardPost}
+                className="bg-red-500 text-white px-2 hover:bg-red-600 py-1 rounded"
+              >
+                Discard
+              </button>
             </div>
           </>
         )}

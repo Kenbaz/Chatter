@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/src/libs/firebase";
 import ContentEditor from "@/app/_components/ContentEditor";
+import ContentEditorSkeleton from "@/app/_components/skeletons/ContentEditorSkeleton";
 
 const CreatePost = () => {
   const { user, loading } = useRequireAuth();
@@ -40,7 +41,7 @@ const CreatePost = () => {
    }, [params.id, user]);
 
   if (loading || fetchingStatus) {
-    return <div>Loading...</div>;
+    return <ContentEditorSkeleton/>
   }
 
   if (!user) {

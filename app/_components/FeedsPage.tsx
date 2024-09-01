@@ -260,7 +260,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           />
         ))}
         {hasMore && <div ref={ref}>{loading && <FeedsPageSkeleton/>}</div>}
-        {!hasMore && <div>No more posts</div>}
+        {!hasMore && <div className="text-center mt-2">No more posts</div>}
       </div>
     </div>
   );
