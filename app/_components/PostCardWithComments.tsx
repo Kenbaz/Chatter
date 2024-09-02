@@ -14,7 +14,7 @@ import {
   ImplementFollowersFuncs,
   UserData,
 } from "@/src/libs/userServices";
-
+import BookmarkBtn from "./BookmarkBtn2";
 
 interface PostCardProps {
   post: PostData;
@@ -44,7 +44,6 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
   
-   
 
   const isCurrentUser = user?.uid === authorId;
 
@@ -91,7 +90,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
     checkFollowStatus();
     fetchPostAnalytics();
   }, [authorId, user]);
-    
+
 
  const handleMouseEnter = () => {
    isHoveringRef.current = true;
@@ -224,8 +223,8 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="p-1 font-light rounded-lg hover:bg-gray-700">
-              <span className="text-teal-700">#</span>
+            <span className="py-1 px-2 font-light rounded-md hover:bg-gray-700 hover:text-white">
+              <span className="text-gray-400">#</span>
               {tag}
             </span>
           </Link>
@@ -234,7 +233,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       <div className="mt-2 mb-3 md:pl-8">
         <Markdown>{`${post.content.substring(0, 130)}....`}</Markdown>
       </div>
-      <div className="post-actions items-center flex gap-10 md:pl-8">
+      <div className="post-actions relative items-center flex gap-10 md:pl-8">
         {likeCount > 0 && (
           <button className="text-sm p-1 rounded-lg font-light">
             <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}
@@ -249,13 +248,16 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
             <span>{commentCount}</span>
           </span>
         )}
+        <div className="absolute z-10 right-0">
+          <BookmarkBtn postId={post.id} userId={user.uid} />
+        </div>
       </div>
       {comments.length > 0 && (
         <div className="comments-preview mt-4">
           {limitedComments.map((comment) => (
             <div
               key={comment.id}
-              className="comment flex gap-3 mb-2 p-2 rounded"
+              className="comment flex gap-3 mb-2 p-2 rounded "
             >
               <div>
                 <div className="w-[20px] h-[20px] border border-teal-700 rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
@@ -271,10 +273,12 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
                   />
                 </div>
               </div>
-              <div className="bg-customGray p-[10px] rounded-lg">
-                <small className="text-customWhite">{comment.author}</small>
-                <p className="text-sm mt-2 text-white">{comment.content}</p>
-              </div>
+              <Link href={`/post/${post.id}?scrollTo=${comment.id}`}>
+                <div className="bg-customGray p-[10px] rounded-lg cursor-pointer hover:bg-customGray1 border border-customGray transition-colors duration-200">
+                  <small className="text-customWhite">{comment.author}</small>
+                  <p className="text-sm mt-2 text-white">{comment.content}</p>
+                </div>
+              </Link>
             </div>
           ))}
         </div>

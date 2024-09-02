@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, FC, useState, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, FC, useState, useRef, useCallback } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Markdown, { Components } from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
@@ -32,9 +32,11 @@ import Head from "next/head";
 import ShareButtons from "./ShareButtons";
 import "prismjs/themes/prism-tomorrow.css";
 
+
 const FullPostView: FC = () => {
   const { user } = useRequireAuth();
   const params = useParams();
+  const searchParams = useSearchParams();
   const [post, setPost] = useState<PostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,10 +59,12 @@ const FullPostView: FC = () => {
   const [openMenuCommentId, setOpenMenuCommentId] = useState<string | null>(
     null
   );
+  
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
-
+  const commentsRef = useRef<{ [key: string]: HTMLDivElement }>({});
+  
   const { getPostById, deletePost } = postFuncs();
   const { likePost, unlikePost } = likeFuncs();
   const {
@@ -79,6 +83,28 @@ const FullPostView: FC = () => {
 
   const { fetchAuthorName, getUserProfilePicture } = Profile();
   const { trackView } = analyticsFuncs();
+
+  const scrollToComment = useCallback(() => {
+    const commentId = searchParams.get("scrollTo");
+
+    if (commentId) {
+      const commentElement = document.getElementById(`comment-${commentId}`);
+
+      if (commentElement) {
+        commentElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!loading) {
+      scrollToComment();
+    }
+  }, [loading, scrollToComment]);
+
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -865,7 +891,14 @@ const FullPostView: FC = () => {
           </div>
           <div className="">
             {comments.map((comment) => (
-              <div key={comment.id} className="comment">
+              <div
+                key={comment.id}
+                ref={(el) => {
+                  if (el) commentsRef.current[comment.id] = el;
+                }}
+                id={`comment-${comment.id}`}
+                className="comment"
+              >
                 <div className="flex mb-3">
                   <div>
                     <div className="w-[20px] h-[20px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">

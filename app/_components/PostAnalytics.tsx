@@ -5,6 +5,7 @@ import { analyticsFuncs, postFuncs, PostData } from "@/src/libs/contentServices"
 import { Profile } from "@/src/libs/userServices";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Image from "next/image";
+import AnalyticsSkeleton from "./skeletons/AnalyticsSkeleton";
 
 interface PostAnalyticsProps {
   postId: string;
@@ -59,7 +60,7 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
   }, [fetchAnalytics]);
 
   const renderedAnalytics = useMemo(() => {
-    if (!analytics) return <div>Loading analytics...</div>;
+    if (!analytics) return <AnalyticsSkeleton/>;
 
     return (
       <div className="detailed-post-analytics mt-14 pb-16 p-2 gap-2 grid place-items-center md:w-[80%] md:m-auto md:mt-14 2xl:w-[55%]">

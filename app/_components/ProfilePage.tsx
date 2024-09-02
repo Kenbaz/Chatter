@@ -17,6 +17,7 @@ import { ImplementFollowersFuncs } from "@/src/libs/userServices";
 import { MdLocationOn } from "react-icons/md";
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
 import PostCardWithNoPreview from "./PostCardWithNoPreview";
+import ProfilePageSkeleton from "./skeletons/ProfilePageSkeleton";
 
 interface UserProfileData {
   username: string;
@@ -156,7 +157,7 @@ const ProfilePage: FC = () => {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className=" mt-14 "><ProfilePageSkeleton/></div>;
   if (!profileData) return <div>User not found</div>;
 
   const isCurrentUser = user && user.uid === params.userId;

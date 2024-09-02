@@ -41,7 +41,7 @@ const MyInterests: FC = () => {
           {error && <p className="text-[14px] text-red-600">{error}</p>}
           {interests.map((interest, index) => (
             <Link key={index} href={`/tag/${encodeURIComponent(interest)}`}>
-              <li className="mb-2 tracking-wide hover:text-white">
+              <li className="mb-2 tracking-wide px-2 py-[0.40rem] hover:rounded-md hover:text-white hover:bg-teal-900 hover:underline hover:opacity-65 transition-colors duration-200">
                 #{interest}
               </li>
             </Link>

@@ -4,6 +4,7 @@ import { useState, useEffect, FC } from "react";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { postFuncs, PostData } from "@/src/libs/contentServices";
 import { useBookmarkFuncs, BookmarkWithId } from "@/src/libs/bookmark";
+import TagPageSkeleton from "./skeletons/TagsPageSkeleton";
 
 import PostCard from "./PostCardWithNoPreview";
 
@@ -35,11 +36,11 @@ const ReadingListPage: FC = () => {
 
   return (
     <div className="mt-14 md:w-[70%] md:m-auto md:mt-14 lg:w-[60%] 2xl:w-[50%]">
-      <h1 className="px-2 py-4 font-bold text-xl md:text-2xl text-white md:text-center">
+      <h1 className="px-2 py-4 font-bold text-xl md:text-2xl text-teal-700 md:text-center">
         Your Reading List
       </h1>
       {isLoading ? (
-        <p>Loading your reading list...</p>
+        <TagPageSkeleton/>
       ) : (
         <>
           {bookmarkedPosts.map((post) => (

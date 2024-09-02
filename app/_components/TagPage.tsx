@@ -10,7 +10,7 @@ import { clearError, setError } from "../_store/errorSlice";
 import { RootState } from "../_store/store";
 import { useInView } from "react-intersection-observer";
 import TagPageSkeleton from "./skeletons/TagsPageSkeleton";
-import { FaSpinner } from "react-icons/fa";
+import { Loader2 } from "lucide-react";
 
 const TagPage: FC = () => {
   const params = useParams();
@@ -95,7 +95,7 @@ const TagPage: FC = () => {
           {hasMore && (
             <div ref={ref}>
               {isLoading && (
-                <div className="animate-spin rounded-[50%] h-4 w-4 ml-[50%] border-t-2 border-b-2 border-teal-500 "></div>
+                <Loader2 size={20} className="animate-spin ml-[50%] text-customWhite" />
               )}
             </div>
           )}

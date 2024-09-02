@@ -177,7 +177,7 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="p-1 font-light rounded-lg hover:bg-gray-700">
+            <span className="py-1 px-2 font-light rounded-md hover:bg-gray-700">
               <span className="text-gray-400">#</span>
               {tag}
             </span>

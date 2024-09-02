@@ -12,6 +12,7 @@ import { FaSearch, FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
 import FeedsPageSkeleton from "./skeletons/FeedsPageSkeleton";
+import { Search } from "lucide-react";
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -195,7 +196,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           onClick={toggleSearchBar}
           className=" p-2 md:hidden relative -right-16 hover:bg-teal-700 opacity-80 rounded-lg"
         >
-          <FaSearch className="text-[22px] font-light md:hidden" />
+          <Search className="text-[22px] font-light md:hidden" />
         </div>
 
         <div className="flex z-50 items-center gap-20">
@@ -229,7 +230,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
       >
         <div className="filter-options flex items-center justify-evenly mb-2 mt-2">
           <select
-            className="p-1 rounded-lg text-sm dark:bg-primary border border-teal-700 text-white outline-none"
+            className="p-1 rounded-md text-sm dark:bg-primary border border-teal-700 text-white outline-none"
             value={filters.sortBy}
             onChange={(e) =>
               handleFilterChange("sortBy", e.target.value as SortBy)
@@ -239,7 +240,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
             <option value="popular">Most Popular</option>
           </select>
           <select
-            className="p-1 rounded-lg text-sm border border-teal-700 outline-none text-white"
+            className="p-1 rounded-md text-sm border border-teal-700 outline-none text-white"
             value={filters.dateRange}
             onChange={(e) =>
               handleFilterChange("dateRange", e.target.value as DateRange)

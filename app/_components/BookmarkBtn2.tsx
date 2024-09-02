@@ -2,11 +2,9 @@ import { FC, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../_store/store";
 import { setError, clearError } from "@/app/_store/errorSlice";
-import { bookmarkFuncs } from "@/src/libs/contentServices"; 
+import { bookmarkFuncs } from "@/src/libs/contentServices";
 import { FaBookmark } from "react-icons/fa6";
-import {
-  Bookmark,
-} from "lucide-react";
+import { Bookmark } from "lucide-react";
 
 interface BookmarkButtonProps {
   userId: string;
@@ -14,12 +12,12 @@ interface BookmarkButtonProps {
   onBookmarkChange?: (isBookmarked: boolean) => void;
 }
 
- const BookmarkButton: FC<BookmarkButtonProps> = ({
+const BookmarkBtn: FC<BookmarkButtonProps> = ({
   userId,
-   postId,
+  postId,
   onBookmarkChange,
- }) => {
-   const {error} = useSelector((state: RootState) => state.error)
+}) => {
+  const { error } = useSelector((state: RootState) => state.error);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const dispatch = useDispatch();
   const {
@@ -50,13 +48,13 @@ interface BookmarkButtonProps {
         setIsBookmarked(false);
         if (typeof onBookmarkChange !== "undefined") {
           onBookmarkChange(false);
-        }   
+        }
       } else {
         await addBookmark(userId, postId);
         setIsBookmarked(true);
-        if (typeof onBookmarkChange !== 'undefined') {
+        if (typeof onBookmarkChange !== "undefined") {
           onBookmarkChange(true);
-        }   
+        }
       }
       dispatch(clearError());
     } catch (error) {
@@ -72,9 +70,13 @@ interface BookmarkButtonProps {
   return (
     <button onClick={handleBookmarkToggle}>
       {error && <p className="text-sm text-red-700">{error}</p>}
-      {isBookmarked ? <Bookmark className="text-blue-500 text-xl"/> : <Bookmark className="text-xl"/>}
+      {isBookmarked ? (
+        <Bookmark className="text-blue-500" size={20} />
+      ) : (
+        <Bookmark className="" size={20} />
+      )}
     </button>
   );
 };
 
-export default BookmarkButton;
+export default BookmarkBtn;
