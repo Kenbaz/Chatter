@@ -12,6 +12,7 @@
     "@algolia/client-search": "^4.24.0",
     "@reduxjs/toolkit": "^2.2.6",
     "@types/algoliasearch": "^4.0.0",
+    "@vercel/og": "^0.6.2",
     "algoliasearch": "^4.24.0",
     "clsx": "^2.1.1",
     "firebase": "^10.12.3",

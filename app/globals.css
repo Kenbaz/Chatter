@@ -241,7 +241,7 @@ body {
    animation: likeAnimation 0.5s ease-out;
  }
 
- @keyframes circleReflection {
+ /* @keyframes circleReflection {
    0% {
      transform: scale(0);
      opacity: 0.5;
@@ -264,7 +264,7 @@ body {
    background: rgba(255, 0, 0, 0.3);
    transform: translate(-50%, -50%);
    animation: circleReflection 0.5s ease-out;
- }
+ } */
 
  /* Like animation end*/
  

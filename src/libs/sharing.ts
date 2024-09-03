@@ -12,24 +12,30 @@ export const shareFuncs = () => {
     const shareOnTwitter = (
       postId: string,
       postTitle: string,
-      imageUrl: string
     ) => {
       const postUrl = `${window.location.origin}/post/${postId}`;
       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
         postTitle
-      )}&url=${encodeURIComponent(postUrl)}&image=${encodeURIComponent(
-        imageUrl
-      )}`;
+      )}&url=${encodeURIComponent(postUrl)}`;
       window.open(twitterUrl, "_blank");
-    };
+  };
+  
 
-    const shareOnLinkedIn = (postId: string, imageUrl: string) => {
+    const shareOnLinkedIn = (postId: string) => {
       const postUrl = `${window.location.origin}/post/${postId}`;
       const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
         postUrl
       )}`;
       window.open(linkedInUrl, "_blank");
-    };
+  };
+  
+  const shareOnFacebook = (postId: string) => {
+    const postUrl = `${window.location.origin}/post/${postId}`;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      postUrl
+    )}`;
+    window.open(facebookUrl, "_blank");
+  };
 
-    return {copyLinkToClipboard, shareOnTwitter, shareOnLinkedIn}
+    return {copyLinkToClipboard, shareOnTwitter, shareOnLinkedIn, shareOnFacebook}
 }

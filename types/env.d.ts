@@ -11,5 +11,6 @@ namespace NodeJS {
     NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY: string;
     NEXT_PUBLIC_ALGOLIA_WRITE_API_KEY: string;
     NEXT_PUBLIC_ALGOLIA_ADMIN_API_KEY: string;
+    NEXT_PUBLIC_SITE_URL: string;
   }
 }

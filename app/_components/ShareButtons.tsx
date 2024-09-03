@@ -48,13 +48,13 @@ const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, coverImageUrl 
         </button>
         <button
           className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:opacity-50 text-start w-full"
-          onClick={() => shareOnTwitter(postId, postTitle, coverImageUrl)}
+          onClick={() => shareOnTwitter(postId, postTitle)}
         >
           Share on Twitter
         </button>
         <button
           className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:opacity-50 text-start w-full"
-          onClick={() => shareOnLinkedIn(postId, coverImageUrl)}
+          onClick={() => shareOnLinkedIn(postId)}
         >
           Share on LinkedIn
         </button>

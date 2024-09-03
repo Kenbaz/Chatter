@@ -28,12 +28,16 @@ import {
   FaComment,
   FaEllipsis,
 } from "react-icons/fa6";
-import Head from "next/head";
 import ShareButtons from "./ShareButtons";
 import "prismjs/themes/prism-tomorrow.css";
+import { Heart, MessageCircle } from 'lucide-react';
+
+type FullPostViewProps = {
+  postId: string;
+};
 
 
-const FullPostView: FC = () => {
+const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
   const { user } = useRequireAuth();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -59,12 +63,12 @@ const FullPostView: FC = () => {
   const [openMenuCommentId, setOpenMenuCommentId] = useState<string | null>(
     null
   );
-  
+
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
   const commentsRef = useRef<{ [key: string]: HTMLDivElement }>({});
-  
+
   const { getPostById, deletePost } = postFuncs();
   const { likePost, unlikePost } = likeFuncs();
   const {
@@ -105,13 +109,12 @@ const FullPostView: FC = () => {
     }
   }, [loading, scrollToComment]);
 
-
   useEffect(() => {
     const fetchPost = async () => {
       if (!params.id || !user) return;
 
       try {
-        const postData = await getPostById(params.id as string);
+        const postData = await getPostById(postId as string);
         if (postData) {
           setPost(postData);
           setIsLiked(postData.likes?.includes(user.uid) || false);
@@ -141,7 +144,7 @@ const FullPostView: FC = () => {
     };
 
     fetchPost();
-  }, [params.id, user]);
+  }, [postId, user]);
 
   const markdownComponents: Components = {
     h1: ({ node, ...props }) => (
@@ -643,20 +646,6 @@ const FullPostView: FC = () => {
 
   return (
     <>
-      <Head>
-        <title>{post.title}</title>
-        <meta property="og:title" content={post.title} />
-        <meta
-          property="og:description"
-          content={`This is a full post view page for ${post.title}`}
-        />
-        <meta property="og:image" content={post.coverImage} />
-        <meta
-          property="og:url"
-          content={`${process.env.NEXT_PUBLIC_SITE_URL}/post/${post.id}`}
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
       <div className="full-post-container mt-14 relative h-auto pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
         {post && (
           <div className="full-post-content dark:bg-primary max-w-4xl mx-auto rounded-md xl:w-[80%] 2xl:w-[80%]">
@@ -736,9 +725,9 @@ const FullPostView: FC = () => {
                 {post.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="inline-block rounded-full bg-gray-200 mr-2 px-3 py-1 text-sm font-semibold text-gray-800 mb-2"
+                    className="inline-block rounded-full mr-2 bg-customGray1 px-3 py-1 text-sm font-semibold text-gray-200 mb-2"
                   >
-                    <span className="text-teal-700">#</span>
+                    <span className="text-gray-400">#</span>
                     {tag}
                   </span>
                 ))}
@@ -766,9 +755,9 @@ const FullPostView: FC = () => {
             >
               <span className="text-2xl">
                 {isLiked ? (
-                  <FaHeartCircleMinus className="text-red-500 transition-all duration-200 ease-in-out cursor-pointer" />
+                  <Heart className="text-red-500 transition-all duration-200 ease-in-out cursor-pointer" />
                 ) : (
-                  <FaHeartCirclePlus className="cursor-pointer" />
+                  <Heart className="cursor-pointer" />
                 )}
               </span>
               <span className="font-light">{post.likes.length}</span>
@@ -778,7 +767,7 @@ const FullPostView: FC = () => {
               className="flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleCommentClick}
             >
-              <FaComment className="text-xl cursor-pointer" />
+              <MessageCircle className="text-xl cursor-pointer" />
               <span className="font-light">{post.comments.length}</span>
             </div>
             <div className="flex items-center gap-2 lg:flex-col md:flex-col">
@@ -821,9 +810,9 @@ const FullPostView: FC = () => {
             >
               <span className="text-2xl">
                 {isLiked ? (
-                  <FaHeartCircleMinus className="text-red-500 transition-all duration-200 ease-in-out cursor-pointer" />
+                  <Heart className="text-red-500 transition-all duration-200 ease-in-out cursor-pointer" />
                 ) : (
-                  <FaHeartCirclePlus className="cursor-pointer" />
+                  <Heart className="cursor-pointer" />
                 )}
               </span>
               <span className="font-light">{post.likes.length}</span>
@@ -833,7 +822,7 @@ const FullPostView: FC = () => {
               className="flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleCommentClick}
             >
-              <FaComment className="text-xl cursor-pointer" />
+              <MessageCircle className="text-xl cursor-pointer" />
               <span className="font-light">{post.comments.length}</span>
             </div>
             <div className="flex items-center gap-2 lg:flex-col md:flex-col">
@@ -846,7 +835,7 @@ const FullPostView: FC = () => {
             </div>
             <div className="relative ellipsis-button">
               <button onClick={toggleShareButtons} className="text-2xl">
-                <FaEllipsis />
+                <FaEllipsis className="hover:text-gray-400 transition-colors duration-200" />
               </button>
               {showShareButtons && (
                 <>
@@ -929,13 +918,13 @@ const FullPostView: FC = () => {
                               )
                             }
                           >
-                            <FaEllipsis />
+                            <FaEllipsis className="hover:text-white transition-colors duration-200" />
                           </button>
                           {openMenuCommentId === comment.id && (
                             <div className="absolute right-0 mt-2 w-48 dark:bg-primary border dark:border-customGray rounded-md shadow-lg z-10">
                               <div className="py-1">
                                 <button
-                                  className="block w-full text-left px-4 py-2 text-sm dark:text-gray-200 hover:bg-gray-800"
+                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-teal-800 transition-colors duration-200"
                                   onClick={() => {
                                     setEditingCommentId(comment.id);
                                     setEditCommentContent(comment.content);
@@ -945,7 +934,7 @@ const FullPostView: FC = () => {
                                   Edit
                                 </button>
                                 <button
-                                  className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-teal-800 transition-colors duration-200"
                                   onClick={() => {
                                     handleDeleteComment(comment.id);
                                     setOpenMenuCommentId(null);
@@ -984,9 +973,15 @@ const FullPostView: FC = () => {
                       >
                         <span className="p-1 relative">
                           {comment.likes.includes(user?.uid) ? (
-                            <FaHeartCircleMinus className="text-red-500 text-[20px]" />
+                            <Heart
+                              size={20}
+                              className="text-red-500 transition-all duration-200"
+                            />
                           ) : (
-                            <FaHeartCirclePlus className="text-[20px]" />
+                            <Heart
+                              size={20}
+                              className="text-[20px] transition-all duration-200"
+                            />
                           )}
                         </span>
                         <span className="font-light relative top-[0.6px] text-[15px]">
@@ -997,7 +992,7 @@ const FullPostView: FC = () => {
                         className="relative -top-[6.8px]"
                         onClick={() => setReplyingTo(comment.id)}
                       >
-                        <FaComment />
+                        <MessageCircle size={18} />
                       </button>
                     </div>
                     {editingCommentId === comment.id && (

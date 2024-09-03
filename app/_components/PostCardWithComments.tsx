@@ -1,6 +1,7 @@
 "use client";
 
-import { FC, useState, useEffect, useRef} from "react";
+import { FC, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { PostData } from "@/src/libs/contentServices";
 import Markdown from "react-markdown";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
@@ -15,6 +16,8 @@ import {
   UserData,
 } from "@/src/libs/userServices";
 import BookmarkBtn from "./BookmarkBtn2";
+import { MessageCircle, Heart } from 'lucide-react';
+import { likeFuncs } from "@/src/libs/contentServices";
 
 interface PostCardProps {
   post: PostData;
@@ -29,15 +32,18 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   const [commentCount, setCommentCount] = useState(post.comments.length);
   const [showProfileHover, setShowProfileHover] = useState(false);
     const [authorName, setAuthorName] = useState("");
-    const [comments, setComments] = useState(post.comments);
+  const [comments, setComments] = useState(post.comments);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldShowDropdown, setShouldShowDropdown] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [authorProfilePicture, setAuthorProfilePicture] = useState("");
+  const [isClicked, setIsClicked] = useState(false);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hoverRef = useRef<HTMLDivElement>(null);
-   const isHoveringRef = useRef(false);
+  const isHoveringRef = useRef(false);
+  
+  const router = useRouter();
 
   const { getPostAnalytics } = analyticsFuncs();
   const { getUserProfile } = Profile();
@@ -80,6 +86,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       try {
         const analytics = await getPostAnalytics(post.id);
         setLikeCount(analytics.likes);
+
         setCommentCount(analytics.comments);
       } catch (error) {
         console.error("Error fetching post analytics:", error);
@@ -90,6 +97,16 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
     checkFollowStatus();
     fetchPostAnalytics();
   }, [authorId, user]);
+
+
+   const handleIconClick = (event: React.MouseEvent) => {
+     event.preventDefault();
+     setIsClicked(true);
+     setTimeout(() => {
+       setIsClicked(false);
+       router.push(`/post/${post.id}`);
+     }, 500);
+   };
 
 
  const handleMouseEnter = () => {
@@ -142,7 +159,13 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10">
+    <div
+      className={`post-card bg-primary mb-2 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
+        isClicked
+          ? "border-2 border-teal-700 shadow-lg"
+          : "border-2 border-transparent"
+      }`}
+    >
       <div className="flex items-center mt-2 gap-2">
         <div
           ref={hoverRef}
@@ -223,7 +246,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="py-1 px-2 font-light rounded-md hover:bg-gray-700 hover:text-white">
+            <span className="py-1 px-2 font-light rounded-md hover:bg-customGray1 hover:text-white transition-colors duration-200">
               <span className="text-gray-400">#</span>
               {tag}
             </span>
@@ -233,17 +256,28 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       <div className="mt-2 mb-3 md:pl-8">
         <Markdown>{`${post.content.substring(0, 130)}....`}</Markdown>
       </div>
-      <div className="post-actions relative items-center flex gap-10 md:pl-8">
+      <div className="post-actions relative items-center flex gap-5 md:pl-8">
         {likeCount > 0 && (
-          <button className="text-sm p-1 rounded-lg font-light">
-            <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}
+          <button
+            className="text-sm py-1 px-2 rounded-md font-light flex items-center gap-2 hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            onClick={handleIconClick}
+          >
+            <span className=" rounded-lg flex items-center gap-1">
+              <Heart size={18} className="text-red-700" />
+              Likes
+            </span>
+            <span>{likeCount}</span>
           </button>
         )}
 
         {commentCount > 0 && (
-          <span className="comment-button rounded-lg flex gap-2 items-center text-sm font-light relative">
-            <span className="rounded-lg p-1 bg-gray-700">
-              <FaComment />
+          <span
+            className="comment-button cursor-pointer rounded-md flex gap-2 items-center text-sm font-light py-1 px-2 relative hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            onClick={handleIconClick}
+          >
+            <span className=" flex items-center gap-1">
+              <MessageCircle size={18} />
+              Comments
             </span>{" "}
             <span>{commentCount}</span>
           </span>
