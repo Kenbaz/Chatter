@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       process.env.NEXT_PUBLIC_SITE_URL
     }/api/og?title=${encodeURIComponent(
       post.title
-    )}&author=${encodeURIComponent(post.author)}&image=${encodeURIComponent(
+    )}&author=${encodeURIComponent(post.author)}&coverImage=${encodeURIComponent(
       post.coverImage
     )}`;
 

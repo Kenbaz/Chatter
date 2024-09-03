@@ -10,7 +10,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
     const title = searchParams.get("title");
     const author = searchParams.get("author");
-    const imageUrl = searchParams.get("image");
+    const imageUrl = searchParams.get("coverImage");
 
     const imageResponse = new ImageResponse(
       (
