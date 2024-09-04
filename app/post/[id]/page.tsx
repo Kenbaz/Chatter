@@ -21,22 +21,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       process.env.NEXT_PUBLIC_SITE_URL
     }/api/og?title=${encodeURIComponent(
       post.title
-    )}&author=${encodeURIComponent(post.author)}&coverImage=${encodeURIComponent(
+    )}&author=${encodeURIComponent(post.author)}&image=${encodeURIComponent(
       post.coverImage
     )}`;
 
+  const description = `Read more about ${post.title}`;
 
   return {
     title: post.title,
-    description: `Read more about ${post.title}`,
+    description: description,
     openGraph: {
       title: post.title,
-      description: `Read more about ${post.title}`,
+      description: description,
+      siteName: "Chatter",
+      authors: `Written by ${post.author}`,
       images: [
         {
           url: ogImageUrl,
-          width: 1200,
-          height: 630,
+          width: 500,
+          height: 500,
           alt: post.title,
         },
       ],
@@ -47,8 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: post.title,
       description: `Read more about ${post.title}`,
-        images: [ogImageUrl],
-      creator: "@Ken_baz"
+      images: post.coverImage,
+      creator: "@Ken_baz",
     },
   };
 }

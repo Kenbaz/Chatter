@@ -22,6 +22,16 @@ interface ContentPreviewProps {
   publishDate?: string | FieldValue;
 }
 
+function formatDateString(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  };
+  return date.toLocaleDateString("en-US", options).replace(",", "");
+};
+
+
 const ContentPreview: FC<ContentPreviewProps> = ({
   title,
   content,
@@ -89,10 +99,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
     ),
   };
 
-  const formattedDate =
-    publishDate instanceof FieldValue
-      ? new Date().toLocaleDateString()
-      : publishDate;
+  const formattedDate = publishDate instanceof FieldValue ? formatDateString(new Date()) : typeof publishDate === 'string' ? formatDateString(new Date(publishDate)) : 'Unknown date';
   
 
   return (

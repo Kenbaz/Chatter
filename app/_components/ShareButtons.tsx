@@ -7,10 +7,10 @@ import { FaCopy } from 'react-icons/fa';
 interface ShareButtonsProps {
   postId: string;
   postTitle: string;
-    coverImageUrl: string;
+  postAuthor: string;
 }
 
-const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, coverImageUrl }) => {
+const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, postAuthor }) => {
   const [copyButtonText, setCopyButtonText] = useState("Copy Link");
 
     const { shareOnLinkedIn, shareOnTwitter } = shareFuncs();
@@ -48,13 +48,13 @@ const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, coverImageUrl 
         </button>
         <button
           className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:opacity-50 text-start w-full"
-          onClick={() => shareOnTwitter(postId, postTitle)}
+          onClick={() => shareOnTwitter(postId, postTitle, postAuthor)}
         >
           Share on Twitter
         </button>
         <button
           className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:opacity-50 text-start w-full"
-          onClick={() => shareOnLinkedIn(postId)}
+          onClick={() => shareOnLinkedIn(postId, postTitle)}
         >
           Share on LinkedIn
         </button>

@@ -513,21 +513,31 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     }
   };
 
+   function formatDateString(date: Date): string {
+     const options: Intl.DateTimeFormatOptions = {
+       day: "numeric",
+       month: "short",
+       year: "numeric",
+     };
+     return date.toLocaleDateString("en-US", options).replace(",", "");
+   }
+
   function formatDate(
     date: string | number | Date | Timestamp | FieldValue | undefined
   ): string {
     if (date instanceof Timestamp) {
-      return date.toDate().toLocaleDateString();
+      return formatDateString(date.toDate());
     } else if (date instanceof Date) {
-      return date.toLocaleDateString();
+      return formatDateString(date);
     } else if (typeof date === "string" || typeof date === "number") {
-      return new Date(date).toLocaleDateString();
+      return formatDateString(new Date(date));
     } else if (date instanceof FieldValue) {
       return "Pending";
     } else {
       return "Unknown date";
     }
   }
+
 
   const handleEditPost = (postId: string) => {
     router.push(`/create-post/${postId}`);
@@ -784,18 +794,18 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
               </button>
               {showShareButtons && (
                 <>
-                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[20%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[30%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
+                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[17%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[30%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
-                      coverImageUrl={post.coverImage}
+                      postAuthor={post.author}
                     />
                   </div>
                   <div className="share-buttons-container hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[8rem] xl:top-[25rem] border border-customGray rouned-md bg-primary shadow-lg p-2 ">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
-                      coverImageUrl={post.coverImage}
+                      postAuthor={post.author}
                     />
                   </div>
                 </>
@@ -839,18 +849,18 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
               </button>
               {showShareButtons && (
                 <>
-                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[20%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[30%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
+                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[20%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[20%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
-                      coverImageUrl={post.coverImage}
+                      postAuthor={post.author}
                     />
                   </div>
                   <div className="share-buttons-container rounded-md hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[14.3rem] xl:top-[24.5rem] 2xl:left-[18rem] 2xl:top-[23.5rem] border border-customGray rouned-md bg-primary shadow-lg p-2 ">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
-                      coverImageUrl={post.coverImage}
+                      postAuthor={post.author}
                     />
                   </div>
                 </>

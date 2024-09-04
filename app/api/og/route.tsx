@@ -10,7 +10,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
     const title = searchParams.get("title");
     const author = searchParams.get("author");
-    const imageUrl = searchParams.get("coverImage");
+    const imageUrl = searchParams.get("image");
 
     const imageResponse = new ImageResponse(
       (
@@ -30,17 +30,28 @@ export async function GET(req: NextRequest): Promise<Response> {
           <Image
             src={imageUrl || ""}
             alt="Cover"
-            style={{ width: "100%", height: "60%", objectFit: "cover" }}
+            style={{ width: "100%", height: "60%", objectFit: "contain" }}
           />
-          <div style={{ padding: "20px 50px", textAlign: "center" }}>
-            <h1 style={{ fontSize: 48, margin: 0 }}>{title}</h1>
-            <p style={{ fontSize: 24, margin: "10px 0" }}>By {author}</p>
+          <div
+            style={{
+              padding: "20px",
+              textAlign: "center",
+              width: "100%",
+              backgroundColor: "#fff",
+            }}
+          >
+            <h1 style={{ fontSize: 48, margin: "0 0 10px", color: "#333" }}>
+              {title}
+            </h1>
+            <p style={{ fontSize: 18, margin: 0, color: "#666" }}>
+              By {author}
+            </p>
           </div>
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
+        width: 1000,
+        height: 500,
       }
     );
 

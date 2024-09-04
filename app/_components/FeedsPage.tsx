@@ -228,7 +228,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
       <div
         className={`feed-content ${isSearchBarVisible ? "search-visible" : ""}`}
       >
-        <div className="filter-options flex items-center justify-evenly mb-2 mt-2">
+        <div className="filter-option flex items-center justify-evenly mb-2 mt-2">
           <select
             className="p-1 rounded-md text-sm dark:bg-primary border border-teal-700 text-white outline-none"
             value={filters.sortBy}
@@ -260,7 +260,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
             authorId={post.authorId}
           />
         ))}
-        {hasMore && <div ref={ref}>{loading && <FeedsPageSkeleton/>}</div>}
+        {hasMore && <div ref={ref}>{loading && <FeedsPageSkeleton />}</div>}
         {!hasMore && <div className="text-center mt-2">No more posts</div>}
       </div>
     </div>

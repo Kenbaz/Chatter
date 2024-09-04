@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+     "tunnel": "ngrok http 3000"
   },
   "dependencies": {
     "@algolia/client-search": "^4.24.0",

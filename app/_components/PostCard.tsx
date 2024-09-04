@@ -1,17 +1,21 @@
-'use client';
+"use client";
 
-import { FC, useState, useEffect } from 'react';
-import { PostData, likeFuncs } from '@/src/libs/contentServices';
-import Markdown from 'react-markdown';
-import { useRequireAuth } from '@/src/libs/useRequireAuth';
-import Image from 'next/image';
-import Link from 'next/link';
-import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '@/src/libs/firebase';
-import { FaComment } from 'react-icons/fa6';
-import { analyticsFuncs } from '@/src/libs/contentServices';
-import ProfileHoverDropdown from './ProfileHoverDropdown';
-import { Profile, ImplementFollowersFuncs, UserData } from '@/src/libs/userServices';
+import { FC, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { PostData } from "@/src/libs/contentServices";
+import Markdown from "react-markdown";
+import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import Image from "next/image";
+import Link from "next/link";
+import { analyticsFuncs } from "@/src/libs/contentServices";
+import {
+  Profile,
+  ImplementFollowersFuncs,
+  UserData,
+} from "@/src/libs/userServices";
+import BookmarkBtn from "./BookmarkBtn2";
+import { MessageCircle, Heart } from "lucide-react";
+
 
 interface PostCardProps {
   post: PostData;
@@ -21,24 +25,20 @@ interface PostCardProps {
 const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
   const { user } = useRequireAuth();
   const [likeCount, setLikeCount] = useState(post.likes.length);
-   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
+  const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
   const [commentCount, setCommentCount] = useState(post.comments.length);
-  const [showProfileHover, setShowProfileHover] = useState(false);
-  const [authorName, setAuthorName] = useState('');
+  const [authorName, setAuthorName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [shouldShowDropdown, setShouldShowDropdown] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [publishedDate, setPublishedDate] = useState('');
-  const [authorProfilePicture, setAuthorProfilePicture] = useState(
-    ""
-  );
+  const [authorProfilePicture, setAuthorProfilePicture] = useState("");
+  const [isClicked, setIsClicked] = useState(false);
+  
+  const router = useRouter();
 
   const { getPostAnalytics } = analyticsFuncs();
   const { getUserProfile } = Profile();
-   const { followUser, unfollowUser, isFollowingUser } =
+  const { isFollowingUser } =
     ImplementFollowersFuncs();
-  
-  const isCurrentUser = user?.uid === authorId;
 
   useEffect(() => {
     const fetchAuthorData = async () => {
@@ -73,6 +73,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
       try {
         const analytics = await getPostAnalytics(post.id);
         setLikeCount(analytics.likes);
+
         setCommentCount(analytics.comments);
       } catch (error) {
         console.error("Error fetching post analytics:", error);
@@ -81,8 +82,18 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
 
     fetchAuthorData();
     checkFollowStatus();
-    fetchPostAnalytics()
+    fetchPostAnalytics();
   }, [authorId, user]);
+
+  const handleIconClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setIsClicked(true);
+    setTimeout(() => {
+      setIsClicked(false);
+      router.push(`/post/${post.id}`);
+    }, 500);
+  };
+
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
@@ -92,95 +103,104 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
     }, 150);
   };
 
-  const handleMouseEnter = () => {
-    setShowProfileHover(true);
-
-    setTimeout(() => {
-      setShouldShowDropdown(true);
-    }, 1000);
-  };
-
-  const handleMouseLeave = () => {
-    setShowProfileHover(false);
-    setShouldShowDropdown(false);
-  };
-
 
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 md:pl-4 md:rounded-md">
-      <div className="profile-picture-container">
-        <div className="flex items-center mt-2 gap-2">
-          <div className="w-[30px] h-[30px] rounded-[50%] overflow-hidden flex justify-center items-center">
-            {isLoading ? (
-              <div>
+    <div
+      className={`post-card bg-primary mb-2 pb-4 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
+        isClicked
+          ? "md:border-2 md:border-teal-700 md:shadow-lg"
+          : "md:border-2 md:border-transparent"
+      }`}
+    >
+      <div className="flex items-center mt-2 gap-2">
+        <div
+          className="relative"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 overflow-hidden flex justify-center items-center">
+              {isLoading ? (
                 <Image
-                  src={"/images/default-profile-image-2.jpg"}
+                  src="/images/default-profile-image-2.jpg"
                   alt="Avatar"
                   width={30}
                   height={30}
                   style={{ objectFit: "cover" }}
                 />
-              </div>
-            ) : (
-              <Image
-                src={
-                  authorProfilePicture || "/images/default-profile-image-2.jpg"
-                }
-                alt="Avatar"
-                width={30}
-                height={30}
-                style={{ objectFit: "cover" }}
-              />
-            )}
+              ) : (
+                <Image
+                  src={
+                    authorProfilePicture ||
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt="Avatar"
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "cover" }}
+                />
+              )}
+            </div>
+              <small
+                className="text-[14px]"
+              >
+                {authorName}
+              </small>
           </div>
-          <small
-            className="text-[14px]"
-            onClick={handleClick}
-            style={{ position: "relative" }}
-          >
-            {authorName}
-          </small>
         </div>
       </div>
+
       <Link href={`/post/${post.id}`}>
         <h1
-          className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-9"
+          className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8"
           onClick={handleClick}
           style={{ position: "relative" }}
         >
           {post.title}
         </h1>
       </Link>
-      <small className="flex gap-2 text-sm md:pl-9 ">
+      <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="p-1 font-light rounded-lg hover:bg-gray-700">
+            <span className="py-1 px-2 font-light rounded-md hover:bg-customGray1 hover:text-white transition-colors duration-200">
               <span className="text-gray-400">#</span>
               {tag}
             </span>
           </Link>
         ))}
       </small>
-      <div className="mt-2 mb-3 md:pl-9">
-        <Markdown>{`${post.content.substring(0, 120)}....`}</Markdown>
+      <div className="mt-2 mb-3 md:pl-8">
+        <Markdown>{`${post.content.substring(0, 130)}....`}</Markdown>
       </div>
-      <div className="post-actions items-center flex gap-10 md:pl-9">
+      <div className="post-actions relative items-center flex gap-5 md:pl-8">
         {likeCount > 0 && (
-          <button className="text-sm p-1 rounded-lg font-light">
-            <span className=" rounded-lg bg-gray-700">{"❤️"}</span> {likeCount}
+          <button
+            className="text-sm py-1 px-2 rounded-md font-light flex items-center gap-2 hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            onClick={handleIconClick}
+          >
+            <span className=" rounded-lg flex items-center gap-1">
+              <Heart size={18} className="text-red-700" />
+              Likes
+            </span>
+            <span>{likeCount}</span>
           </button>
         )}
 
         {commentCount > 0 && (
-          <span className="comment-button rounded-lg flex gap-2 items-center text-sm font-light relative">
-            <span className="rounded-lg p-1 bg-gray-700">
-              <FaComment />
+          <span
+            className="comment-button cursor-pointer rounded-md flex gap-2 items-center text-sm font-light py-1 px-2 relative hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            onClick={handleIconClick}
+          >
+            <span className=" flex items-center gap-1">
+              <MessageCircle size={18} />
+              Comments
             </span>{" "}
             <span>{commentCount}</span>
           </span>
         )}
+        <div className="absolute z-10 right-0">
+          <BookmarkBtn postId={post.id} userId={user.uid} />
+        </div>
       </div>
     </div>
   );

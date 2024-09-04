@@ -162,8 +162,8 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
     <div
       className={`post-card bg-primary mb-2 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
         isClicked
-          ? "border-2 border-teal-700 shadow-lg"
-          : "border-2 border-transparent"
+          ? "md:border-2 md:border-teal-700 md:shadow-lg"
+          : "md:border-2 md:border-transparent"
       }`}
     >
       <div className="flex items-center mt-2 gap-2">
