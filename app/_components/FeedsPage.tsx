@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
 import FeedsPageSkeleton from "./skeletons/FeedsPageSkeleton";
 import { Search } from "lucide-react";
+import CustomPullToRefreshIndicator from "./CustomPullToRefreshIndicator";
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -43,6 +44,12 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
+
+  // Pull to refresh states and ref
+  const [isPulling, setIsPulling] = useState(false);
+  const [pullHeight, setPullHeight] = useState(0);
+  const maxPullHeight = 100;
+  const touchStartY = useRef(0);
 
   useEffect(() => {
     setFeedType(searchParams.get("feedType") as string | undefined);
@@ -185,6 +192,42 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     setHasMore(true);
   };
 
+  // Pull to refresh touch event handlers
+  const handleTouchStart = (e: TouchEvent) => {
+    if (window.scrollY === 0) {
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (window.scrollY === 0 && e.touches[0].clientY > touchStartY.current) {
+      const distance = e.touches[0].clientY - maxPullHeight;
+      setIsPulling(true);
+      setPullHeight(Math.min(distance / 2, maxPullHeight));
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (isPulling && pullHeight > 70) {
+      setPosts([]);
+      setHasMore(true);
+    } 
+    setIsPulling(false);
+    setPullHeight(0);
+  };
+
+  useEffect(() => {
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isPulling, pullHeight, fetchMorePosts])
+
   return (
     <div className="feed-container h-auto pb-10">
       <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 z-10 w-full flex justify-around items-center">
@@ -210,6 +253,19 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           <MenuButton />
         </div>
       </header>
+      {isPulling && (
+        <div
+          style={{ height: pullHeight }}
+          className="flex items-center flex-col justify-center mt-14 -mb-12"
+        >
+          <CustomPullToRefreshIndicator
+            refreshing={isPulling && pullHeight > 70}
+          />
+          <span className="relative -top-[0.7rem] text-sm">
+            {pullHeight > 70 ? "Release to refresh" : "Pull to refresh"}
+          </span>
+        </div>
+      )}
       {isSearchBarVisible && (
         <div
           ref={searchBarRef}

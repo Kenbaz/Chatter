@@ -34,12 +34,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: post.title,
       description: description,
       siteName: "Chatter",
-      authors: `Written by ${post.author}`,
+      authors: [`Written by ${post.author}`],
       images: [
         {
           url: ogImageUrl,
-          width: 500,
-          height: 500,
+          width: 1200,
+          height: 600,
           alt: post.title,
         },
       ],
@@ -49,8 +49,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: `Read more about ${post.title}`,
-      images: post.coverImage,
+      description: description,
+      images: [ogImageUrl],
       creator: "@Ken_baz",
     },
   };

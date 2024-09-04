@@ -30,7 +30,7 @@ export async function GET(req: NextRequest): Promise<Response> {
           <Image
             src={imageUrl || ""}
             alt="Cover"
-            style={{ width: "100%", height: "60%", objectFit: "contain" }}
+            style={{ width: "100%", height: "60%", objectFit: "cover" }}
           />
           <div
             style={{
@@ -43,15 +43,15 @@ export async function GET(req: NextRequest): Promise<Response> {
             <h1 style={{ fontSize: 48, margin: "0 0 10px", color: "#333" }}>
               {title}
             </h1>
-            <p style={{ fontSize: 18, margin: 0, color: "#666" }}>
+            <p style={{ fontSize: 18, margin: 0, color: "#555" }}>
               By {author}
             </p>
           </div>
         </div>
       ),
       {
-        width: 1000,
-        height: 500,
+        width: 1200,
+        height: 600,
       }
     );
 
