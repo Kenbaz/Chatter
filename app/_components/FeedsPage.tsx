@@ -194,14 +194,14 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (containerRef.current && containerRef.current.scrollTop === 0) {
-      startY.current = e.touches[0].clientY;
+      startY.current = e.touches[0].screenY;
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (startY.current === null) return;
 
-    const currentY = e.touches[0].clientY;
+    const currentY = e.touches[0].screenY;
     const distance = currentY - startY.current;
 
     if (
@@ -250,7 +250,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   return (
     <div
       ref={containerRef}
-      className="feed-container h-auto pb-10 overflow-y-auto"
+      className="feed-container h-auto pb-10 overflow-y-auto overscroll-y-contain"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
