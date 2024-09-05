@@ -310,7 +310,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
          </div>
        </header>
        <div
-         className="w-full flex mt-14 -mb-14 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
+         className="w-full flex relative top-14 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
          style={{
            height: refreshing
              ? `${pullDownThreshold}px`
