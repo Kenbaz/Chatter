@@ -1103,9 +1103,9 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                         >
                           <span className="p-1 relative">
                             {reply.likes.includes(user?.uid) ? (
-                              <FaHeartCircleMinus className="text-red-500 text-[20px]" />
+                              <Heart size={20} className="text-red-500 text-[20px]" />
                             ) : (
-                              <FaHeartCirclePlus className="text-[20px]" />
+                              <Heart className="text-[20px]" />
                             )}
                           </span>
                           <span className="font-light text-[15px]">

@@ -61,63 +61,82 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   const router = useRouter();
 
-  const fetchMorePosts = useCallback(async () => {
-    if (!user || !hasMore) return;
-    setLoading(true);
-    setError("");
-    let fetchedPosts: PostData[] = [];
-    const lastPostId = posts[posts.length - 1]?.id;
+  const fetchMorePosts = useCallback(
+    async (reset: boolean = false) => {
+      console.log(`Fetching posts. Reset: ${reset}, Has More: ${hasMore}`);
+      if (!user) return;
+      if (!reset && !hasMore) return;
 
-    try {
-      switch (feedType) {
-        case "following":
-          fetchedPosts = await getFollowingFeed(user.uid, 10, lastPostId, {
-            sortBy: filters.sortBy,
-            dateRange: filters.dateRange,
-          });
-          break;
-        case "latest":
-          fetchedPosts = await getLatestFeed(10, lastPostId, {
-            sortBy: filters.sortBy,
-            dateRange: filters.dateRange,
-          });
-          break;
-        default:
-          fetchedPosts = await getPersonalizedFeed(user.uid, 10, lastPostId, {
-            sortBy: filters.sortBy,
-            dateRange: filters.dateRange,
-          });
-      }
+      setLoading(true);
+      setError("");
 
-      if (fetchedPosts.length === 0) {
-        setHasMore(false);
-      } else {
-        setPosts((prevPosts) => {
-          const newPosts = fetchedPosts.filter(
-            (newPost) =>
-              !prevPosts.some((existingPost) => existingPost.id === newPost.id)
-          );
-          const updatedPosts = [...prevPosts, ...newPosts];
-          return updatedPosts;
-        });
+      let fetchedPosts: PostData[] = [];
+      const lastPostId = reset ? undefined : posts[posts.length - 1]?.id;
+
+      try {
+        switch (feedType) {
+          case "following":
+            fetchedPosts = await getFollowingFeed(user.uid, 10, lastPostId, {
+              sortBy: filters.sortBy,
+              dateRange: filters.dateRange,
+            });
+            break;
+          case "latest":
+            fetchedPosts = await getLatestFeed(10, lastPostId, {
+              sortBy: filters.sortBy,
+              dateRange: filters.dateRange,
+            });
+            break;
+          default:
+            fetchedPosts = await getPersonalizedFeed(user.uid, 10, lastPostId, {
+              sortBy: filters.sortBy,
+              dateRange: filters.dateRange,
+            });
+        }
+
+        console.log(`Fetched ${fetchedPosts.length} posts.`);
+
+        if (fetchedPosts.length === 0) {
+          setHasMore(false);
+        } else {
+          setPosts((prevPosts) => {
+            if (reset) {
+              // Replace posts on refresh
+              return fetchedPosts;
+            } else {
+              // Append posts on infinite scroll
+              const newPosts = fetchedPosts.filter(
+                (newPost) =>
+                  !prevPosts.some(
+                    (existingPost) => existingPost.id === newPost.id
+                  )
+              );
+              return [...prevPosts, ...newPosts];
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        setError("Failed to fetch posts. Please try again.");
+        if (reset) {
+          setHasMore(false);
+        }
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching post:", error);
-      setError("Posts fetch failed, please refresh");
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    user,
-    getPersonalizedFeed,
-    getFollowingFeed,
-    getLatestFeed,
-    feedType,
-    hasMore,
-    filters,
-    posts,
-  ]);
+    },
+    [
+      user,
+      getPersonalizedFeed,
+      getFollowingFeed,
+      getLatestFeed,
+      feedType,
+      hasMore,
+      filters.sortBy,
+      filters.dateRange,
+      posts,
+    ]
+  );
 
   const toggleSearchBar = () => {
     setIsSearchBarVisible((prev) => !prev);
@@ -155,19 +174,16 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   useEffect(() => {
     if (isInitialMount) {
       setIsInitialMount(false);
-    } else {
-      //
     }
-    setPosts([]);
     setHasMore(true);
-    fetchMorePosts();
+    fetchMorePosts(true); // Pass `true` to reset posts
   }, [filters, feedType]);
 
   useEffect(() => {
-    if (inView && !loading) {
+    if (inView && !loading && hasMore && !refreshing) {
       fetchMorePosts();
     }
-  }, [inView, fetchMorePosts, loading]);
+  }, [inView, fetchMorePosts, loading, refreshing]);
 
   const handleFilterChange = (filterName: keyof Filters, value: string) => {
     setFilters((prev) => {
@@ -188,8 +204,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
       }
       return prev;
     });
-    setPosts([]); // Reset posts when filters change
-    setHasMore(true);
+    // No need to reset posts here since the `useEffect` handles it based on `filters` change
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -214,30 +229,34 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   };
 
   const handleTouchEnd = () => {
+    console.log(`Touch end. Pull distance: ${pullDownDistance}`);
     if (pullDownDistance > pullDownThreshold) {
+      console.log("Pull threshold exceeded. Refreshing feed.");
       refreshFeed();
     }
     setPullDownDistance(0);
     startY.current = null;
   };
 
-   const refreshFeed = async () => {
-     setRefreshing(true);
-     setPosts([]);
-     setHasMore(true);
-     try {
-       await fetchMorePosts();
-     } catch (error) {
-       console.error("Error refreshing feed:", error);
-       setError('Error refreshing feed')
-     } finally {
-       // Delay to keep the refresh indicator visible
-       setTimeout(() => {
-         setRefreshing(false);
-         setPullDownDistance(0);
-       }, 1000); // Adjust this delay as needed
-     }
-   };
+  const refreshFeed = async () => {
+    if (refreshing) return; // Prevent multiple refreshes
+    console.log("Refreshing feed...");
+    setRefreshing(true);
+    setPosts([]);
+    setHasMore(true);
+    try {
+      await fetchMorePosts(true); // Pass `true` to indicate a reset
+    } catch (error) {
+      console.error("Error refreshing feed:", error);
+      setError("Error refreshing feed");
+    } finally {
+      // Delay to keep the refresh indicator visible
+      setTimeout(() => {
+        setRefreshing(false);
+        setPullDownDistance(0);
+      }, 100); // Adjust this delay as needed
+    }
+  };
 
   // Calculate the rotation angle for the arrow
   const arrowRotation = useMemo(() => {
@@ -290,24 +309,30 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         }}
       >
         {refreshing ? (
-          <CustomPullToRefreshIndicator refreshing={refreshing } />
+          <>
+            <CustomPullToRefreshIndicator refreshing={refreshing} />
+            <span className="text-sm relative -top-2">Refreshing</span>
+          </>
         ) : pullDownDistance > pullDownThreshold ? (
-          <ArrowUp className="text-white mb-2 animate-bounce" size={18} />
-        ) : (
-          <ArrowDown
-            className="text-white mb-2"
-            size={18}
-            style={{ transform: `rotate(${arrowRotation}deg)` }}
-          />
-        )}
-        <span className="text-white text-sm relative -top-2">
-          {refreshing
-            ? "Refreshing"
-            : pullDownDistance > pullDownThreshold
-            ? "Release to refresh"
-            : "Pull down to refresh"}
-        </span>
+          <>
+              <ArrowUp className="text-white mb-2 animate-bounce" size={18} />
+              <span className="text-sm relative -top-2">Release to refresh</span>
+          </>
+        ) : pullDownDistance > 0 && !refreshing ? ( // Only show when not refreshing
+          <>
+            <ArrowDown
+              className="text-white mb-2"
+              size={18}
+              style={{ transform: `rotate(${arrowRotation}deg)` }}
+            />
+            <span className="text-white text-sm relative -top-2">
+              Pull down to refresh
+            </span>
+          </>
+        ) : null}{" "}
+        {/* Hide text when refreshing or after refresh */}
       </div>
+
       {isSearchBarVisible && (
         <div
           ref={searchBarRef}
