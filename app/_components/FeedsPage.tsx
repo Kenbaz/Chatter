@@ -12,7 +12,7 @@ import { FaSearch, FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
 import FeedsPageSkeleton from "./skeletons/FeedsPageSkeleton";
-import { Search } from "lucide-react";
+import { Search, ArrowUp, ArrowDown, RefreshCcw } from "lucide-react";
 import CustomPullToRefreshIndicator from "./CustomPullToRefreshIndicator";
 
 type SortBy = "recent" | "popular";
@@ -45,11 +45,11 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const searchBarRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
 
-  // Pull to refresh states and ref
-  const [isPulling, setIsPulling] = useState(false);
-  const [pullHeight, setPullHeight] = useState(0);
-  const maxPullHeight = 100;
-  const touchStartY = useRef(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullDownDistance, setPullDownDistance] = useState(0);
+  const pullDownThreshold = 70; // Pixels to pull down before refreshing
+  const startY = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setFeedType(searchParams.get("feedType") as string | undefined);
@@ -192,44 +192,69 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     setHasMore(true);
   };
 
-  // Pull to refresh touch event handlers
-  const handleTouchStart = (e: TouchEvent) => {
-    if (window.scrollY === 0) {
-      touchStartY.current = e.touches[0].clientY;
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (containerRef.current && containerRef.current.scrollTop === 0) {
+      startY.current = e.touches[0].clientY;
     }
   };
 
-  const handleTouchMove = (e: TouchEvent) => {
-    if (window.scrollY === 0 && e.touches[0].clientY > touchStartY.current) {
-      const distance = e.touches[0].clientY - maxPullHeight;
-      setIsPulling(true);
-      setPullHeight(Math.min(distance / 2, maxPullHeight));
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (startY.current === null) return;
+
+    const currentY = e.touches[0].clientY;
+    const distance = currentY - startY.current;
+
+    if (
+      distance > 0 &&
+      containerRef.current &&
+      containerRef.current.scrollTop === 0
+    ) {
+      setPullDownDistance(distance);
     }
   };
 
-  const handleTouchEnd = async () => {
-    if (isPulling && pullHeight > 70) {
-      setPosts([]);
-      setHasMore(true);
-    } 
-    setIsPulling(false);
-    setPullHeight(0);
+  const handleTouchEnd = () => {
+    if (pullDownDistance > pullDownThreshold) {
+      refreshFeed();
+    }
+    setPullDownDistance(0);
+    startY.current = null;
   };
 
-  useEffect(() => {
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchmove", handleTouchMove);
-    window.addEventListener("touchend", handleTouchEnd);
+   const refreshFeed = async () => {
+     setRefreshing(true);
+     setPosts([]);
+     setHasMore(true);
+     try {
+       await fetchMorePosts();
+     } catch (error) {
+       console.error("Error refreshing feed:", error);
+       setError('Error refreshing feed')
+     } finally {
+       // Delay to keep the refresh indicator visible
+       setTimeout(() => {
+         setRefreshing(false);
+         setPullDownDistance(0);
+       }, 1000); // Adjust this delay as needed
+     }
+   };
 
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [isPulling, pullHeight, fetchMorePosts])
+  // Calculate the rotation angle for the arrow
+  const arrowRotation = useMemo(() => {
+    if (pullDownDistance >= pullDownThreshold) {
+      return 180; // Fully rotated when ready to refresh
+    }
+    return (pullDownDistance / pullDownThreshold) * 180;
+  }, [pullDownDistance, pullDownThreshold]);
 
   return (
-    <div className="feed-container h-auto pb-10">
+    <div
+      ref={containerRef}
+      className="feed-container h-auto pb-10 overflow-y-auto"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
@@ -253,19 +278,36 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           <MenuButton />
         </div>
       </header>
-      {isPulling && (
-        <div
-          style={{ height: pullHeight }}
-          className="flex items-center flex-col justify-center mt-14 -mb-12"
-        >
-          <CustomPullToRefreshIndicator
-            refreshing={isPulling && pullHeight > 70}
+      <div
+        className="w-full flex mt-14 -mb-14 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
+        style={{
+          height: refreshing
+            ? `${pullDownThreshold}px`
+            : `${Math.min(pullDownDistance, pullDownThreshold)}px`,
+          opacity: refreshing
+            ? 1
+            : Math.min(pullDownDistance / pullDownThreshold, 1),
+        }}
+      >
+        {refreshing ? (
+          <CustomPullToRefreshIndicator refreshing={refreshing } />
+        ) : pullDownDistance > pullDownThreshold ? (
+          <ArrowUp className="text-white mb-2 animate-bounce" size={18} />
+        ) : (
+          <ArrowDown
+            className="text-white mb-2"
+            size={18}
+            style={{ transform: `rotate(${arrowRotation}deg)` }}
           />
-          <span className="relative -top-[0.7rem] text-sm">
-            {pullHeight > 70 ? "Release to refresh" : "Pull to refresh"}
-          </span>
-        </div>
-      )}
+        )}
+        <span className="text-white text-sm relative -top-2">
+          {refreshing
+            ? "Refreshing"
+            : pullDownDistance > pullDownThreshold
+            ? "Release to refresh"
+            : "Pull down to refresh"}
+        </span>
+      </div>
       {isSearchBarVisible && (
         <div
           ref={searchBarRef}
