@@ -47,7 +47,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [pullDownDistance, setPullDownDistance] = useState(0);
-  const pullDownThreshold = 75; // Pixels to pull down before refreshing
+  const pullDownThreshold = 80; // Pixels to pull down before refreshing
   const startY = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -261,9 +261,9 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="feed-container h-screen overflow-y-scroll dark:bg-headerColor  pb-12"
+      className="feed-container mt-14 overflow-y-scroll dark:bg-headerColor  pb-12"
     >
-      <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 z-10 w-full flex justify-around items-center">
+      <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 left-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
         </div>
@@ -287,7 +287,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         </div>
       </header>
       <div
-        className="w-full flex relative top-14 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
+        className="w-full flex relative -mb-12 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
         style={{
           height: refreshing
             ? `${pullDownThreshold}px`

@@ -12,13 +12,12 @@
   --text-color: #e0e6f2;
 }
 
-html,
+
 body {
-  @apply dark:text-tinWhite dark:bg-customBlack;
+  @apply dark:text-tinWhite dark:bg-customBlack overflow-y-hidden;
   background-color: var(--background);
   color: var(--text-color);
   transition: all 0.3s ease;
-  /* overflow: hidden; */
   height: auto;
 }
 
@@ -203,7 +202,7 @@ body {
 
  .feed-container {
    position: relative;
-   /* overflow-x: hidden; */
+   height: calc(100vh - 56px);
  }
 
  .feed-content {

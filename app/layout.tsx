@@ -21,7 +21,7 @@ export default function RootLayout({
  
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} overflow-y-hidden`}>
+      <body className={`${inter.className}`}>
         <Providers>
           <ThemeProvider attribute="class">
             <ClientInitWrapper>{children}</ClientInitWrapper>
