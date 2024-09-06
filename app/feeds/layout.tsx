@@ -22,7 +22,7 @@ export default function RootLayout({
   };
 
   return (
-    <div className={`${inter.className} overflow-y-scroll h-screen`}>
+    <div className={`${inter.className}`}>
       <header className="h-14 hidden md:flex md:fixed md:top-0 md:z-10 md:w-full md:border md:border-t-0 md:border-l-0 md:border-r-0 md:border-headerColor bg-primary md:py-2  justify-around items-center">
         <div className="text-outline-teal p-1 text-black text-xl font-bold tracking-wide md:text-2xl">
           Chatter

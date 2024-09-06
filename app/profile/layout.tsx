@@ -23,7 +23,7 @@ export default function RootLayout({
 
   return (
     <div
-      className={`${inter.className} overflow-y-scroll h-screen`}
+      className={`${inter.className} overflow-y-scroll h-screen profile-layout`}
     >
       <header className="h-14 dark:bg-primary fixed top-0 z-40 w-full flex justify-around items-center border border-t-0 border-l-0 border-r-0 border-headerColor">
         <Link href="/feeds">

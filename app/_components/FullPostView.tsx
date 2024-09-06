@@ -656,7 +656,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
 
   return (
     <>
-      <div className="full-post-container mt-14 relative h-auto pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
+      <div className="full-post-container mt-14 relative dark:bg-headerColor h-screen overflow-y-auto pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
         {post && (
           <div className="full-post-content dark:bg-primary max-w-4xl mx-auto rounded-md xl:w-[80%] 2xl:w-[80%]">
             {post.coverImage && (
@@ -1103,9 +1103,12 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                         >
                           <span className="p-1 relative">
                             {reply.likes.includes(user?.uid) ? (
-                              <Heart size={20} className="text-red-500 text-[20px]" />
+                              <Heart
+                                size={20}
+                                className="text-red-500 text-[20px]"
+                              />
                             ) : (
-                              <Heart className="text-[20px]" />
+                              <Heart size={20} className="text-[20px]" />
                             )}
                           </span>
                           <span className="font-light text-[15px]">

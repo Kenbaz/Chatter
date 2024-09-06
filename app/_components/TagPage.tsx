@@ -75,7 +75,7 @@ const TagPage: FC = () => {
   }, [inView, loadMorePosts, isLoading]);
 
   return (
-    <div className="tag-page pb-10 mt-14 md:w-[70%] md:m-auto md:mt-14 lg:w-[60%] 2xl:w-[50%]">
+    <div className="tag-page h-auto bg-headerColor pb-10 mt-14 md:w-[70%] md:m-auto md:mt-14 lg:w-[60%] 2xl:w-[50%]">
       <h1 className="text-xl font-bold md:text-2xl tracking-wide p-2 text-center text-teal-700">
         #{params.tagName}
       </h1>
@@ -95,7 +95,7 @@ const TagPage: FC = () => {
           {hasMore && (
             <div ref={ref}>
               {isLoading && (
-                <Loader2 size={20} className="animate-spin ml-[50%] text-customWhite" />
+                <Loader2 size={20} className="animate-spin ml-[46%] md:ml-[50%] text-customWhite" />
               )}
             </div>
           )}

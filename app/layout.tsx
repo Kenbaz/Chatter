@@ -21,7 +21,7 @@ export default function RootLayout({
  
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} overscroll-y-contain`}>
+      <body className={`${inter.className}`}>
         <Providers>
           <ThemeProvider attribute="class">
             <ClientInitWrapper>{children}</ClientInitWrapper>
