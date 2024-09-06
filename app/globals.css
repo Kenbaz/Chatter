@@ -19,7 +19,7 @@ body {
   color: var(--text-color);
   transition: all 0.3s ease;
   overflow: hidden;
-  height: 100vh;
+  height: auto;
 }
 
 @layer utilities {
