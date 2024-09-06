@@ -50,7 +50,6 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const pullDownThreshold = 70; // Pixels to pull down before refreshing
   const startY = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-   const lastScrollTop = useRef(0);
 
 
   useEffect(() => {
@@ -208,6 +207,11 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     const currentY = e.touches[0].clientY;
     const distance = currentY - startY.current;
 
+    console.log(
+      `scrollTop: ${containerRef.current?.scrollTop}, distance: ${distance}, pullDownDistance: ${pullDownDistance}`
+    );
+
+
     if (
       distance > 0 &&
       containerRef.current &&
@@ -259,13 +263,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   }, [pullDownDistance, pullDownThreshold]);
 
    return (
-     <div
-       ref={containerRef}
-       className="feed-container h-auto pb-10 overflow-y-auto overscroll-y-contain"
-       onTouchStart={handleTouchStart}
-       onTouchMove={handleTouchMove}
-       onTouchEnd={handleTouchEnd}
-     >
+     <div className="feed-container h-auto pb-10 overflow-y-auto overscroll-y-contain">
        <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 z-10 w-full flex justify-around items-center">
          <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
            Chatter
@@ -307,8 +305,8 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
            </>
          ) : pullDownDistance > pullDownThreshold ? (
            <>
-               <ArrowUp className="text-white mb-2 animate-bounce" size={18} />
-               <span className="text-sm relative -top-2">Release to refresh</span>
+             <ArrowUp className="text-white mb-2 animate-bounce" size={18} />
+             <span className="text-sm relative -top-2">Release to refresh</span>
            </>
          ) : pullDownDistance > 0 && !refreshing ? ( // Only show when not refreshing
            <>
@@ -340,6 +338,10 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
          <ContentsNavigation />
        </div>
        <div
+         ref={containerRef}
+         onTouchStart={handleTouchStart}
+         onTouchMove={handleTouchMove}
+         onTouchEnd={handleTouchEnd}
          className={`feed-content ${
            isSearchBarVisible ? "search-visible" : ""
          }`}
