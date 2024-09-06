@@ -197,13 +197,15 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const handleTouchStart = (e: React.TouchEvent) => {
     if (containerRef.current && containerRef.current.scrollTop === 0) {
       startY.current = e.touches[0].clientY;
+    } else {
+      startY.current = null; // Reset if not at the top
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (startY.current === null) return;
 
-    const currentY = e.touches[0].screenY;
+    const currentY = e.touches[0].clientY;
     const distance = currentY - startY.current;
 
     if (
@@ -212,45 +214,23 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
       containerRef.current.scrollTop === 0
     ) {
       setPullDownDistance(distance);
-    }
-  };
-
-  const handleScroll = useCallback(() => {
-    if (!containerRef.current) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-    const isScrollingUp = scrollTop < lastScrollTop.current;
-    lastScrollTop.current = scrollTop;
-
-    if (isScrollingUp && scrollTop === 0) {
-      // Allow pull-to-refresh when at the top and scrolling up
-      containerRef.current.style.overscrollBehavior = 'auto';
     } else {
-      // Prevent default refresh behavior
-      containerRef.current.style.overscrollBehavior = 'contain';
+      setPullDownDistance(0)
     }
-
-    // Check if we're near the bottom for infinite scrolling
-    if (scrollHeight - scrollTop <= clientHeight + 100) {
-      fetchMorePosts();
-    }
-  }, [fetchMorePosts]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
-    }
-  }, [handleScroll]);
-
-  const handleTouchEnd = () => {
-    if (pullDownDistance > pullDownThreshold) {
-      refreshFeed();
-    }
-    setPullDownDistance(0);
-    startY.current = null;
   };
+
+
+   const handleTouchEnd = () => {
+     if (
+       pullDownDistance > pullDownThreshold &&
+       containerRef.current &&
+       containerRef.current.scrollTop === 0
+     ) {
+       refreshFeed();
+     }
+     setPullDownDistance(0);
+     startY.current = null;
+   };
 
    const refreshFeed = async () => {
      setRefreshing(true);
