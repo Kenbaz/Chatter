@@ -31,6 +31,7 @@ import {
 import ShareButtons from "./ShareButtons";
 import "prismjs/themes/prism-tomorrow.css";
 import { Heart, MessageCircle } from 'lucide-react';
+import { FaHeart } from "react-icons/fa";
 
 type FullPostViewProps = {
   postId: string;
@@ -656,7 +657,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
 
   return (
     <>
-      <div className="full-post-container mt-14 relative dark:bg-headerColor h-screen overflow-y-auto pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
+      <div className="full-post-container post-layout mt-14 relative dark:bg-headerColor h-screen overflow-y-auto pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
         {post && (
           <div className="full-post-content dark:bg-primary max-w-4xl mx-auto rounded-md xl:w-[80%] 2xl:w-[80%]">
             {post.coverImage && (
@@ -765,9 +766,9 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             >
               <span className="text-2xl">
                 {isLiked ? (
-                  <Heart className="text-red-500 transition-all duration-200 ease-in-out cursor-pointer" />
+                  <FaHeart className="text-red-600 transition-all duration-200 ease-in-out cursor-pointer" />
                 ) : (
-                  <Heart className="cursor-pointer" />
+                  <Heart className="cursor-pointer transition-all duration-200 ease-in-out" />
                 )}
               </span>
               <span className="font-light">{post.likes.length}</span>
@@ -820,9 +821,9 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             >
               <span className="text-2xl">
                 {isLiked ? (
-                  <Heart className="text-red-500 transition-all duration-200 ease-in-out cursor-pointer" />
+                  <FaHeart className="text-red-600 transition-all duration-200 ease-in-out cursor-pointer" />
                 ) : (
-                  <Heart className="cursor-pointer" />
+                  <Heart className="cursor-pointer transition-all duration-200 ease-in-out" />
                 )}
               </span>
               <span className="font-light">{post.likes.length}</span>
@@ -983,14 +984,14 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                       >
                         <span className="p-1 relative">
                           {comment.likes.includes(user?.uid) ? (
-                            <Heart
-                              size={20}
-                              className="text-red-500 transition-all duration-200"
+                            <FaHeart
+                              size={19}
+                              className="text-red-600 transition-all duration-200 ease-in-out"
                             />
                           ) : (
                             <Heart
-                              size={20}
-                              className="text-[20px] transition-all duration-200"
+                              size={19}
+                              className="transition-all duration-200 ease-in-out"
                             />
                           )}
                         </span>
@@ -1103,12 +1104,16 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                         >
                           <span className="p-1 relative">
                             {reply.likes.includes(user?.uid) ? (
-                              <Heart
-                                size={20}
-                                className="text-red-500 text-[20px]"
+                              <FaHeart
+                                size={19}
+                                color=""
+                                className="text-red-600 transition-all duration-200 ease-in-out"
                               />
                             ) : (
-                              <Heart size={20} className="text-[20px]" />
+                              <Heart
+                                size={19}
+                                className="transition-all duration-200 ease-in-out"
+                              />
                             )}
                           </span>
                           <span className="font-light text-[15px]">

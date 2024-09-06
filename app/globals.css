@@ -18,7 +18,7 @@ body {
   background-color: var(--background);
   color: var(--text-color);
   transition: all 0.3s ease;
-  /* overflow: hidden; */
+  overflow: hidden;
   height: 100vh;
 }
 
@@ -80,15 +80,15 @@ body {
     scrollbar-color: #555 transparent;
   }
 
-  /* .feed-container::-webkit-scrollbar {
+  .feed-container::-webkit-scrollbar {
     background-color: #262626;
     width: 5px;
     display: none;
-  } */
+  }
 
-  /* .post-layout::-webkit-scrollbar {
+  .post-layout::-webkit-scrollbar {
     display: none;
-  } */
+  }
 
 
   .interest-dropdown::-webkit-scrollbar {

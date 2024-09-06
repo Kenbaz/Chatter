@@ -15,6 +15,7 @@ import {
 } from "@/src/libs/userServices";
 import BookmarkBtn from "./BookmarkBtn2";
 import { MessageCircle, Heart } from "lucide-react";
+import { FaHeart } from "react-icons/fa";
 
 
 interface PostCardProps {
@@ -179,7 +180,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
             onClick={handleIconClick}
           >
             <span className=" rounded-lg flex items-center gap-1">
-              <Heart size={18} className="text-red-700" />
+              <FaHeart size={18} className="text-red-600" />
               Likes
             </span>
             <span>{likeCount}</span>

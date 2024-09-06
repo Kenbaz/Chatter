@@ -287,7 +287,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         </div>
       </header>
       <div
-        className="w-full flex relative top-10 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
+        className="w-full flex relative top-14 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
         style={{
           height: refreshing
             ? `${pullDownThreshold}px`
@@ -365,7 +365,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
             <option value="thisMonth">This Month</option>
           </select>
         </div>
-        {error && <p className="text-red-500 mt-2">{error}</p>}
+        {error && <p className="text-red-600 mt-2">{error}</p>}
         {sortedPosts.map((post, index) => (
           <PostCardWithComments
             key={`${post.id}-${index}`}

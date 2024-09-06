@@ -72,7 +72,11 @@ interface BookmarkButtonProps {
   return (
     <button onClick={handleBookmarkToggle}>
       {error && <p className="text-sm text-red-700">{error}</p>}
-      {isBookmarked ? <Bookmark className="text-blue-500 text-xl"/> : <Bookmark className="text-xl"/>}
+      {isBookmarked ? (
+        <FaBookmark className="text-blue-600 text-xl transition-all duration-200 ease-in-out" />
+      ) : (
+        <Bookmark className="text-xl transition-all duration-200 ease-in-out" />
+      )}
     </button>
   );
 };

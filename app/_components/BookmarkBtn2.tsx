@@ -71,9 +71,15 @@ const BookmarkBtn: FC<BookmarkButtonProps> = ({
     <button onClick={handleBookmarkToggle}>
       {error && <p className="text-sm text-red-700">{error}</p>}
       {isBookmarked ? (
-        <Bookmark className="text-blue-500" size={20} />
+        <FaBookmark
+          className="text-blue-600 transition-all duration-200 ease-in-out"
+          size={18}
+        />
       ) : (
-        <Bookmark className="" size={20} />
+        <Bookmark
+          className="transition-all duration-200 ease-in-out"
+          size={18}
+        />
       )}
     </button>
   );
