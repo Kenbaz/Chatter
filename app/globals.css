@@ -85,6 +85,10 @@ body {
     display: none;
   }
 
+  .scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
   .post-layout::-webkit-scrollbar {
     display: none;
   }
