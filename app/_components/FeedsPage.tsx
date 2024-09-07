@@ -256,7 +256,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   }, [pullDownDistance, pullDownThreshold]);
 
   return (
-    <div className="feed-container mt-14 flex flex-col dark:bg-headerColor">
+    <div className="feed-container flex flex-col dark:bg-headerColor">
       <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 left-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
