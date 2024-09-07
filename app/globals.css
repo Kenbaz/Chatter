@@ -12,14 +12,13 @@
   --text-color: #e0e6f2;
 }
 
-
- body {
-  @apply dark:text-tinWhite dark:bg-customBlack overflow-y-hidden;
+html,
+body {
+  @apply dark:text-tinWhite dark:bg-customBlack overflow-y-hidden overscroll-y-contain;
   background-color: var(--background);
   color: var(--text-color);
   transition: all 0.3s ease;
-  height: calc(100vh - 53px);
-  margin-block-start: 56px;
+  height: auto;
 }
 
 @layer utilities {
