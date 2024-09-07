@@ -14,11 +14,12 @@
 
 html,
 body {
-  @apply dark:text-tinWhite dark:bg-customBlack overflow-y-hidden overscroll-y-contain;
+  @apply dark:text-tinWhite dark:bg-customBlack overflow-y-hidden;
   background-color: var(--background);
   color: var(--text-color);
   transition: all 0.3s ease;
   height: auto;
+  overscroll-behavior-y: contain;
 }
 
 @layer utilities {

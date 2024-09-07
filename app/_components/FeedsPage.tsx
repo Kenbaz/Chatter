@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, FC, useState, useCallback, useMemo, useRef } from "react";
+import {
+  useEffect,
+  FC,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  TouchEvent,
+} from "react";
 import { useInView } from "react-intersection-observer";
 import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import ContentsNavigation from "./ContentsNav";
@@ -49,7 +57,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const [pullDownDistance, setPullDownDistance] = useState(0);
   const pullDownThreshold = 80; // Pixels to pull down before refreshing
   const startY = useRef<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setFeedType(searchParams.get("feedType") as string | undefined);
@@ -192,44 +200,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
     setHasMore(true);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (containerRef.current && containerRef.current.scrollTop === 0) {
-      startY.current = e.touches[0].clientY;
-    } else {
-      startY.current = null; // Reset if not at the top
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (startY.current === null) return;
-
-    const currentY = e.touches[0].clientY;
-    const distance = currentY - startY.current;
-
-    if (
-      distance > 0 &&
-      containerRef.current &&
-      containerRef.current.scrollTop === 0
-    ) {
-      setPullDownDistance(distance);
-    } else {
-      setPullDownDistance(0);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (
-      pullDownDistance > pullDownThreshold &&
-      containerRef.current &&
-      containerRef.current.scrollTop === 0
-    ) {
-      refreshFeed();
-    }
-    setPullDownDistance(0);
-    startY.current = null;
-  };
-
-  const refreshFeed = async () => {
+  const refreshFeed = useCallback(async () => {
     setRefreshing(true);
     setPosts([]);
     setHasMore(true);
@@ -245,7 +216,52 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         setPullDownDistance(0);
       }, 1000); // Adjust this delay as needed
     }
-  };
+  }, [fetchMorePosts, setError, setPosts, setHasMore]);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
+    const touchStart = (e: globalThis.TouchEvent) => {
+      if (content.scrollTop === 0) {
+        startY.current = e.touches[0].clientY;
+      } else {
+        startY.current = null; // Reset if not at the top
+      }
+    };
+
+    const touchMove = (e: globalThis.TouchEvent) => {
+      if (startY.current === null) return;
+
+      const currentY = e.touches[0].clientY;
+      const distance = currentY - startY.current;
+
+      if (distance > 0 && content.scrollTop === 0) {
+        e.preventDefault();
+        setPullDownDistance(distance);
+      } else {
+        setPullDownDistance(0);
+      }
+    };
+
+    const touchEnd = () => {
+      if (pullDownDistance > pullDownThreshold && content.scrollTop === 0) {
+        refreshFeed();
+      }
+      setPullDownDistance(0);
+      startY.current = null;
+    };
+
+    content.addEventListener("touchstart", touchStart);
+    content.addEventListener("touchmove", touchMove);
+    content.addEventListener("touchend", touchEnd);
+
+    return () => {
+      content.removeEventListener("touchstart", touchStart);
+      content.removeEventListener("touchmove", touchMove);
+      content.removeEventListener("touchend", touchEnd);
+    };
+  }, [pullDownDistance, pullDownThreshold, refreshFeed]);
 
   // Calculate the rotation angle for the arrow
   const arrowRotation = useMemo(() => {
@@ -256,7 +272,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   }, [pullDownDistance, pullDownThreshold]);
 
   return (
-    <div className="feed-container overscroll-y-contain mt-14 flex flex-col dark:bg-headerColor">
+    <div className="feed-container mt-14 flex flex-col dark:bg-headerColor">
       <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 left-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
@@ -281,11 +297,8 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         </div>
       </header>
       <div
-        ref={containerRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="flex-1 scroll-container overflow-y-auto relative h-full pb-12"
+        ref={contentRef}
+        className="flex-1 scroll-container overscroll-y-contain overflow-y-auto relative h-full pb-12"
       >
         <div
           className="w-full flex relative -mb-12 text-sm flex-col items-center justify-center transition-all duration-300 ease-out overflow-hidden"
