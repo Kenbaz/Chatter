@@ -12,7 +12,7 @@
   --text-color: #e0e6f2;
 }
 
-
+html,
 body {
   @apply dark:text-tinWhite dark:bg-customBlack overflow-y-hidden;
   background-color: var(--background);
