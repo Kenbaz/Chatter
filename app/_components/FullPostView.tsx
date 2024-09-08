@@ -30,7 +30,7 @@ import {
 } from "react-icons/fa6";
 import ShareButtons from "./ShareButtons";
 import "prismjs/themes/prism-tomorrow.css";
-import { Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle, Loader2 } from 'lucide-react';
 import { FaHeart } from "react-icons/fa";
 
 type FullPostViewProps = {
@@ -557,7 +557,14 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     };
   }, [openMenuCommentId]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div>
+      <Loader2
+        size={20}
+        className="animate-spin relative left-[50%] top-[50%] text-customWhite"
+      />
+    </div>
+  );
   if (!user) return;
   if (!post) return <div>Post not found</div>;
 
@@ -759,7 +766,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
           </div>
         )}
         <div className="post-actions">
-          <div className="flex items-center w-full p-4 bg-headerColor justify-around fixed z-50 bottom-0 md:w-[10%] md:flex-col md:h-[30%] md:left-0 md:top-16 lg:landscape:w-[10%] lg:landscape:flex-col lg:landscape:h-[50%] lg:landscape:left-10 lg:landscape:top-14 lg:w-[10%] lg:flex-col lg:h-[30%] lg:left-7 lg:top-16 xl:hidden">
+          <div className="flex items-center h-[9%] w-full p-4 bg-headerColor justify-around fixed z-50 left-0 bottom-0 md:w-[10%] md:flex-col md:h-[30%] md:left-0 md:top-16 lg:landscape:w-[10%] lg:landscape:flex-col lg:landscape:h-[50%] lg:landscape:left-10 lg:landscape:top-14 lg:w-[10%] lg:flex-col lg:h-[30%] lg:left-7 lg:top-16 xl:hidden">
             <button
               className="like-button relative flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleLike}

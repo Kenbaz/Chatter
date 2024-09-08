@@ -99,7 +99,7 @@ const SearchBar: FC = () => {
           {results.length > 0 ? (
             results.map((post) => (
               <Link key={post.id} href={`/post/${post.id}`}>
-                <div className="search-result-item mb-2 dark:hover:bg-lightGray2 p-1">
+                <div className="search-result-item mb-2 dark:hover:bg-customGray p-1 px-2 rounded-lg">
                   <small
                     className="font-bold text-gray-400"
                     dangerouslySetInnerHTML={{ __html: post.author }}

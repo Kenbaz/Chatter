@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModals, openSignupModal } from "../_store/modalSlice";
 import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
+import {Loader2, XIcon} from 'lucide-react'
 
 const SignInModal: FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -90,26 +91,29 @@ const SignInModal: FC = () => {
   return (
     <div className="modal " onClick={close}>
       <div
-        className="modal-content text-white"
+        className="modal-content text-white h-[60%] rounded-md md:w-[50%] md:h-[50%] lg:landscape:w-[40%] lg:landscape:h-[70%] lg:landscape:mt-14 2xl:hidden"
         role="dialog"
         aria-labelledby="signin-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="close-modal" onClick={close} aria-label="Close modal">
-          &times;
+        <span
+          className="close-modal rounded-[50%] hover:bg-customGray p-1"
+          onClick={close}
+          aria-label="Close modal"
+        >
+          <XIcon size={18} className="md:hidden" />
+          <XIcon size={24} className="hidden md:block" />
         </span>
         <h2 id="signin-title" className="text-center mt-14 text-xl">
-          Welcome!
+          Welcome back!
         </h2>
         <div className="flex flex-col items-center">
           <form onSubmit={signUserIn} className="signIn-form mt-10">
             <div className="flex flex-col w-72 mb-6">
-              <label htmlFor="email"></label>
               <input
                 ref={emailInput}
-                className="h-8 rounded-full p-2 text-gray-900 dark:text-tinWhite outline-none text-base placeholder:text-sm"
+                className="h-[2.3rem] rounded py-2 px-3 text-gray-900 dark:text-tinWhite outline-none text-base placeholder:text-sm tracking-wide"
                 type="email"
-                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -118,11 +122,9 @@ const SignInModal: FC = () => {
               />
             </div>
             <div className="flex flex-col">
-              <label htmlFor="password"></label>
               <input
-                className="h-8 rounded-full p-2 dark:text-tinWhite text-gray-900 outline-none text-base placeholder:text-sm"
+                className="h-[2.3rem] rounded py-2 dark:text-tinWhite text-gray-900 px-3 outline-none text-base placeholder:text-sm tracking-wide"
                 type="password"
-                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -131,11 +133,15 @@ const SignInModal: FC = () => {
               />
             </div>
             <button
-              className="ml-[118px] mt-5 hover:underline text-lg"
+              className="ml-[118px] mt-5 hover:underline"
               type="submit"
               disabled={isLoading}
             >
-              {isEmailSignupLoading ? "Signing in..." : "Sign in"}
+              {isEmailSignupLoading ? (
+                <Loader2 size={19} className="animate-spin ml-[10px]" />
+              ) : (
+                "Sign in"
+              )}
             </button>
           </form>
           {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -144,7 +150,90 @@ const SignInModal: FC = () => {
             className="mt-2 hover:underline"
             disabled={isLoading}
           >
-            {isGoogleSignupLoading ? "Signing in..." : "Sign in with Google"}
+            {isGoogleSignupLoading ? (
+              <Loader2 size={19} className="animate-spin ml-[10px]" />
+            ) : (
+              "Sign in with Google"
+            )}
+          </button>
+          <p className="mt-4 text-gray-400">
+            Don&apos;t have an account?{" "}
+            <a
+              className="hover:underline cursor-pointer"
+              tabIndex={0}
+              onClick={swicthToSignUp}
+            >
+              Sign up
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <div
+        className="modal-content text-white hidden h-[60%] rounded-md md:w-[50%] md:h-[50%] 2xl:block 2xl:w-[30%] 2xl:h-[60%]"
+        role="dialog"
+        aria-labelledby="signin-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <span
+          className="close-modal rounded-[50%] hover:bg-customGray p-1"
+          onClick={close}
+          aria-label="Close modal"
+        >
+          <XIcon size={18} className="md:hidden" />
+          <XIcon size={24} className="hidden md:block" />
+        </span>
+        <h2 id="signin-title" className="text-center mt-14 text-xl">
+          Welcome back!
+        </h2>
+        <div className="flex flex-col items-center">
+          <form onSubmit={signUserIn} className="signIn-form mt-10">
+            <div className="flex flex-col w-72 mb-6">
+              <input
+                ref={emailInput}
+                className="h-[2.3rem] rounded py-2 px-3 text-gray-900 dark:text-tinWhite outline-none text-base placeholder:text-sm tracking-wide"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Email"
+                disabled={isLoading}
+              />
+            </div>
+            <div className="flex flex-col">
+              <input
+                className="h-[2.3rem] rounded py-2 dark:text-tinWhite text-gray-900 px-3 outline-none text-base placeholder:text-sm tracking-wide"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Password"
+                disabled={isLoading}
+              />
+            </div>
+            <button
+              className="ml-[118px] mt-5 hover:underline"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isEmailSignupLoading ? (
+                <Loader2 size={19} className="animate-spin ml-[10px]" />
+              ) : (
+                "Sign in"
+              )}
+            </button>
+          </form>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
+          <button
+            onClick={signInWithGoogleAccount}
+            className="mt-2 hover:underline"
+            disabled={isLoading}
+          >
+            {isGoogleSignupLoading ? (
+              <Loader2 size={19} className="animate-spin ml-[10px]" />
+            ) : (
+              "Sign in with Google"
+            )}
           </button>
           <p className="mt-4 text-gray-400">
             Don&apos;t have an account?{" "}

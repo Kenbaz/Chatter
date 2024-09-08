@@ -16,10 +16,12 @@ const LandingPage: FC = () => {
 
    return (
      <div className={`h-screen`}>
-       <header className=" dark:bg-customGray1 rounded-full w-1/2 mt-5 m-auto h-16 p-2 flex gap-3 items-center justify-between">
-         <h1><span className="text-gold2 font-extrabold text-2xl">C</span>hatter</h1>
-         <nav className="mr-10 flex gap-4 w-2/5 justify-between items-center h-8 p-2">
-           <button onClick={() => dispatch(openSignupOptionsModal())}>
+       <header className=" w-full  m-auto h-16 p-2 flex gap-3 items-center justify-between">
+         <div className="text-outline-teal p-1 text-black text-xl font-bold tracking-wide">
+           Chatter
+         </div>
+         <nav className=" flex gap-4 justify-between items-center py-2 px-3">
+           <button className=" py-2 px-3" onClick={() => dispatch(openSignupOptionsModal())}>
              Get started
            </button>
            <button onClick={() => dispatch(openSigninModal())}>Sign in</button>

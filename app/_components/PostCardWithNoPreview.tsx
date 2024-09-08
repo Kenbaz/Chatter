@@ -85,9 +85,9 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
-    target.style.color = "rgba(15, 118, 110, 0.5)";
     setTimeout(() => {
-      target.style.color = "";
+      target.style.color = "rgba(15, 118, 110, 0.5)";
+      target.style.opacity = '50px';
     }, 150);
   };
 
