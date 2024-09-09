@@ -20,6 +20,7 @@ const SignInModal: FC = () => {
   const [isEmailSignupLoading, setIsEmailSignupLoading] = useState(false);
   const [isGoogleSignupLoading, setIsGoogleSignupLoading] = useState(false);
   const emailInput = useRef<HTMLInputElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const { signInUser, signInWithGoogle } = useAuth();
 
@@ -28,6 +29,14 @@ const SignInModal: FC = () => {
   const { showSigninModal } = useSelector((state: RootState) => state.modal);
   const { isLoading } = useSelector((state: RootState) => state.loading);
   const { error } = useSelector((state: RootState) => state.error);
+
+  useEffect(() => {
+    if (showSigninModal) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  }, [showSigninModal]);
 
   const signUserIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -61,12 +70,18 @@ const SignInModal: FC = () => {
   };
 
   const close = useCallback(() => {
-    dispatch(closeModals());
+    setIsVisible(false);
+    setTimeout(() => {
+      dispatch(closeModals());
+    }, 300); // Match this with the transition duration
   }, [dispatch]);
 
   const swicthToSignUp = () => {
-    close();
-    dispatch(openSignupModal());
+     setIsVisible(false);
+     close();
+     setTimeout(() => {
+       dispatch(openSignupModal());
+     }, 300);
   };
 
   useEffect(() => {
@@ -89,9 +104,16 @@ const SignInModal: FC = () => {
   if (!showSigninModal) return null;
 
   return (
-    <div className="modal " onClick={close}>
+    <div
+      className={`modal transition-opacity duration-300 ease-in-out ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
+      onClick={close}
+    >
       <div
-        className="modal-content text-white h-[60%] rounded-md md:w-[50%] md:h-[50%] lg:landscape:w-[40%] lg:landscape:h-[70%] lg:landscape:mt-14 2xl:hidden"
+        className={`modal-content shadow-xl text-white h-full w-full md:w-[80%] md:h-[100%] lg:landscape:w-[60%] lg:h-[50%] lg:w-[70%] rounded-md lg:landscape:h-[100%] xl:hidden transition-transform duration-300 ease-in-out ${
+          isVisible ? "scale-100" : "scale-95"
+        }`}
         role="dialog"
         aria-labelledby="signin-title"
         onClick={(e) => e.stopPropagation()}
@@ -104,7 +126,10 @@ const SignInModal: FC = () => {
           <XIcon size={18} className="md:hidden" />
           <XIcon size={24} className="hidden md:block" />
         </span>
-        <h2 id="signin-title" className="text-center mt-14 text-xl">
+        <h2
+          id="signin-title"
+          className="text-center mt-[40%] md:mt-[50%] font-serif text-xl md:text-2xl lg:mt-[25%]"
+        >
           Welcome back!
         </h2>
         <div className="flex flex-col items-center">
@@ -112,7 +137,7 @@ const SignInModal: FC = () => {
             <div className="flex flex-col w-72 mb-6">
               <input
                 ref={emailInput}
-                className="h-[2.3rem] rounded py-2 px-3 text-gray-900 dark:text-tinWhite outline-none text-base placeholder:text-sm tracking-wide"
+                className="h-[2.3rem] rounded-md py-2 px-3 text-gray-900 dark:text-tinWhite outline-none text-base placeholder:text-sm tracking-wide font-sans"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -123,7 +148,7 @@ const SignInModal: FC = () => {
             </div>
             <div className="flex flex-col">
               <input
-                className="h-[2.3rem] rounded py-2 dark:text-tinWhite text-gray-900 px-3 outline-none text-base placeholder:text-sm tracking-wide"
+                className="h-[2.3rem] rounded-md py-2 dark:text-tinWhite text-gray-900 px-3 outline-none text-base placeholder:text-sm tracking-wide font-sans"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -159,7 +184,7 @@ const SignInModal: FC = () => {
           <p className="mt-4 text-gray-400">
             Don&apos;t have an account?{" "}
             <a
-              className="hover:underline cursor-pointer"
+              className="cursor-pointer py-1 px-2 mt-10 rounded-full inline-block dark:bg-slate-200 text-gray-900"
               tabIndex={0}
               onClick={swicthToSignUp}
             >
@@ -170,7 +195,9 @@ const SignInModal: FC = () => {
       </div>
 
       <div
-        className="modal-content text-white hidden h-[60%] rounded-md md:w-[50%] md:h-[50%] 2xl:block 2xl:w-[30%] 2xl:h-[60%]"
+        className={`modal-content text-white hidden rounded-md xl:block xl:w-[50%] xl:h-[80%] 2xl:w-[40%] 2xl:h-[90%] transition-transform duration-300 ease-in-out ${
+          isVisible ? "scale-100" : "scale-95"
+        }`}
         role="dialog"
         aria-labelledby="signin-title"
         onClick={(e) => e.stopPropagation()}
@@ -183,7 +210,10 @@ const SignInModal: FC = () => {
           <XIcon size={18} className="md:hidden" />
           <XIcon size={24} className="hidden md:block" />
         </span>
-        <h2 id="signin-title" className="text-center mt-14 text-xl">
+        <h2
+          id="signin-title"
+          className="text-center xl:mt-[25%] text-xl font-serif xl:text-2xl"
+        >
           Welcome back!
         </h2>
         <div className="flex flex-col items-center">
