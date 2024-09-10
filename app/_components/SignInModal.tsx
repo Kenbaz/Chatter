@@ -20,7 +20,6 @@ const SignInModal: FC = () => {
   const [isEmailSignupLoading, setIsEmailSignupLoading] = useState(false);
   const [isGoogleSignupLoading, setIsGoogleSignupLoading] = useState(false);
   const emailInput = useRef<HTMLInputElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
 
   const { signInUser, signInWithGoogle } = useAuth();
 
@@ -30,13 +29,6 @@ const SignInModal: FC = () => {
   const { isLoading } = useSelector((state: RootState) => state.loading);
   const { error } = useSelector((state: RootState) => state.error);
 
-  useEffect(() => {
-    if (showSigninModal) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
-  }, [showSigninModal]);
 
   const signUserIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -70,18 +62,12 @@ const SignInModal: FC = () => {
   };
 
   const close = useCallback(() => {
-    setIsVisible(false);
-    setTimeout(() => {
-      dispatch(closeModals());
-    }, 300); // Match this with the transition duration
+     dispatch(closeModals());
   }, [dispatch]);
 
   const swicthToSignUp = () => {
-     setIsVisible(false);
-     close();
-     setTimeout(() => {
-       dispatch(openSignupModal());
-     }, 300);
+    close();
+    dispatch(openSignupModal());
   };
 
   useEffect(() => {
@@ -105,21 +91,17 @@ const SignInModal: FC = () => {
 
   return (
     <div
-      className={`modal transition-opacity duration-300 ease-in-out ${
-        isVisible ? "opacity-100" : "opacity-0"
-      }`}
+      className={`modal transition-opacity duration-300 ease-in-out`}
       onClick={close}
     >
       <div
-        className={`modal-content shadow-xl text-white h-full w-full md:w-[80%] md:h-[100%] lg:landscape:w-[60%] lg:h-[50%] lg:w-[70%] rounded-md lg:landscape:h-[100%] xl:hidden transition-transform duration-300 ease-in-out ${
-          isVisible ? "scale-100" : "scale-95"
-        }`}
+        className={`modal-content shadow-xl dark:bg-customGray1 bg-customWhite2 dark:text-white h-full w-full md:w-[80%] md:h-[100%] lg:landscape:w-[60%] lg:h-[50%] lg:w-[70%] rounded-md lg:landscape:h-[100%] xl:hidden`}
         role="dialog"
         aria-labelledby="signin-title"
         onClick={(e) => e.stopPropagation()}
       >
         <span
-          className="close-modal rounded-[50%] hover:bg-customGray p-1"
+          className="close-modal rounded-[50%] hover:bg-white dark:hover:bg-customGray p-1"
           onClick={close}
           aria-label="Close modal"
         >
@@ -128,7 +110,7 @@ const SignInModal: FC = () => {
         </span>
         <h2
           id="signin-title"
-          className="text-center mt-[40%] md:mt-[50%] font-serif text-xl md:text-2xl lg:mt-[25%]"
+          className="text-center mt-[40%] md:mt-[50%] font-serif text-xl md:text-2xl lg:mt-[25%] font-medium"
         >
           Welcome back!
         </h2>
@@ -181,10 +163,10 @@ const SignInModal: FC = () => {
               "Sign in with Google"
             )}
           </button>
-          <p className="mt-4 text-gray-400">
+          <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm">
             Don&apos;t have an account?{" "}
             <a
-              className="cursor-pointer py-1 px-2 mt-10 rounded-full inline-block dark:bg-slate-200 text-gray-900"
+              className="cursor-pointer bg-gray-950 py-1 px-2 mt-10 text-slate-200 rounded-full inline-block dark:bg-slate-200 dark:text-gray-900"
               tabIndex={0}
               onClick={swicthToSignUp}
             >
@@ -195,15 +177,13 @@ const SignInModal: FC = () => {
       </div>
 
       <div
-        className={`modal-content text-white hidden rounded-md xl:block xl:w-[50%] xl:h-[80%] 2xl:w-[40%] 2xl:h-[90%] transition-transform duration-300 ease-in-out ${
-          isVisible ? "scale-100" : "scale-95"
-        }`}
+        className={`modal-content dark:text-white dark:bg-customGray1 bg-customWhite2 hidden rounded-md xl:block xl:w-[50%] xl:h-[80%] 2xl:w-[40%] 2xl:h-[90%]`}
         role="dialog"
         aria-labelledby="signin-title"
         onClick={(e) => e.stopPropagation()}
       >
         <span
-          className="close-modal rounded-[50%] hover:bg-customGray p-1"
+          className="close-modal rounded-[50%] hover:bg-white dark:hover:bg-customGray p-1"
           onClick={close}
           aria-label="Close modal"
         >
@@ -212,7 +192,7 @@ const SignInModal: FC = () => {
         </span>
         <h2
           id="signin-title"
-          className="text-center xl:mt-[25%] text-xl font-serif xl:text-2xl"
+          className="text-center xl:mt-[25%] text-xl font-serif xl:text-2xl font-medium"
         >
           Welcome back!
         </h2>
@@ -265,14 +245,14 @@ const SignInModal: FC = () => {
               "Sign in with Google"
             )}
           </button>
-          <p className="mt-4 text-gray-400">
+          <p className="mt-4 text-gray-500 dark:text-gray-400">
             Don&apos;t have an account?{" "}
             <a
               className="hover:underline cursor-pointer"
               tabIndex={0}
               onClick={swicthToSignUp}
             >
-              Sign up
+              <span className="dark:text-gray-400 text-gray-900">Sign up</span>
             </a>
           </p>
         </div>

@@ -161,7 +161,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
 
   return (
     <div
-      className={`post-card bg-primary mb-2 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
+      className={`post-card dark:bg-primary bg-customWhite3 mb-2 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
         isClicked
           ? "md:border-2 md:border-teal-700 md:shadow-lg"
           : "md:border-2 md:border-transparent"
@@ -199,7 +199,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
             </div>
             <Link href={`/profile/${authorId}`}>
               <small
-                className="text-[14px] hover:text-white"
+                className="text-[14px] dark:hover:text-white hover:text-customBlack"
                 onClick={handleClick}
                 style={{ position: "relative" }}
               >
@@ -237,7 +237,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
 
       <Link href={`/post/${post.id}`}>
         <h1
-          className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8"
+          className="text-xl font-bold mt-2 dark:text-white dark:hover:text-gray-300 hover:text-gray-700 mb-2 md:pl-8"
           onClick={handleClick}
           style={{ position: "relative" }}
         >
@@ -247,8 +247,8 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="py-1 px-2 font-light rounded-md hover:bg-customGray1 hover:text-white transition-colors duration-200">
-              <span className="text-gray-400">#</span>
+            <span className="py-1 px-2 dark:font-light rounded-md dark:hover:bg-customGray1 dark:text-gray-400 text-gray-800 hover:bg-customWhite2 dark:hover:text-white hover:text-customBlack transition-colors duration-200">
+              <span className="text-gray-500 dark:text-gray-400">#</span>
               {tag}
             </span>
           </Link>
@@ -260,7 +260,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
       <div className="post-actions relative items-center flex gap-5 md:pl-8">
         {likeCount > 0 && (
           <button
-            className="text-sm py-1 px-2 rounded-md font-light flex items-center gap-2 hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            className="text-sm py-1 px-2 rounded-md dark:font-light flex items-center gap-2 dark:hover:bg-customGray1 hover:bg-customWhite2 hover:opacity-90 transition-colors duration-200 dark:hover:text-white hover:text-customBlack"
             onClick={handleIconClick}
           >
             <span className=" rounded-lg flex items-center gap-1">
@@ -273,7 +273,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
 
         {commentCount > 0 && (
           <span
-            className="comment-button cursor-pointer rounded-md flex gap-2 items-center text-sm font-light py-1 px-2 relative hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            className="comment-button cursor-pointer rounded-md flex gap-2 items-center text-sm dark:font-light py-1 px-2 relative dark:hover:bg-customGray1 hover:bg-customWhite2 hover:opacity-90 transition-colors duration-200 hover:text-customBlack dark:hover:text-white"
             onClick={handleIconClick}
           >
             <span className=" flex items-center gap-1">
@@ -309,9 +309,9 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
                 </div>
               </div>
               <Link href={`/post/${post.id}?scrollTo=${comment.id}`}>
-                <div className="bg-customGray p-[10px] rounded-lg cursor-pointer hover:bg-customGray1 border border-customGray transition-colors duration-200">
-                  <small className="text-customWhite">{comment.author}</small>
-                  <p className="text-sm mt-2 text-white">{comment.content}</p>
+                <div className="dark:bg-customGray bg-customWhite2 p-[10px] rounded-lg cursor-pointer dark:hover:bg-customGray1 border hover:bg-customGray3 dark:border-customGray transition-colors duration-200">
+                  <small className="dark:text-customWhite">{comment.author}</small>
+                  <p className="text-sm mt-2 dark:text-white">{comment.content}</p>
                 </div>
               </Link>
             </div>

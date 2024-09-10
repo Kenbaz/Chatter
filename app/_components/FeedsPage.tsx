@@ -273,14 +273,14 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
 
   return (
     <div className="feed-container mt-14 flex flex-col dark:bg-headerColor">
-      <header className="h-14 bg-primary fixed border border-t-0 border-l-0 border-r-0 border-headerColor md:hidden top-0 left-0 z-10 w-full flex justify-around items-center">
+      <header className="h-14 bg-customWhite3 dark:bg-primary fixed border border-t-0 border-l-0 border-r-0  dark:border-headerColor md:hidden top-0 left-0 z-10 w-full flex justify-around items-center">
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
         </div>
         <div
           ref={iconRef}
           onClick={toggleSearchBar}
-          className=" p-2 md:hidden relative -right-16 hover:bg-teal-700 opacity-80 rounded-lg"
+          className=" p-2 md:hidden hover:bg-customWhite2 relative -right-16 dark:hover:bg-teal-700 opacity-80 rounded-lg"
         >
           <Search className="text-[22px] font-light md:hidden" />
         </div>
@@ -318,7 +318,10 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
             </>
           ) : pullDownDistance > pullDownThreshold ? (
             <>
-              <ArrowUp className="text-white mb-2 animate-bounce" size={18} />
+              <ArrowUp
+                className="dark:text-white text-customBlack mb-2 animate-bounce"
+                size={18}
+              />
               <span className="text-sm relative -top-2">
                 Release to refresh
               </span>
@@ -326,11 +329,11 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           ) : pullDownDistance > 0 && !refreshing ? ( // Only show when not refreshing
             <>
               <ArrowDown
-                className="text-white mb-2"
+                className="dark:text-white text-customBlack mb-2"
                 size={18}
                 style={{ transform: `rotate(${arrowRotation}deg)` }}
               />
-              <span className="text-white text-sm relative -top-2">
+              <span className="dark:text-white text-customBlack text-sm relative -top-2">
                 Pull down to refresh
               </span>
             </>
@@ -359,7 +362,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         >
           <div className="filter-option flex items-center justify-evenly mb-2 mt-2">
             <select
-              className="p-1 rounded-md text-sm dark:bg-primary border border-teal-700 text-white outline-none"
+              className="p-1 rounded-md text-sm bg-customWhite3 dark:bg-primary border border-customWhite dark:border-teal-700 dark:text-white outline-none"
               value={filters.sortBy}
               onChange={(e) =>
                 handleFilterChange("sortBy", e.target.value as SortBy)
@@ -369,7 +372,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
               <option value="popular">Most Popular</option>
             </select>
             <select
-              className="p-1 rounded-md text-sm border border-teal-700 outline-none text-white"
+              className="p-1 rounded-md text-sm border border-customWhite dark:border-teal-700 outline-none dark:text-white"
               value={filters.dateRange}
               onChange={(e) =>
                 handleFilterChange("dateRange", e.target.value as DateRange)

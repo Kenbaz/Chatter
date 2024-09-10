@@ -19,31 +19,37 @@ const ContentsNavigation: FC = () => {
   return (
     <nav>
       <ul className="flex space-x-4">
-        <li className="hover:text-teal-800">
+        <li className="hover:text-teal-800 px-2 py-2 hover:bg-customWhite3 rounded-lg dark:px-0 dark:py-0 dark:hover:bg-opacity-0">
           <Link
             href={`${pathname}?${createQueryString("feedType", "forYou")}`}
             className={
-              feedType === "forYou" ? "font-bold text-white" : "font-light"
+              feedType === "forYou"
+                ? "font-bold dark:text-white text-customBlack"
+                : "font-medium"
             }
           >
             For You
           </Link>
         </li>
-        <li className="hover:text-teal-800">
+        <li className="hover:text-teal-800 px-2 py-2 hover:bg-customWhite3 rounded-lg dark:px-0 dark:py-0 dark:hover:bg-opacity-0">
           <Link
             href={`${pathname}?${createQueryString("feedType", "following")}`}
             className={
-              feedType === "following" ? "font-bold text-white" : "font-light"
+              feedType === "following"
+                ? "font-bold dark:text-white text-customBlack"
+                : "font-medium"
             }
           >
             Following
           </Link>
         </li>
-        <li className="hover:text-teal-700">
+        <li className="hover:text-teal-800 px-2 py-2 hover:bg-customWhite3 rounded-lg dark:px-0 dark:py-0 dark:hover:bg-opacity-0">
           <Link
             href={`${pathname}?${createQueryString("feedType", "latest")}`}
             className={
-              feedType === "latest" ? "font-bold text-white" : "font-light"
+              feedType === "latest"
+                ? "font-bold dark:text-white text-customBlack"
+                : "font-medium"
             }
           >
             Latest

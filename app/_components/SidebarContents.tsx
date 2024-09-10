@@ -22,25 +22,25 @@ const SideBarContent: FC = () => {
         <div className="space-y-2 -mt-1 mb-7 lg:relative lg:left-4">
           <button
             onClick={handleNavHome}
-            className="flex items-center space-x-2 w-full p-2 rounded cursor-pointer hover:bg-teal-900 hover:opacity-85 hover:text-white transition-colors duration-200"
+            className="flex items-center space-x-2 w-full p-2 rounded cursor-pointer dark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200"
           >
             <FaHome className="text-orange-300" />
             <span>Home</span>
           </button>
 
-          <button className="flex items-center space-x-2 w-full p-2 rounded hover:bg-teal-900 hover:text-white hover:opacity-85 transition-colors duration-200">
+          <button className="flex items-center space-x-2 w-full p-2 rounded ark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200">
             <FaInfoCircle className="text-purple-500" />
             <span>About</span>
           </button>
 
-          <button className="flex items-center space-x-2 w-full p-2 rounded hover:bg-teal-900 hover:text-white hover:opacity-85 transition-colors duration-200">
+          <button className="flex items-center space-x-2 w-full p-2 rounded ark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200">
             <FaTags className="text-gold4" />
             <span>Tags</span>
           </button>
 
           <button
             onClick={navigateToReadingList}
-            className="flex items-center justify-between w-full p-2 text-white rounded cursor-pointer hover:bg-teal-900 hover:text-white hover:opacity-85 transition-colors duration-200"
+            className="flex items-center justify-between w-full p-2 dark:text-white rounded cursor-pointerark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200"
           >
             <div className="flex items-center space-x-2">
               <FaBookmark className="text-blue-800" />
@@ -49,21 +49,21 @@ const SideBarContent: FC = () => {
           </button>
 
           <div className="flex items-center text-xl">
-            <button className="flex items-center w-full p-1 text-white rounded">
+            <button className="flex items-center w-full p-1 dark:text-white rounded">
               <FaTwitter />
             </button>
 
-            <button className="flex items-center w-full p-1 text-white rounded">
+            <button className="flex items-center w-full p-1 dark:text-white rounded">
               <FaLinkedin />
             </button>
 
-            <button className="flex items-center w-full p-1 text-white rounded">
+            <button className="flex items-center w-full p-1 dark:text-white rounded">
               <FaGithub />
             </button>
-            <button className="flex items-center w-full p-1 text-white rounded">
+            <button className="flex items-center w-full p-1 dark:text-white rounded">
               <FaFacebook />
             </button>
-            <button className="flex items-center w-full p-1 text-white rounded">
+            <button className="flex items-center w-full p-1 dark:text-white rounded">
               <FaInstagram />
             </button>
           </div>

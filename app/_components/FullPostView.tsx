@@ -666,7 +666,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     <>
       <div className="full-post-container post-layout mt-14 relative pb-12 md:w-[79%] md:m-auto md:mt-16 lg:landscape:w-[70%] lg:mt-16 lg:w-[70%]">
         {post && (
-          <div className="full-post-content dark:bg-primary max-w-4xl mx-auto rounded-md xl:w-[80%] 2xl:w-[80%]">
+          <div className="full-post-content dark:bg-primary bg-customWhite3 max-w-4xl mx-auto rounded-md xl:w-[80%] 2xl:w-[80%]">
             {post.coverImage && (
               <div className="relative w-full aspect-[17/8] lg:landscape:aspect-[12/4] mb-5">
                 <Image
@@ -683,20 +683,20 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             {user && post && user.uid === post.authorId && (
               <div className=" p-2 -top-[15px] relative justify-end font-light text-[15px] -mb-4 flex gap-4">
                 <button
-                  className="text-white hover:text-gold4"
+                  className="dark:text-white dark:hover:text-gold4 hover:text-gold1"
                   onClick={() => handleEditPost(post.id)}
                 >
                   Edit
                 </button>
                 <button
                   onClick={openDeleteModal}
-                  className="delete-post-btn text-white hover:text-red-600"
+                  className="delete-post-btn dark:text-white hover:text-red-600"
                 >
                   Delete post
                 </button>
                 <button
                   onClick={() => handleViewAnalytics(post.id)}
-                  className="view-analytics-btn text-white hover:text-gold4"
+                  className="view-analytics-btn dark:text-white dark:hover:text-gold4 hover:text-gold1"
                 >
                   Stats
                 </button>
@@ -705,7 +705,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             {user && post && !isOwnPost && (
               <button
                 onClick={handleFollow}
-                className="text-[15px] relative dark:bg-gray-200 px-2 w-[23%] md:w-[15%] md:left-[80%] font-semibold text-gray-900 left-[75%] p-1 rounded-md"
+                className="text-[15px] relative dark:bg-gray-200 bg-gray-900 text-white px-2 w-[23%] md:w-[15%] md:left-[80%] font-semibold dark:text-gray-900 left-[75%] p-1 rounded-md"
               >
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
@@ -727,7 +727,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                 </div>
                 <div className="flex flex-col">
                   <Link href={`/profile/${post.authorId}`}>
-                    <p className="text-tinWhite font-semibold text-base tracking-wide">
+                    <p className="dark:text-tinWhite font-semibold text-base tracking-wide">
                       {authorName}
                     </p>
                   </Link>
@@ -736,16 +736,16 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                   </small>
                 </div>
               </div>
-              <h1 className="text-3xl text-white font-bold mb-4">
+              <h1 className="text-3xl dark:text-white font-bold mb-4">
                 {post.title}
               </h1>
               <div className="mb-4">
                 {post.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="inline-block rounded-full mr-2 bg-customGray1 px-3 py-1 text-sm font-semibold text-gray-200 mb-2"
+                    className="inline-block rounded-full mr-2 dark:bg-customGray1 bg-customWhite2 px-3 py-1 text-sm font-semibold dark:text-gray-200 text-gray-800 mb-2"
                   >
-                    <span className="text-gray-400">#</span>
+                    <span className="dark:text-gray-400 text-gray-500">#</span>
                     {tag}
                   </span>
                 ))}
@@ -766,7 +766,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
           </div>
         )}
         <div className="post-actions">
-          <div className="flex items-center h-[9%] w-full p-4 bg-headerColor justify-around fixed z-50 left-0 bottom-0 md:w-[10%] md:flex-col md:h-[30%] md:left-0 md:top-16 lg:landscape:w-[10%] lg:landscape:flex-col lg:landscape:h-[50%] lg:landscape:left-10 lg:landscape:top-14 lg:w-[10%] lg:flex-col lg:h-[30%] lg:left-7 lg:top-16 xl:hidden">
+          <div className="flex items-center h-[9%] w-full p-4 dark:bg-headerColor bg-customWhite3 border border-l-0 border-r-0 border-b-0 dark:border-t-0 justify-around fixed z-50 left-0 bottom-0 md:w-[10.5%] md:flex-col dark:md:bg-headerColor md:bg-customWhite2 md:h-[30%] md:border-t-0 md:left-0 md:top-16 lg:landscape:w-[10%] lg:landscape:flex-col lg:landscape:h-[50%] lg:landscape:left-10 lg:landscape:top-14 lg:w-[10%] lg:flex-col lg:h-[30%] lg:left-7 lg:top-16 xl:hidden">
             <button
               className="like-button relative flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleLike}
@@ -802,14 +802,14 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
               </button>
               {showShareButtons && (
                 <>
-                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[17%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[30%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
+                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 dark:border-customGray bg-customWhite3 dark:bg-primary border rounded shadow-lg p-2 md:top-[29%] md:w-[30%] md:left-[9%] md:h-[17%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[30%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
                       postAuthor={post.author}
                     />
                   </div>
-                  <div className="share-buttons-container hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[8rem] xl:top-[25rem] border border-customGray rouned-md bg-primary shadow-lg p-2 ">
+                  <div className="share-buttons-container hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[8rem] xl:top-[25rem] border dark:border-customGray rouned-md dark:bg-primary bg-customWhite3 shadow-lg p-2 ">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
@@ -821,7 +821,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             </div>
           </div>
 
-          <div className="hidden xl:flex xl:fixed xl:w-[10%] xl:h-[45%] xl:justify-around xl:z-50 xl:left-[9rem] xl:top-[5rem] xl:flex-col xl:items-center xl:p-4 2xl:left-[14rem] 2xl:top-[6rem] 2xl:w-[5%] bg-headerColor">
+          <div className="hidden xl:flex xl:fixed xl:w-[10%] xl:h-[45%] xl:justify-around xl:z-50 xl:left-[9rem] xl:top-[5rem] xl:flex-col xl:items-center xl:p-4 2xl:left-[14rem] 2xl:top-[6rem] 2xl:w-[5%] dark:bg-headerColor bg-customWhite2">
             <button
               className="like-button relative flex items-center gap-2 lg:flex-col md:flex-col"
               onClick={handleLike}
@@ -857,14 +857,14 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
               </button>
               {showShareButtons && (
                 <>
-                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 border-customGray bg-white dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[20%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[20%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
+                  <div className="share-buttons-container w-[95.5%] h-[25%] top-[64.4%] fixed z-20 right-[10px] mt-2 dark:border-customGray bg-customWhite3 dark:bg-primary border rounded shadow-lg p-2 md:top-[22rem] md:w-[30%] md:left-[5rem] md:h-[20%] lg:landscape:left-[7rem] lg:landscape:top-[19rem] lg:landscape:h-[20%] lg:landscape:w-[25%] lg:left-[7rem] lg:top-[25rem] xl:hidden">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
                       postAuthor={post.author}
                     />
                   </div>
-                  <div className="share-buttons-container rounded-md hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[14.3rem] xl:top-[24.5rem] 2xl:left-[18rem] 2xl:top-[23.5rem] border border-customGray rouned-md bg-primary shadow-lg p-2 ">
+                  <div className="share-buttons-container rounded-md hidden xl:block xl:fixed xl:w-[20%] xl:z-20 xl:h-[25%] xl:left-[14.3rem] xl:top-[24.5rem] 2xl:left-[18rem] 2xl:top-[23.5rem] border dark:border-customGray rouned-md dark:bg-primary bg-customWhite3 shadow-lg p-2 ">
                     <ShareButtons
                       postId={post.id}
                       postTitle={post.title}
@@ -877,7 +877,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
           </div>
         </div>
 
-        <div className="comments-section p-2 mt-2 pb-[60px] dark:bg-primary md:pr-36 md:pl-10 xl:w-[80%] xl:m-auto xl:mt-3 2xl:w-[80%] 2xl:rounded-md ">
+        <div className="comments-section p-2 mt-2 pb-[60px] bg-customWhite3 dark:bg-primary md:pr-36 md:pl-10 xl:w-[80%] xl:m-auto xl:mt-3 2xl:w-[80%] 2xl:rounded-md ">
           <h3 className="dark:text-white xl:text-xl xl:pb-2 mb-4 font-semibold">
             Comments
           </h3>
@@ -887,10 +887,10 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="border border-teal-700 rounded-md p-2 outline-none"
+              className="border dark:border-teal-700 rounded-md p-2 outline-none"
             />
             <button
-              className="w-20 p-1 rounded-lg bg-teal-800"
+              className="w-20 p-1 rounded-lg text-white dark:text-customBlack bg-teal-800"
               onClick={handleAddComment}
             >
               Submit
@@ -923,7 +923,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                     <div className="h-5 border-teal-700 border-dashed border w-0 ml-[9px] mt-[1px] "></div>
                   </div>
                   <div className="comment-box relative">
-                    <div className="flex relative flex-col p-[10px] border border-customGray rounded-lg mb-2 -mt-6">
+                    <div className="flex relative flex-col p-[10px] border dark:border-customGray rounded-lg mb-2 -mt-6">
                       {user.uid === comment.authorId && (
                         <div className="relative ml-auto -mb-3">
                           <button
@@ -936,13 +936,13 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                               )
                             }
                           >
-                            <FaEllipsis className="hover:text-white transition-colors duration-200" />
+                            <FaEllipsis className="dark:hover:text-white transition-colors duration-200" />
                           </button>
                           {openMenuCommentId === comment.id && (
-                            <div className="absolute right-0 mt-2 w-48 dark:bg-primary border dark:border-customGray rounded-md shadow-lg z-10">
+                            <div className="absolute right-0 mt-2 w-48 dark:bg-primary bg-customWhite3 border dark:border-customGray rounded-md shadow-lg z-10">
                               <div className="py-1">
                                 <button
-                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-teal-800 transition-colors duration-200"
+                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-customGray3 dark:hover:bg-teal-800 transition-colors duration-200"
                                   onClick={() => {
                                     setEditingCommentId(comment.id);
                                     setEditCommentContent(comment.content);
@@ -952,7 +952,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                                   Edit
                                 </button>
                                 <button
-                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-teal-800 transition-colors duration-200"
+                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-customGray3 dark:hover:bg-teal-800 transition-colors duration-200"
                                   onClick={() => {
                                     handleDeleteComment(comment.id);
                                     setOpenMenuCommentId(null);
@@ -967,8 +967,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                       )}
                       <div className="">
                         <small className="dark:text-gray-400">
-                          {comment.author} on{" "}
-                          {new Date(comment.createdAt).toLocaleDateString()}
+                          {comment.author} on {formatDate(comment.createdAt)}
                         </small>
                         <p className="mt-3 w-full tracking-normal text-[15px]">
                           {comment.content}
@@ -1020,11 +1019,11 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                           onChange={(e) =>
                             setEditCommentContent(e.target.value)
                           }
-                          className="border border-teal-700 rounded-md p-2 w-full outline-none"
+                          className="border dark:border-teal-700 rounded-md p-2 w-full outline-none"
                         />
                         <div className="mt-2">
                           <button
-                            className="bg-teal-800 px-3 py-1 rounded-lg mr-2"
+                            className="bg-teal-800 text-white dark:text-customBlack px-3 py-1 rounded-lg mr-2"
                             onClick={() => {
                               handleEditComment(comment.id, editCommentContent);
                               setEditingCommentId(null);
@@ -1033,7 +1032,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                             Save
                           </button>
                           <button
-                            className="bg-gray-500 px-2 py-1 rounded-lg"
+                            className="bg-gray-500 dark:text-customBlack text-white px-2 py-1 rounded-lg"
                             onClick={() => setEditingCommentId(null)}
                           >
                             Cancel
@@ -1050,17 +1049,17 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                       value={newReply}
                       onChange={(e) => setNewReply(e.target.value)}
                       placeholder="Reply..."
-                      className="border border-teal-700 rounded-md p-2 outline-none"
+                      className="border dark:border-teal-700 rounded-md p-2 outline-none"
                     />
                     <div className="flex items-center gap-3">
                       <button
-                        className="w-20 p-1 rounded-lg bg-teal-800"
+                        className="w-20 p-1 rounded-lg text-white dark:text-customBlack bg-teal-800"
                         onClick={() => handleAddReply(comment.id)}
                       >
                         Reply
                       </button>
                       <button
-                        className="w-20 p-1 rounded-lg bg-gray-600"
+                        className="w-20 p-1 rounded-lg text-white dark:text-customBlack bg-gray-600"
                         onClick={handleCancelReply}
                       >
                         Cancel
@@ -1087,10 +1086,9 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                       </div>
                       <div>
                         <div>
-                          <div className="flex flex-col p-[10px] border border-customGray rounded-lg mb-2 -mt-4">
+                          <div className="flex flex-col p-[10px] border dark:border-customGray rounded-lg mb-2 -mt-4">
                             <small>
-                              {reply.author} on{" "}
-                              {new Date(reply.createdAt).toLocaleDateString()}
+                              {reply.author} on {formatDate(reply.createdAt)}
                             </small>
                             <p className="mt-3 w-full tracking-normal text-[15px]">
                               {reply.content}

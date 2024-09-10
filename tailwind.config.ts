@@ -26,6 +26,9 @@ const config: Config = {
         gold3: "#FFD000",
         gold4: "#DBB42C",
         customBrown: "#FAD643",
+        customWhite2: "#e9e8e4",
+        customWhite3: "#FEFEFE",
+        customGray3: "#CCCCCC",
       },
       scale: {
         20: "0.3",

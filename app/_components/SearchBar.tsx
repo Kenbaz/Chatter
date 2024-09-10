@@ -80,7 +80,7 @@ const SearchBar: FC = () => {
   }, []);
 
   return (
-    <div className="search-bar-container border outline-none relative w-full rounded-lg border-secondary z-50">
+    <div className="search-bar-container border outline-none relative w-full rounded-lg dark:border-secondary z-50">
       {error && <p className="text-red-600 absolute top-20 left-[50%] z-10">{error}</p>}
       <div className="relative">
         <input
@@ -95,12 +95,12 @@ const SearchBar: FC = () => {
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="search-results-dropdown md:absolute w-full border border-t-0 rounded-t-sm dark:border-customGray1 rounded-b-lg dark:bg-customGray1 p-1"
+          className="search-results-dropdown md:absolute w-full border border-t-0 rounded-t-sm dark:border-customGray1 rounded-b-lg dark:bg-customGray1 bg-customWhite3 p-1"
         >
           {results.length > 0 ? (
             results.map((post) => (
               <Link key={post.id} href={`/post/${post.id}`}>
-                <div className="search-result-item mb-2 dark:hover:bg-customGray p-1 px-2 rounded-lg tracking-wide">
+                <div className="search-result-item mb-2 dark:hover:bg-customGray hover:bg-customWhite2 p-1 px-2 rounded-lg tracking-wide">
                   <small className="font-bold text-gray-400" dangerouslySetInnerHTML={{ __html: post.author }} />
                   <h3 dangerouslySetInnerHTML={{ __html: post.title }} />
                 </div>

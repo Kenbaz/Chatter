@@ -30,11 +30,11 @@ const MyLanguages: FC = () => {
   }, [fetchLanguages]);
 
   if (loading) {
-    return <div className="text-white text-[14px]">Loading languages...</div>;
+    return <div className="dark:text-white text-[14px]">Loading languages...</div>;
   }
 
   return (
-    <div className="bg-primary">
+    <div className="dark:bg-primary bg-customWhite3">
       {languages.length > 0 ? (
         <ul className=" mb-6">
           {error && <p className="text-[14px] text-red-600">{error}</p>}
