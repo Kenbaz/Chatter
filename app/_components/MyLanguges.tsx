@@ -2,11 +2,12 @@
 
 import { FC, useEffect, useState, useCallback } from "react";
 import { Profile } from "@/src/libs/userServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 
 const MyLanguages: FC = () => {
   const { getUserLanguages } = Profile();
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [languages, setLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

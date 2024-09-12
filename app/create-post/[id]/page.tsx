@@ -7,9 +7,11 @@ import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/src/libs/firebase";
 import ContentEditor from "@/app/_components/ContentEditor";
 import ContentEditorSkeleton from "@/app/_components/skeletons/ContentEditorSkeleton";
+import { useAuthentication } from "@/app/_components/AuthContext";
 
 const CreatePost = () => {
-  const { user, loading } = useRequireAuth();
+  // const { user, loading } = useRequireAuth();
+  const {user, loading} = useAuthentication()
 
   const params = useParams();
 

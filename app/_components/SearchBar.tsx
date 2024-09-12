@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, FC } from "react";
+import { useState, useEffect, useRef, FC, RefObject } from "react";
 import { PostData } from "@/src/libs/contentServices";
 import { postFuncs } from "@/src/libs/contentServices";
 import { setLoading } from "../_store/loadingSlice";
@@ -10,10 +10,14 @@ import { RootState } from "../_store/store";
 import Link from "next/link";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/src/libs/firebase";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 
+interface SearchBarProps {
+  inputRef?: RefObject<HTMLInputElement>;
+}
 
-const SearchBar: FC = () => {
+const SearchBar: FC<SearchBarProps> = ({inputRef}) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PostData[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -26,7 +30,7 @@ const SearchBar: FC = () => {
 
   const { searchPosts } = postFuncs();
 
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
 
   useEffect(() => {
     if (!user) return;
@@ -84,6 +88,7 @@ const SearchBar: FC = () => {
       {error && <p className="text-red-600 absolute top-20 left-[50%] z-10">{error}</p>}
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

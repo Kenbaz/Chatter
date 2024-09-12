@@ -3,9 +3,10 @@
 import { FC, useEffect, useState, useCallback, useMemo } from "react";
 import { analyticsFuncs, postFuncs, PostData } from "@/src/libs/contentServices";
 import { Profile } from "@/src/libs/userServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Image from "next/image";
 import AnalyticsSkeleton from "./skeletons/AnalyticsSkeleton";
+import { useAuthentication } from "./AuthContext";
 
 interface PostAnalyticsProps {
   postId: string;
@@ -42,7 +43,7 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
   const { getPostAnalytics } = analyticsFuncs();
   const { getPostById } = postFuncs();
   const { getUserProfile } = Profile();
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
 
   const fetchAnalytics = useCallback(async () => {
     try {

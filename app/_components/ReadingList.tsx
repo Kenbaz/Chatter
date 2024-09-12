@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, FC } from "react";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 import { postFuncs, PostData } from "@/src/libs/contentServices";
 import { useBookmarkFuncs, BookmarkWithId } from "@/src/libs/bookmark";
 import TagPageSkeleton from "./skeletons/TagsPageSkeleton";
@@ -9,7 +10,7 @@ import TagPageSkeleton from "./skeletons/TagsPageSkeleton";
 import PostCard from "./PostCardWithNoPreview";
 
 const ReadingListPage: FC = () => {
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [bookmarkedPosts, setBookmarkedPosts] = useState<PostData[]>([]);
   const { getBookmarks } = useBookmarkFuncs();
   const [isLoading, setIsLoading] = useState(true);

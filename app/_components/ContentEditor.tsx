@@ -239,12 +239,10 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
           setTitle(postData.title);
           setContent(postData.content);
           setSelectedTags(tagIds);
-          console.log('selected Tags:', postData.tags);
           setCoverImageUrl(postData.coverImage);
            setIsDraft(postData.status === "draft");
           dispatch(clearError());
         } else {
-          console.log("No such document");
           dispatch(setError("Post not found"));
         }
       } catch (error) {

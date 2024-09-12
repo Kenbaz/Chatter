@@ -2,10 +2,10 @@
 
 import { FC, useState, useEffect } from "react";
 import { PostData } from "@/src/libs/contentServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 import Image from "next/image";
 import Link from "next/link";
-import { FaComment } from "react-icons/fa6";
 import { analyticsFuncs } from "@/src/libs/contentServices";
 import ProfileHoverDropdown from "./ProfileHoverDropdown";
 import {
@@ -20,7 +20,7 @@ interface PostCardProps {
 }
 
 const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
   const [commentCount, setCommentCount] = useState(post.comments.length);
@@ -86,7 +86,7 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
     setTimeout(() => {
-      target.style.color = "rgba(15, 118, 110, 1)";
+      target.style.color = "rgba(15, 118, 110, 2)";
     }, 150);
   };
 

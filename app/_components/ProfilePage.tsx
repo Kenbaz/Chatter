@@ -11,12 +11,12 @@ import { RootState } from "../_store/store";
 import PostCardForDrafts from "./PostCardForDrafts";
 import Image from "next/image";
 import Link from "next/link";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 import PostCard from "./PostCard";
 import { ImplementFollowersFuncs } from "@/src/libs/userServices";
 import { MdLocationOn } from "react-icons/md";
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
-import PostCardWithNoPreview from "./PostCardWithNoPreview";
 import ProfilePageSkeleton from "./skeletons/ProfilePageSkeleton";
 
 interface UserProfileData {
@@ -38,7 +38,7 @@ interface UserProfileData {
 }
 
 const ProfilePage: FC = () => {
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const { getUserProfile } = Profile();
   const params = useParams();
   const { error } = useSelector((state: RootState) => state.error);

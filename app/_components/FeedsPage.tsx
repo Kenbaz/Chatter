@@ -7,21 +7,21 @@ import {
   useCallback,
   useMemo,
   useRef,
-  TouchEvent,
 } from "react";
 import { useInView } from "react-intersection-observer";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import ContentsNavigation from "./ContentsNav";
 import PostCardWithComments from "./PostCardWithComments";
 import { feeds, PostData } from "@/src/libs/contentServices";
 import { useSearchParams } from "next/navigation";
 import SearchBar from "./SearchBar";
-import { FaSearch, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MenuButton from "./MenuButton";
 import FeedsPageSkeleton from "./skeletons/FeedsPageSkeleton";
-import { Search, ArrowUp, ArrowDown, RefreshCcw } from "lucide-react";
+import { Search, ArrowUp, ArrowDown } from "lucide-react";
 import CustomPullToRefreshIndicator from "./CustomPullToRefreshIndicator";
+import { useAuthentication } from "./AuthContext";
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -37,7 +37,7 @@ interface FeedsPageProps {
 
 const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const searchParams = useSearchParams();
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(false);
   const [authorName, setAuthorName] = useState("");
@@ -58,6 +58,8 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const pullDownThreshold = 80; // Pixels to pull down before refreshing
   const startY = useRef<number | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setFeedType(searchParams.get("feedType") as string | undefined);
@@ -128,7 +130,16 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   ]);
 
   const toggleSearchBar = () => {
-    setIsSearchBarVisible((prev) => !prev);
+    setIsSearchBarVisible((prev) => {
+      if (!prev) {
+        // scroll to the search bar when its being opened
+        setTimeout(() => {
+          searchBarRef.current?.scrollIntoView({ behavior: 'smooth' });
+          searchInputRef.current?.focus();
+        }, 100);
+      }
+      return !prev;
+    });
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -349,7 +360,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
                 : "-translate-y-full opacity-0"
             }`}
           >
-            <SearchBar />
+            <SearchBar inputRef={searchInputRef} />
           </div>
         )}
         <div className="mt-[65px] p-2">

@@ -14,7 +14,6 @@ import {
 } from "@/src/libs/contentServices";
 import { ImplementFollowersFuncs, Profile } from "@/src/libs/userServices";
 import { postFuncs } from "@/src/libs/contentServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Image from "next/image";
 import Link from "next/link";
 import { Timestamp, FieldValue } from "firebase/firestore";
@@ -23,15 +22,13 @@ import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 import { analyticsFuncs } from "@/src/libs/contentServices";
 import BookmarkButton from "./BookmarkButton";
 import {
-  FaHeartCircleMinus,
-  FaHeartCirclePlus,
-  FaComment,
   FaEllipsis,
 } from "react-icons/fa6";
 import ShareButtons from "./ShareButtons";
 import "prismjs/themes/prism-tomorrow.css";
 import { Heart, MessageCircle, Loader2 } from 'lucide-react';
 import { FaHeart } from "react-icons/fa";
+import { useAuthentication } from "./AuthContext";
 
 type FullPostViewProps = {
   postId: string;
@@ -39,7 +36,7 @@ type FullPostViewProps = {
 
 
 const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const params = useParams();
   const searchParams = useSearchParams();
   const [post, setPost] = useState<PostData | null>(null);
@@ -707,7 +704,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             {user && post && !isOwnPost && (
               <button
                 onClick={handleFollow}
-                className="text-[15px] relative dark:bg-teal-700 bg-teal-800 text-tinWhite px-2 w-[23%] md:w-[15%] md:left-[80%] font-semibold left-[75%] p-1 rounded-md"
+                className="text-[15px] relative dark:bg-teal-700 dark:hover:bg-teal-800 bg-teal-800 hover:bg-teal-900 text-tinWhite px-2 w-[23%] md:w-[15%] md:left-[80%] font-semibold left-[75%] p-1 rounded-md"
               >
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>

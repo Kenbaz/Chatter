@@ -18,7 +18,7 @@ import {
 import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
 import { XIcon, Loader2 } from "lucide-react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft } from "react-icons/fa";
 
 const SignUpModal: FC = () => {
   const dispatch = useDispatch();

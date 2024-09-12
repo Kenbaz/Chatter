@@ -1,15 +1,16 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import PostAnalytics from "@/app/_components/PostAnalytics";
 import { postFuncs } from "@/src/libs/contentServices";
 import { useEffect, useState } from "react";
+import { useAuthentication } from "@/app/_components/AuthContext";
 
 const PostAnalyticsPage = () => {
   const params = useParams();
   const id = params.id as string;
-  const { user, loading: authLoading } = useRequireAuth();
+  const { user, loading: authLoading } = useAuthentication();
   const [isAuthor, setIsAuthor] = useState(false);
   const [loading, setLoading] = useState(true);
   const { getPostById } = postFuncs();

@@ -5,6 +5,7 @@ import "highlight.js/styles/github.css";
 import { Providers } from "./_components/Providers";
 import ClientInitWrapper from "./_components/ClientInitWrapper";
 import { ThemeProvider } from "next-themes";
+import ConsoleWatermark from "./_components/ConsoleWatermark";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,10 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <Providers>
           <ThemeProvider attribute="class">
-            <ClientInitWrapper>{children}</ClientInitWrapper>
+            <ClientInitWrapper>
+              {children}
+              <ConsoleWatermark/>
+            </ClientInitWrapper>
           </ThemeProvider>
         </Providers>
       </body>

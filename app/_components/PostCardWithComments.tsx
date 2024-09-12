@@ -4,10 +4,10 @@ import { FC, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PostData } from "@/src/libs/contentServices";
 import Markdown from "react-markdown";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 import Image from "next/image";
 import Link from "next/link";
-import { FaComment } from "react-icons/fa6";
 import { analyticsFuncs } from "@/src/libs/contentServices";
 import ProfileHoverDropdown from "./ProfileHoverDropdown";
 import {
@@ -16,8 +16,7 @@ import {
   UserData,
 } from "@/src/libs/userServices";
 import BookmarkBtn from "./BookmarkBtn2";
-import { MessageCircle, Heart } from 'lucide-react';
-import { likeFuncs } from "@/src/libs/contentServices";
+import { MessageCircle } from 'lucide-react';
 import { FaHeart } from "react-icons/fa";
 
 interface PostCardProps {
@@ -27,7 +26,7 @@ interface PostCardProps {
 
 
 const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
   const [commentCount, setCommentCount] = useState(post.comments.length);
@@ -123,8 +122,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
     setTimeout(() => {
-      target.style.color = "rgba(15, 118, 110, 0.6)";
-      target.style.opacity = ''
+      target.style.color = "rgba(15, 118, 110, 2.0)";
     }, 150);
   };
 

@@ -2,12 +2,13 @@
 
 import { FC, useEffect, useState, useCallback } from "react";
 import { Profile } from "@/src/libs/userServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import Link from "next/link";
+import { useAuthentication } from "./AuthContext";
 
 const MyInterests: FC = () => {
   const { getUserInterests } = Profile();
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -4,9 +4,10 @@ import { useState, useEffect, useRef, FC } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Profile } from "@/src/libs/userServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuth } from "@/src/libs/authServices";
 import { FaBookmark, FaPlus } from "react-icons/fa6";
+import { useAuthentication } from "./AuthContext";
 
 interface UserProfileData {
   username: string;
@@ -33,7 +34,7 @@ const MenuButton: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { getUserProfile } = Profile();
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const { signOutUser } = useAuth();
 
   useEffect(() => {

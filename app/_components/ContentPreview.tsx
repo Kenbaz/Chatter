@@ -6,9 +6,8 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
-import { FieldValue, Timestamp } from "firebase/firestore";
+import { FieldValue } from "firebase/firestore";
 import Link from "next/link";
-import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
 
 
@@ -22,15 +21,6 @@ interface ContentPreviewProps {
   publishDate?: string | FieldValue;
   status?: "draft" | undefined | "published";
 }
-
-function formatDateString(date: Date): string {
-  const options: Intl.DateTimeFormatOptions = {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  };
-  return date.toLocaleDateString("en-US", options).replace(",", "");
-};
 
 
 const ContentPreview: FC<ContentPreviewProps> = ({
@@ -46,22 +36,22 @@ const ContentPreview: FC<ContentPreviewProps> = ({
 
   const components: Components = {
     h1: ({ node, ...props }) => (
-      <h1 className="text-3xl text-white font-bold my-4" {...props} />
+      <h1 className="text-3xl dark:text-white font-bold my-4" {...props} />
     ),
     h2: ({ node, ...props }) => (
-      <h2 className="text-2xl text-white font-bold my-3" {...props} />
+      <h2 className="text-2xl dark:text-white font-bold my-3" {...props} />
     ),
     h3: ({ node, ...props }) => (
-      <h3 className="text-xl text-white font-bold my-2" {...props} />
+      <h3 className="text-xl dark:text-white font-bold my-2" {...props} />
     ),
     h4: ({ node, ...props }) => (
-      <h4 className="text-lg text-white font-bold my-2" {...props} />
+      <h4 className="text-lg dark:text-white font-bold my-2" {...props} />
     ),
     h5: ({ node, ...props }) => (
-      <h5 className="text-base text-white font-bold my-1" {...props} />
+      <h5 className="text-base dark:text-white font-bold my-1" {...props} />
     ),
     h6: ({ node, ...props }) => (
-      <h6 className="text-sm text-white font-bold my-1" {...props} />
+      <h6 className="text-sm dark:text-white font-bold my-1" {...props} />
     ),
     ul: ({ node, ...props }) => (
       <ul className="list-disc list-inside my-4" {...props} />

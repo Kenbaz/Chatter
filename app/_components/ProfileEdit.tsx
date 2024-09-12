@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, FC, ChangeEvent, FormEvent } from "react";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 import { Profile, UserData } from "@/src/libs/userServices";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/src/libs/firebase";
@@ -32,7 +33,7 @@ type ProfileData = {
 
 const EditProfile: FC = () => {
   const router = useRouter();
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const { error } = useSelector((state: RootState) => state.error);
   const { isLoading } = useSelector((state: RootState) => state.loading);
   const [validationErrors, setValidationErrors] = useState<{

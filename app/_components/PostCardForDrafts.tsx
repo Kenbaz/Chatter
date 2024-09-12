@@ -2,7 +2,8 @@
 
 import { FC, useState, useEffect } from "react";
 import { PostData } from "@/src/libs/contentServices";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
+// import { useRequireAuth } from "@/src/libs/useRequireAuth";
+import { useAuthentication } from "./AuthContext";
 import Image from "next/image";
 import Link from "next/link";
 import { analyticsFuncs } from "@/src/libs/contentServices";
@@ -18,7 +19,7 @@ interface PostCardProps {
 }
 
 const PostCardForDrafts: FC<PostCardProps> = ({ post, authorId }) => {
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [authorData, setAuthorData] = useState<Partial<UserData> | null>(null);
   const [commentCount, setCommentCount] = useState(post.comments.length);
