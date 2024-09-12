@@ -1,17 +1,16 @@
-'use client'
 
 import { useTheme } from 'next-themes';
-import { Sun, Moon } from 'lucide-react';
+import { FaMoon, FaSun } from 'react-icons/fa';
 
 export default function ThemeToggle() {
     const { theme, setTheme } = useTheme();
 
     return (
       <button
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
         aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       >
-        {theme === "light" ? <Moon /> : <Sun />}
+        {theme === "light" ? <FaMoon /> : <FaSun />}
       </button>
     );
 };

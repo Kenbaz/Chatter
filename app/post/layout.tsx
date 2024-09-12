@@ -38,7 +38,7 @@ export default function RootLayout({
         </div>
         <div className="md:flex hidden items-center gap-10">
           <button
-            className="w-32 rounded-lg hidden md:block border border-teal-800 text-teal-700 text-center relative py-2"
+            className="w-32 rounded-lg hidden md:block border border-teal-800 text-teal-700 hover:bg-teal-800 hover:text-white text-center relative py-2"
             onClick={handleCreatePostNavigation}
           >
             Create

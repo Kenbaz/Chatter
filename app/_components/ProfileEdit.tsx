@@ -269,16 +269,18 @@ const EditProfile: FC = () => {
 
   return (
     <>
-      <div className="profile-edit-container mt-[70px] pb-[5rem] text-tinWhite md:w-[70%] md:m-auto md:mt-16 lg:landscape:w-[60%] lg:landscape:pb-2 md:pb-[7rem] 2xl:hidden">
+      <div className="profile-edit-container mt-[70px] pb-[5rem] dark:text-tinWhite md:w-[70%] md:m-auto md:mt-16 lg:landscape:w-[60%] lg:landscape:pb-2 md:pb-[7rem] 2xl:hidden">
         {error && <p className="text-red-600">{error}</p>}
         {successMessage && <p className="text-green-600">{successMessage}</p>}
 
         <form onSubmit={handleSubmit} className="">
-          <div className="p-2 pb-8 dark:bg-primary dark:text-white mt-2 md:pl-5 md:pr-5">
+          <div className="p-2 pb-8 dark:bg-primary bg-customWhite3 dark:text-white mt-2 md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">
               Basic Info
             </h1>
-            <label htmlFor="profilePicture">Profile Picture</label>
+            <label htmlFor="profilePicture" className="font-semibold">
+              Profile Picture
+            </label>
             <div className="mt-2 flex items-center w-full mb-3">
               <div>
                 {profileData.profilePictureUrl && (
@@ -299,11 +301,13 @@ const EditProfile: FC = () => {
                 id="profilePicture"
                 accept="image/*"
                 onChange={handleProfilePictureUpload}
-                className=" border w-full px-2 py-[10.2px] outline-none rounded-md border-customGray1"
+                className=" border w-full px-2 py-[10.2px] outline-none rounded-md dark:border-customGray1"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username" className="font-semibold">
+                Username
+              </label>
               <div className="relative w-full">
                 <input
                   type="text"
@@ -311,9 +315,9 @@ const EditProfile: FC = () => {
                   name="username"
                   value={profileData.username}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 w-full border border-customGray1 rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 w-full border dark:border-customGray1 rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.username}/{maxLengths.username}
                 </span>
               </div>
@@ -326,7 +330,9 @@ const EditProfile: FC = () => {
               )}
             </div>
             <div className="flex flex-col gap-2 mt-7">
-              <label htmlFor="fullname">Name</label>
+              <label htmlFor="fullname" className="font-semibold">
+                Name
+              </label>
               <div className="relative w-full">
                 <input
                   type="text"
@@ -334,9 +340,9 @@ const EditProfile: FC = () => {
                   name="fullname"
                   value={profileData.fullname}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.fullname}/{maxLengths.fullname}
                 </span>
               </div>
@@ -350,16 +356,18 @@ const EditProfile: FC = () => {
               )}
             </div>
             <div className="flex flex-col gap-2 mt-7">
-              <label htmlFor="bio">Bio</label>
+              <label htmlFor="bio" className="font-semibold">
+                Bio
+              </label>
               <div className="relative w-full">
                 <textarea
                   id="bio"
                   name="bio"
                   value={profileData.bio}
                   onChange={handleInputChange}
-                  className="dark:text-white border dark:border-customGray1 rounded-md p-2 w-full outline-none text-gray-900"
+                  className="dark:text-white border dark:border-customGray1 rounded-md p-2 w-full outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.bio}/{maxLengths.bio}
                 </span>
               </div>
@@ -373,10 +381,12 @@ const EditProfile: FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-3 dark:bg-primary p-2 pb-8 dark:text-white md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 p-2 pb-8 dark:text-white md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">Personal</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="location">Location</label>
+              <label htmlFor="location" className="font-semibold">
+                Location
+              </label>
               <div className="relative w-full">
                 <input
                   type="text"
@@ -384,9 +394,9 @@ const EditProfile: FC = () => {
                   name="location"
                   value={profileData.location}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.location}/{maxLengths.location}
                 </span>
               </div>
@@ -400,19 +410,21 @@ const EditProfile: FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-3 dark:bg-primary dark:text-white pb-8 p-2 md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 dark:text-white pb-8 p-2 md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">Career</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="work">Work</label>
+              <label htmlFor="work" className="font-semibold">
+                Work
+              </label>
               <div className="relative w-full">
                 <textarea
                   id="work"
                   name="work"
                   value={profileData.work}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.work}/{maxLengths.work}
                 </span>
               </div>
@@ -426,17 +438,19 @@ const EditProfile: FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-3 dark:bg-primary dark:text-white p-2 md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 dark:text-white p-2 md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">Coding</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="Languages">Skills/Languages</label>
+              <label htmlFor="Languages" className="font-semibold">
+                Skills/Languages
+              </label>
               <p>What languages do you currently know?</p>
               <textarea
                 id="languages"
                 name="languages"
                 value={profileData.languages.join(", ")}
                 onChange={handleInputChange}
-                className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
+                className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none"
               />
               {validationErrors.languages && (
                 <ul className="text-red-500">
@@ -448,12 +462,14 @@ const EditProfile: FC = () => {
             </div>
           </div>
 
-          <div className="mb-4 mt-3 dark:bg-primary p-2 dark:text-white md:pl-5 md:pr-5">
+          <div className="mb-4 mt-3 dark:bg-primary bg-customWhite3 p-2 dark:text-white md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">
               Interests
             </h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="Interests">Interests</label>
+              <label htmlFor="Interests" className="font-semibold">
+                Interests
+              </label>
               <div className="relative">
                 <div
                   className="dark:bg-headerColor dark:border-customGray1 border px-4 py-2 rounded-md cursor-pointer"
@@ -464,11 +480,11 @@ const EditProfile: FC = () => {
                       {selectedTags.map((tag) => (
                         <div
                           key={tag}
-                          className="flex items-center gap-1 text-white"
+                          className="flex items-center gap-1 dark:text-white"
                         >
                           {tag}
                           <span
-                            className="cursor-pointer ml-1 relative top-[1px] text-sm hover:text-teal-700"
+                            className="cursor-pointer ml-1 relative top-[1px] text-sm dark:hover:text-teal-700 text-teal-800"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTagSelection(tag);
@@ -499,7 +515,7 @@ const EditProfile: FC = () => {
                           key={tag.id}
                           className={`px-2 py-1 rounded-full cursor-pointer hover:bg-teal-800 hover:scale-110 hover:text-white transition-colors duration-200 border border-teal-800 ${
                             selectedTags.includes(tag.name)
-                              ? "bg-teal-800 opacity-65 text-tinWhite"
+                              ? "bg-teal-800 dark:opacity-65 text-tinWhite"
                               : ""
                           }`}
                           onClick={(e) => {
@@ -516,7 +532,7 @@ const EditProfile: FC = () => {
               </div>
             </div>
           </div>
-          <div className="dark:bg-primary flex flex-col gap-2 pb-8 p-2 dark:text-white md:pl-5 md:pr-5">
+          <div className="dark:bg-primary bg-customWhite3 flex flex-col gap-2 pb-8 p-2 dark:text-white md:pl-5 md:pr-5">
             <label htmlFor="education" className="font-bold">
               Education
             </label>
@@ -526,9 +542,9 @@ const EditProfile: FC = () => {
                 name="education"
                 value={profileData.education}
                 onChange={handleInputChange}
-                className="dark:text-white p-2 w-full border dark:border-customGray1 rounded-md outline-none text-gray-800"
+                className="dark:text-white p-2 w-full border dark:border-customGray1 rounded-md outline-none"
               />
-              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+              <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                 {charCounts.education}/{maxLengths.education}
               </span>
             </div>
@@ -540,14 +556,16 @@ const EditProfile: FC = () => {
               </ul>
             )}
           </div>
-          <div className="mt-3 dark:bg-primary dark:text-white p-2 md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 dark:text-white p-2 md:pl-5 md:pr-5">
             <h3 className="font-bold dark:text-white mb-4 text-xl">
               Social Links
             </h3>
             <div className="flex flex-col gap-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="twitter">Twitter/X</label>
+                  <label htmlFor="twitter" className="font-semibold">
+                    Twitter/X
+                  </label>
                   <input
                     type="text"
                     id="twitter"
@@ -571,7 +589,9 @@ const EditProfile: FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="linkedIn">LinkedIn</label>
+                  <label htmlFor="linkedIn" className="font-semibold">
+                    LinkedIn
+                  </label>
                   <input
                     type="text"
                     id="linkedIn"
@@ -594,7 +614,9 @@ const EditProfile: FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="github">GitHub</label>
+                  <label htmlFor="github" className="font-semibold">
+                    GitHub
+                  </label>
                   <input
                     type="text"
                     id="github"
@@ -618,9 +640,9 @@ const EditProfile: FC = () => {
               </div>
             </div>
           </div>
-          <div className="p-2 mt-3 dark:bg-primary md:pl-5 md:pr-5">
+          <div className="p-2 mt-3 dark:bg-primary bg-customWhite3 md:pl-5 md:pr-5">
             <button
-              className="p-2 w-full rounded-md text-center dark:bg-teal-800 dark:text-white"
+              className="p-2 w-full rounded-md text-center bg-teal-800 text-white"
               type="submit"
             >
               Save Profile
@@ -636,11 +658,13 @@ const EditProfile: FC = () => {
         {successMessage && <p className="text-green-600">{successMessage}</p>}
 
         <form onSubmit={handleSubmit} className="">
-          <div className="p-2 pb-8 dark:bg-primary dark:text-white mt-2 md:pl-5 md:pr-5">
+          <div className="p-2 pb-8 dark:bg-primary bg-customWhite3 dark:text-white mt-2 md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">
               Basic Info
             </h1>
-            <label htmlFor="profilePicture">Profile Picture</label>
+            <label htmlFor="profilePicture" className="font-semibold">
+              Profile Picture
+            </label>
             <div className="mt-2 flex items-center w-full mb-3">
               <div>
                 {profileData.profilePictureUrl && (
@@ -661,11 +685,13 @@ const EditProfile: FC = () => {
                 id="profilePicture"
                 accept="image/*"
                 onChange={handleProfilePictureUpload}
-                className=" border w-full px-2 py-[10.2px] outline-none rounded-md border-customGray1"
+                className=" border w-full px-2 py-[10.2px] outline-none rounded-md dark:border-customGray1"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username" className="font-semibold">
+                Username
+              </label>
               <div className="relative w-full">
                 <input
                   type="text"
@@ -673,9 +699,9 @@ const EditProfile: FC = () => {
                   name="username"
                   value={profileData.username}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 w-full border border-customGray1 rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 w-full border dark:border-customGray1 rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.username}/{maxLengths.username}
                 </span>
               </div>
@@ -688,7 +714,9 @@ const EditProfile: FC = () => {
               )}
             </div>
             <div className="flex flex-col gap-2 mt-7">
-              <label htmlFor="fullname">Name</label>
+              <label htmlFor="fullname" className="font-semibold">
+                Name
+              </label>
               <div className="relative w-full">
                 <input
                   type="text"
@@ -696,9 +724,9 @@ const EditProfile: FC = () => {
                   name="fullname"
                   value={profileData.fullname}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.fullname}/{maxLengths.fullname}
                 </span>
               </div>
@@ -712,16 +740,18 @@ const EditProfile: FC = () => {
               )}
             </div>
             <div className="flex flex-col gap-2 mt-7">
-              <label htmlFor="bio">Bio</label>
+              <label htmlFor="bio" className="font-semibold">
+                Bio
+              </label>
               <div className="relative w-full">
                 <textarea
                   id="bio"
                   name="bio"
                   value={profileData.bio}
                   onChange={handleInputChange}
-                  className="dark:text-white border dark:border-customGray1 rounded-md p-2 w-full outline-none text-gray-900"
+                  className="dark:text-white border dark:border-customGray1 rounded-md p-2 w-full outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.bio}/{maxLengths.bio}
                 </span>
               </div>
@@ -735,10 +765,12 @@ const EditProfile: FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-3 dark:bg-primary p-2 pb-8 dark:text-white md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 p-2 pb-8 dark:text-white md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">Personal</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="location">Location</label>
+              <label htmlFor="location" className="font-semibold">
+                Location
+              </label>
               <div className="relative w-full">
                 <input
                   type="text"
@@ -746,9 +778,9 @@ const EditProfile: FC = () => {
                   name="location"
                   value={profileData.location}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.location}/{maxLengths.location}
                 </span>
               </div>
@@ -762,19 +794,21 @@ const EditProfile: FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-3 dark:bg-primary dark:text-white pb-8 p-2 md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 dark:text-white pb-8 p-2 md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">Career</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="work">Work</label>
+              <label htmlFor="work" className="font-semibold">
+                Work
+              </label>
               <div className="relative w-full">
                 <textarea
                   id="work"
                   name="work"
                   value={profileData.work}
                   onChange={handleInputChange}
-                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none text-gray-800"
+                  className="dark:text-white p-2 border dark:border-customGray1 w-full rounded-md outline-none"
                 />
-                <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+                <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                   {charCounts.work}/{maxLengths.work}
                 </span>
               </div>
@@ -788,17 +822,19 @@ const EditProfile: FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-3 dark:bg-primary dark:text-white p-2 md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 dark:text-white p-2 md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">Coding</h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="Languages">Skills/Languages</label>
+              <label htmlFor="Languages" className="font-semibold">
+                Skills/Languages
+              </label>
               <p>What languages do you currently know?</p>
               <textarea
                 id="languages"
                 name="languages"
                 value={profileData.languages.join(", ")}
                 onChange={handleInputChange}
-                className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none text-gray-800"
+                className="dark:text-white p-2 border dark:border-customGray1 rounded-md outline-none"
               />
               {validationErrors.languages && (
                 <ul className="text-red-500">
@@ -810,12 +846,14 @@ const EditProfile: FC = () => {
             </div>
           </div>
 
-          <div className="mb-4 mt-3 dark:bg-primary p-2 dark:text-white md:pl-5 md:pr-5">
+          <div className="mb-4 mt-3 dark:bg-primary bg-customWhite3 p-2 dark:text-white md:pl-5 md:pr-5">
             <h1 className="font-bold dark:text-white mb-4 text-xl">
               Interests
             </h1>
             <div className="flex flex-col gap-2">
-              <label htmlFor="Interests">Interests</label>
+              <label htmlFor="Interests" className="font-semibold">
+                Interests
+              </label>
               <div className="relative">
                 <div
                   className="dark:bg-headerColor dark:border-customGray1 border px-4 py-2 rounded-md cursor-pointer"
@@ -826,11 +864,11 @@ const EditProfile: FC = () => {
                       {selectedTags.map((tag) => (
                         <div
                           key={tag}
-                          className="flex items-center gap-1 text-white"
+                          className="flex items-center gap-1 dark:text-white"
                         >
                           {tag}
                           <span
-                            className="cursor-pointer ml-1 relative top-[1px] text-sm hover:text-teal-700"
+                            className="cursor-pointer ml-1 relative top-[1px] text-sm dark:hover:text-teal-700 hover:text-teal-800"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleTagSelection(tag);
@@ -861,7 +899,7 @@ const EditProfile: FC = () => {
                           key={tag.id}
                           className={`px-2 py-1 rounded-full cursor-pointer hover:bg-teal-800 hover:scale-110 hover:text-white transition-colors duration-200 border border-teal-800 ${
                             selectedTags.includes(tag.name)
-                              ? "bg-teal-800 opacity-65 text-tinWhite"
+                              ? "bg-teal-800 dark:opacity-65 text-tinWhite"
                               : ""
                           }`}
                           onClick={(e) => {
@@ -878,7 +916,7 @@ const EditProfile: FC = () => {
               </div>
             </div>
           </div>
-          <div className="dark:bg-primary flex flex-col gap-2 pb-8 p-2 dark:text-white md:pl-5 md:pr-5">
+          <div className="dark:bg-primary bg-customWhite3 flex flex-col gap-2 pb-8 p-2 dark:text-white md:pl-5 md:pr-5">
             <label htmlFor="education" className="font-bold">
               Education
             </label>
@@ -890,7 +928,7 @@ const EditProfile: FC = () => {
                 onChange={handleInputChange}
                 className="dark:text-white p-2 w-full border dark:border-customGray1 rounded-md outline-none text-gray-800"
               />
-              <span className="absolute right-2 -bottom-5 text-xs text-tinWhite">
+              <span className="absolute right-2 -bottom-5 text-xs dark:text-tinWhite">
                 {charCounts.education}/{maxLengths.education}
               </span>
             </div>
@@ -902,14 +940,16 @@ const EditProfile: FC = () => {
               </ul>
             )}
           </div>
-          <div className="mt-3 dark:bg-primary dark:text-white p-2 md:pl-5 md:pr-5">
+          <div className="mt-3 dark:bg-primary bg-customWhite3 dark:text-white p-2 md:pl-5 md:pr-5">
             <h3 className="font-bold dark:text-white mb-4 text-xl">
               Social Links
             </h3>
             <div className="flex flex-col gap-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="twitter">Twitter/X</label>
+                  <label htmlFor="twitter" className="font-semibold">
+                    Twitter/X
+                  </label>
                   <input
                     type="text"
                     id="twitter"
@@ -917,7 +957,7 @@ const EditProfile: FC = () => {
                     placeholder="Paste url"
                     value={profileData.socialLinks.twitter}
                     onChange={handleSocialLinkChange}
-                    className="text-gray-900 border dark:border-customGray1 rounded-md dark:text-white w-full outline-none p-2"
+                    className=" border dark:border-customGray1 rounded-md dark:text-white w-full outline-none p-2"
                   />
                 </div>
 
@@ -933,7 +973,9 @@ const EditProfile: FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="linkedIn">LinkedIn</label>
+                  <label htmlFor="linkedIn" className="font-semibold">
+                    LinkedIn
+                  </label>
                   <input
                     type="text"
                     id="linkedIn"
@@ -941,7 +983,7 @@ const EditProfile: FC = () => {
                     placeholder="Paste url"
                     value={profileData.socialLinks.linkedIn}
                     onChange={handleSocialLinkChange}
-                    className="text-gray-900 border dark:border-customGray1 rounded-md dark:text-white w-full outline-none p-2"
+                    className=" border dark:border-customGray1 rounded-md dark:text-white w-full outline-none p-2"
                   />
                 </div>
                 {validationErrors["socialLinks.linkedIn"] && (
@@ -956,7 +998,9 @@ const EditProfile: FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <label htmlFor="github">GitHub</label>
+                  <label htmlFor="github" className="font-semibold">
+                    GitHub
+                  </label>
                   <input
                     type="text"
                     id="github"
@@ -964,7 +1008,7 @@ const EditProfile: FC = () => {
                     placeholder="Paste url"
                     value={profileData.socialLinks.github}
                     onChange={handleSocialLinkChange}
-                    className="text-gray-900 border dark:border-customGray1 rounded-md dark:text-white w-full outline-none p-2"
+                    className=" border dark:border-customGray1 rounded-md dark:text-white w-full outline-none p-2"
                   />
                 </div>
 
@@ -980,9 +1024,9 @@ const EditProfile: FC = () => {
               </div>
             </div>
           </div>
-          <div className="p-2 mt-3 dark:bg-primary md:pl-5 md:pr-5">
+          <div className="p-2 mt-3 dark:bg-primary bg-customWhite3 md:pl-5 md:pr-5">
             <button
-              className="p-2 w-full rounded-md text-center dark:bg-teal-800 dark:text-white"
+              className="p-2 w-full rounded-md text-center bg-teal-800 text-white"
               type="submit"
             >
               Save Profile

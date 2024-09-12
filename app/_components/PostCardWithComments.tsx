@@ -123,8 +123,8 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
     setTimeout(() => {
-      target.style.color = "rgba(15, 118, 110, 0.5)";
-      target.style.opacity = '50px'
+      target.style.color = "rgba(15, 118, 110, 0.6)";
+      target.style.opacity = ''
     }, 150);
   };
 
@@ -199,7 +199,7 @@ const PostCardWithComments: FC<PostCardProps> = ({ post, authorId }) => {
             </div>
             <Link href={`/profile/${authorId}`}>
               <small
-                className="text-[14px] dark:hover:text-white hover:text-customBlack"
+                className="text-[14px] dark:hover:text-white hover:text-gray-700"
                 onClick={handleClick}
                 style={{ position: "relative" }}
               >

@@ -6,7 +6,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
-import { FieldValue } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 import Link from "next/link";
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
@@ -20,6 +20,7 @@ interface ContentPreviewProps {
   authorName?: string;
   authorId?: string;
   publishDate?: string | FieldValue;
+  status?: "draft" | undefined | "published";
 }
 
 function formatDateString(date: Date): string {
@@ -40,6 +41,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
   authorName,
   authorId,
   publishDate,
+  status
 }) => {
 
   const components: Components = {
@@ -99,13 +101,25 @@ const ContentPreview: FC<ContentPreviewProps> = ({
     ),
   };
 
-  const formattedDate = publishDate instanceof FieldValue ? formatDateString(new Date()) : typeof publishDate === 'string' ? formatDateString(new Date(publishDate)) : 'Unknown date';
-  
+
+  const getStatusDisplay = (): string => {
+    switch (status) {
+      case "draft":
+        return "Publish draft when ready";
+      case undefined:
+        return "Not yet published";
+      case "published":
+        return "";
+      default:
+        return "Status unknown";
+    }
+  };
+
 
   return (
-    <article className="max-w-4xl mt-14 bg-primary mx-auto md:w-11/12 md:m-auto md:mt-14 lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-14">
+    <article className="max-w-4xl mt-14 dark:bg-primary bg-customWhite3 mx-auto md:w-11/12 md:m-auto md:mt-14 lg:landscape:w-[70%] lg:landscape:m-auto lg:landscape:mt-14">
       {coverImageUrl && (
-        <div className="relative w-full aspect-[16/8] mb-10">
+        <div className="relative w-full aspect-[17/8] lg:landscape:aspect-[12/4] mb-5">
           <Image
             src={coverImageUrl}
             alt="Cover"
@@ -122,33 +136,28 @@ const ContentPreview: FC<ContentPreviewProps> = ({
           <div className="mb-4 text-sm flex gap-2 items-center">
             <div className="flex flex-col">
               <Link href={`/profile/${authorId}`}>
-                <p className="text-tinWhite font-semibold text-base tracking-wide">
+                <p className="dark:text-tinWhite font-semibold text-base tracking-wide">
                   {authorName}
                 </p>
               </Link>
               <small className="text-gray-600 text-[14px]">
-                Published on {formattedDate}
+                {getStatusDisplay()}
               </small>
             </div>
           </div>
         )}
         {title && (
-          <h1 className="text-3xl text-white font-bold mb-4">{title}</h1>
+          <h1 className="text-3xl dark:text-white font-bold mb-4">{title}</h1>
         )}
-        {/* {authorName && publishDate && (
-        <div className="mb-4 text-sm text-gray-600">
-          By {authorName} | Published on {formattedDate}
-        </div>
-      )} */}
 
         {tags && (
           <div className="mb-4">
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="inline-block rounded-full bg-gray-200 mr-2 px-3 py-1 text-sm font-semibold text-gray-800 mb-2"
+                className="inline-block rounded-full dark:bg-customGray1 bg-customWhite2 mr-2 px-3 py-1 text-sm font-semibold dark:text-tinWhite text-gray-800 mb-2"
               >
-                <span className="text-teal-700">#</span>
+                <span className="dark:text-gray-400 text-gray-500">#</span>
                 {tag}
               </span>
             ))}
@@ -158,8 +167,7 @@ const ContentPreview: FC<ContentPreviewProps> = ({
           <Markdown
             rehypePlugins={[
               rehypeRaw,
-              [rehypeHighlight,
-              { detectLanguage: true, alias: {} }],
+              [rehypeHighlight, { detectLanguage: true, alias: {} }],
             ]}
             remarkPlugins={[remarkGfm]}
             components={components}

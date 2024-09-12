@@ -29,6 +29,8 @@ const config: Config = {
         customWhite2: "#e9e8e4",
         customWhite3: "#FEFEFE",
         customGray3: "#CCCCCC",
+        shimmerColor: "rgba(255, 255, 255, 0.01)",
+        whiteShimmer: "rgba(209, 213, 219, 0.30)",
       },
       scale: {
         20: "0.3",

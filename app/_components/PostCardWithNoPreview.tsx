@@ -86,8 +86,7 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
     setTimeout(() => {
-      target.style.color = "rgba(15, 118, 110, 0.5)";
-      target.style.opacity = '50px';
+      target.style.color = "rgba(15, 118, 110, 1)";
     }, 150);
   };
 
@@ -108,7 +107,7 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 md:pl-5 md:pr-5 md:rounded-md">
+    <div className="post-card dark:bg-primary bg-customWhite3 mb-2 h-auto pb-4 p-2 md:pl-5 md:pr-5 md:rounded-md">
       <div className="profile-picture-container">
         <div className="flex items-center mt-2 gap-2">
           <div
@@ -140,7 +139,7 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
           </div>
           <Link href={`/profile/${authorId}`}>
             <small
-              className="text-[14px] cursor-pointer hover:text-white"
+              className="text-[14px] cursor-pointer hover:text-gray-700 dark:hover:text-white"
               onClick={handleClick}
               style={{ position: "relative" }}
             >
@@ -167,7 +166,7 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
       </div>
       <Link href={`/post/${post.id}`}>
         <h1
-          className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-8"
+          className="text-xl font-bold mt-2 dark:text-customWhite dark:hover:text-gray-300 hover:text-gray-700 mb-2 md:pl-8"
           onClick={handleClick}
           style={{ position: "relative" }}
         >
@@ -177,8 +176,8 @@ const PostCardWithNoPreview: FC<PostCardProps> = ({ post, authorId }) => {
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="py-1 px-2 font-light rounded-md hover:bg-gray-700">
-              <span className="text-gray-400">#</span>
+            <span className="py-1 px-2 font-light rounded-md dark:hover:bg-customGray1  hover:bg-customWhite2">
+              <span className="dark:text-gray-400 text-gray-500">#</span>
               {tag}
             </span>
           </Link>

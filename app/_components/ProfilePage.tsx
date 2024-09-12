@@ -164,7 +164,7 @@ const ProfilePage: FC = () => {
 
   return (
     <>
-      <div className="user-profile-page mt-[70px] md:hidden h-auto pb-16 dark:bg-primary">
+      <div className="user-profile-page mt-[70px] md:hidden h-auto pb-16 dark:bg-primary bg-customWhite3">
         <div className="profile-header pb-4 p-2 mt-5 relative dark:bg-primary mb-4">
           {error && (
             <p className="text-red-600 absolute top-20 left-[50%] z-10">
@@ -174,14 +174,14 @@ const ProfilePage: FC = () => {
           {!isOwnProfile && (
             <button
               onClick={handleFollow}
-              className="follow-btn absolute right-4 py-1 px-3 rounded-md dark:bg-gray-200 dark:text-gray-900"
+              className="follow-btn absolute right-4 py-1 px-3 rounded-md bg-teal-800 text-white"
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </button>
           )}
           {isCurrentUser && (
             <Link href="/profile/edit">
-              <button className="absolute right-4 p-1 px-3 rounded-md dark:bg-gray-200 dark:text-gray-900">
+              <button className="absolute right-4 p-1 px-3 rounded-md bg-teal-800 text-white">
                 Edit Profile
               </button>
             </Link>
@@ -226,8 +226,8 @@ const ProfilePage: FC = () => {
                 <p className="tracking-wide">{profileData.bio}</p>
               )}
             </div>
-            <div className="flex items-center gap-1 border border-t-0 border-l-0 border-r-0 pb-4 dark:border-customGray1 text-gray-400">
-              <MdLocationOn className="text-2xl text-gray-400" />
+            <div className="flex items-center gap-1 border border-t-0 border-l-0 border-r-0 pb-4 dark:border-customGray1 dark:text-gray-400 text-gray-500">
+              <MdLocationOn className="text-2xl dark:text-gray-400 text-gray-500" />
               <span>
                 {profileData.location && <p>{profileData.location}</p>}
               </span>
@@ -235,7 +235,9 @@ const ProfilePage: FC = () => {
             <div>
               {profileData.education && (
                 <div>
-                  <h3 className="text-gray-400 text-[14px]">Education</h3>
+                  <h3 className="dark:text-gray-400 text-gray-500 text-[14px]">
+                    Education
+                  </h3>
                   <p className="tracking-wide">{profileData.education}</p>
                 </div>
               )}
@@ -243,7 +245,7 @@ const ProfilePage: FC = () => {
 
             <button
               onClick={toggleMoreDetails}
-              className="mt-4 px-4 py-2 border-2 dark:border-customGray1 text-white rounded-md transition-colors"
+              className="mt-4 px-4 py-2 border-2 dark:border-customGray1 dark:text-white rounded-md transition-colors"
             >
               {showMoreDetails ? "Show Less" : "Show More"}
             </button>
@@ -251,8 +253,8 @@ const ProfilePage: FC = () => {
             {showMoreDetails && (
               <>
                 <div className="profile-details flex flex-col gap-3">
-                  <div className="border border-t-0 border-l-0 border-r-0 border-customGray1 pb-2">
-                    <h3 className="tracking-wide dark:text-gray-400">
+                  <div className="border border-t-0 border-l-0 border-r-0 dark:border-customGray1 pb-2">
+                    <h3 className="tracking-wide dark:text-gray-400 text-gray-500">
                       Interests
                     </h3>
                     {profileData.interests &&
@@ -263,8 +265,10 @@ const ProfilePage: FC = () => {
                     )}
                   </div>
 
-                  <div className="border border-t-0 border-l-0 border-r-0 border-customGray1 pb-2">
-                    <h3 className="tracking-wide text-gray-400">Work</h3>
+                  <div className="border border-t-0 border-l-0 border-r-0 dark:border-customGray1 pb-2">
+                    <h3 className="tracking-wide dark:text-gray-400 text-gray-500">
+                      Work
+                    </h3>
                     {profileData.work ? (
                       <p>{profileData.work}</p>
                     ) : (
@@ -272,8 +276,8 @@ const ProfilePage: FC = () => {
                     )}
                   </div>
 
-                  <div className="border border-t-0 border-l-0 border-r-0 border-customGray1 pb-2">
-                    <h3 className="tracking-wide text-gray-400">
+                  <div className="border border-t-0 border-l-0 border-r-0 dark:border-customGray1 pb-2">
+                    <h3 className="tracking-wide dark:text-gray-400 text-gray-500">
                       Skills/Languages
                     </h3>
                     {profileData.languages &&
@@ -352,8 +356,9 @@ const ProfilePage: FC = () => {
         </div>
       </div>
 
+      {/** Destop and Tablet screens */}
       <div className="user-profile-page mt-[70px] hidden md:block h-auto pb-[4rem] md:w-[95%] md:m-auto md:mt-28 md:h-full lg:w-[92%] 2xl:w-[70%]">
-        <div className="profile-header rounded-md pb-4 p-2 mt-5 relative dark:bg-primary mb-4 text-center">
+        <div className="profile-header rounded-md pb-4 p-2 mt-5 relative dark:bg-primary bg-customWhite3 mb-4 text-center">
           {error && (
             <p className="text-red-600 absolute top-20 left-[50%] z-10">
               {error}
@@ -362,14 +367,14 @@ const ProfilePage: FC = () => {
           {!isOwnProfile && (
             <button
               onClick={handleFollow}
-              className="follow-btn absolute right-4 py-1 px-3 rounded-md dark:bg-gray-200 dark:text-gray-900"
+              className="follow-btn absolute right-4 py-1 px-3 rounded-md bg-teal-800 hover:bg-teal-900 text-white"
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </button>
           )}
           {isCurrentUser && (
             <Link href="/profile/edit">
-              <button className="absolute right-4 p-1 px-3 rounded-md dark:bg-gray-200 dark:text-gray-900">
+              <button className="absolute right-4 p-1 px-3 rounded-md bg-teal-800 hover:bg-teal-900 text-white">
                 Edit Profile
               </button>
             </Link>
@@ -416,8 +421,8 @@ const ProfilePage: FC = () => {
                 <p className="tracking-wide">{profileData.bio}</p>
               )}
             </div>
-            <div className="flex items-center justify-center gap-1 border border-t-0 border-l-0 border-r-0 pb-4 dark:border-customGray1 text-gray-400 text-center">
-              <MdLocationOn className="text-2xl text-center text-gray-400" />
+            <div className="flex items-center justify-center gap-1 border border-t-0 border-l-0 border-r-0 pb-4 dark:border-customGray1 dark:text-gray-400 text-gray-500 text-center">
+              <MdLocationOn className="text-2xl text-center dark:text-gray-400 text-gray-500" />
               <span>
                 {profileData.location && (
                   <p className="text-center">{profileData.location}</p>
@@ -427,7 +432,7 @@ const ProfilePage: FC = () => {
             <div>
               {profileData.education && (
                 <div>
-                  <h3 className="text-gray-400 text-[14px]">Education</h3>
+                  <h3 className="dark:text-gray-400 text-gray-500 text-[14px]">Education</h3>
                   <p className="tracking-wide">{profileData.education}</p>
                 </div>
               )}
@@ -437,8 +442,8 @@ const ProfilePage: FC = () => {
 
         <div className="user-posts profile-grid">
           <div className="md:profile-details h-[650px]">
-            <div className=" md:bg-primary rounded-md pl-4 pr-4 pt-2 pb-4">
-              <h3 className="tracking-wide dark:text-gray-400 md:py-2 border border-t-0 border-l-0 border-r-0 border-headerColor md:dark:text-white md:font-semibold">
+            <div className=" dark:md:bg-primary md:bg-customWhite3 rounded-md pl-4 pr-4 pt-2 pb-4">
+              <h3 className="tracking-wide dark:text-gray-400 md:py-2 border border-t-0 border-l-0 border-r-0 dark:border-headerColor md:dark:text-white md:font-semibold">
                 Interests
               </h3>
               {profileData.interests && profileData.interests.length > 0 ? (
@@ -448,8 +453,8 @@ const ProfilePage: FC = () => {
               )}
             </div>
 
-            <div className="md:bg-primary rounded-md pl-4 pr-4 pt-2 pb-4">
-              <h3 className="tracking-wide text-gray-400 md:py-2 border border-t-0 border-l-0 border-r-0 border-headerColor md:dark:text-white md:font-semibold">
+            <div className="dark:md:bg-primary bg-customWhite3 rounded-md pl-4 pr-4 pt-2 pb-4">
+              <h3 className="tracking-wide md:py-2 border border-t-0 border-l-0 border-r-0 dark:border-headerColor md:dark:text-white md:font-semibold">
                 Work
               </h3>
               {profileData.work ? (
@@ -459,8 +464,8 @@ const ProfilePage: FC = () => {
               )}
             </div>
 
-            <div className="md:bg-primary rounded-md pl-4 pr-4 pt-2 pb-4">
-              <h3 className="tracking-wide text-gray-400 md:py-2 border border-t-0 border-l-0 border-r-0 border-headerColor md:dark:text-white md:font-semibold">
+            <div className="dark:md:bg-primary bg-customWhite3 rounded-md pl-4 pr-4 pt-2 pb-4">
+              <h3 className="tracking-wide md:py-2 border border-t-0 border-l-0 border-r-0 dark:border-headerColor md:dark:text-white md:font-semibold">
                 Skills/Languages
               </h3>
               {profileData.languages && profileData.languages.length > 0 ? (
@@ -469,8 +474,8 @@ const ProfilePage: FC = () => {
                 <p className="md:pt-1">No languages listed</p>
               )}
             </div>
-            <div className="social-links md:bg-primary rounded-md pl-4 pt-2 pb-2">
-              <h3 className="mb-2 md:py-2 border border-t-0 border-l-0 border-r-0 border-headerColor md:dark:text-white md:font-semibold md:pr-2">
+            <div className="social-links dark:md:bg-primary bg-customWhite3 rounded-md pl-4 pt-2 pb-2">
+              <h3 className="mb-2 md:py-2 border border-t-0 border-l-0 border-r-0 dark:border-headerColor md:dark:text-white md:font-semibold md:pr-2">
                 Connect with {profileData.fullname}
               </h3>
               <div className="flex gap-4 md:pt-2">

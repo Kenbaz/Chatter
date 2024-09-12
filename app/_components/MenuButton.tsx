@@ -91,28 +91,30 @@ const MenuButton: FC = () => {
         />
       </div>
       {isOpen && (
-        <div className="absolute -right-[29px] mt-2 border border-customGray1 w-[90vw] bg-primary rounded-md shadow-lg py-1 transition-all duration-300 ease-out md:w-[30vw] md:right-[13px] md:top-[42px] lg:w-[25vw] 2xl:w-[17vw]">
+        <div className="absolute -right-[29px] mt-2 border dark:border-customGray1 w-[90vw] dark:bg-primary bg-customWhite3 rounded-md shadow-md py-1 transition-all duration-300 ease-out md:w-[30vw] md:right-[13px] md:top-[42px] lg:w-[25vw] 2xl:w-[17vw]">
           <div
             onClick={() => router.push(`/profile/${user.uid}`)}
-            className=" px-4 flex items-center gap-2 md:gap-3 cursor-pointer py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left border border-t-0 border-r-0 border-l-0 border-customGray1"
+            className=" border border-t-0 border-r-0 border-l-0 dark:border-customGray1"
           >
-            <span className="w-[30px] h-[30px] rounded-[50%] overflow-hidden flex justify-center items-center border-2 border-teal-700">
-              <Image
-                src={
-                  profileData.profilePictureUrl ||
-                  "/images/default-profile-image-2.jpg"
-                }
-                alt="menu avatar"
-                width={30}
-                height={30}
-                style={{ objectFit: "cover" }}
-              />
-            </span>
-            <span>{profileData.fullname}</span>
+            <div className="px-2 mb-1 flex items-center gap-2 md:gap-3 rounded-lg cursor-pointer py-4 text-base dark:text-tinWhite hover:bg-gray-100 dark:hover:text-gray-800 w-[95%] m-auto text-left">
+              <span className="w-[30px] h-[30px] rounded-[50%] overflow-hidden flex justify-center items-center border-2 border-teal-700">
+                <Image
+                  src={
+                    profileData.profilePictureUrl ||
+                    "/images/default-profile-image-2.jpg"
+                  }
+                  alt="menu avatar"
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "cover" }}
+                />
+              </span>
+              <span>{profileData.fullname}</span>
+            </div>
           </div>
           <button
             onClick={() => router.push("/reading-list")}
-            className="flex items-center gap-2 md:gap-3 px-4 py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
+            className="px-2 mb-1 flex items-center gap-2 md:gap-3 rounded-lg cursor-pointer py-4 text-base dark:text-tinWhite hover:bg-gray-100 dark:hover:text-gray-800 w-[95%] m-auto text-left mt-1"
           >
             <span>
               <FaBookmark />
@@ -120,7 +122,7 @@ const MenuButton: FC = () => {
             <span>Reading List</span>
           </button>
           <button
-            className="flex items-center gap-2 md:gap-3 px-4 py-4 text-base text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full text-left"
+            className="px-2 mb-1 flex items-center gap-2 md:gap-3 rounded-lg cursor-pointer py-4 text-base dark:text-tinWhite hover:bg-gray-100 dark:hover:text-gray-800 w-[95%] m-auto text-left"
             onClick={handleCreatePostNavigation}
           >
             <span>
@@ -130,9 +132,11 @@ const MenuButton: FC = () => {
           </button>
           <button
             onClick={signOutUser}
-            className="block px-4 py-4 text-center text-base border border-b-0 border-r-0 border-l-0 text-tinWhite hover:bg-gray-100 hover:text-gray-800 w-full border-customGray1"
+            className=" border border-b-0 border-r-0 border-l-0 w-full text-tinWhite dark:border-customGray1"
           >
-            Sign Out
+            <div className="block px-4 py-4 text-center text-base m-auto rounded-lg dark:text-tinWhite text-customBlack hover:bg-gray-100 dark:hover:text-gray-800 w-[95%] mt-1 ">
+              Sign Out
+            </div>
           </button>
         </div>
       )}

@@ -544,10 +544,10 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
 
   return (
     <>
-      <header className="h-14 flex items-center justify-end bg-headerColor fixed w-full top-0 z-50 lg:landscape:h-10 xl:w-[70%] xl:ml-[12rem]">
+      <header className="h-14 flex items-center justify-end dark:bg-headerColor bg-customWhite2 fixed w-full top-0 z-50 lg:landscape:h-10 xl:w-[70%] xl:ml-[12rem]">
         <button
           onClick={togglePreview}
-          className="text-tinWhite z-50 text-[15px] px-2 mr-4 py-2 rounded-lg preview-btn hover:bg-teal-700 hover:opacity-95 lg:landscape:relative lg:landscape:right-36 lg:relative lg:right-28 xl:-left-28"
+          className="dark:text-tinWhite relative hover:text-white z-50 text-[15px] px-2 mr-4 py-2 rounded-lg preview-btn hover:bg-teal-700 md:right-[5%] hover:opacity-95 lg:landscape:relative lg:landscape:right-36 lg:relative lg:right-28 xl:-left-28"
         >
           Preview
         </button>
@@ -563,10 +563,11 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
               coverImageUrl={coverImageUrl}
               authorName={authorName}
               publishDate={publishDate}
+              status={postStatus}
             />
             <button
               onClick={togglePreview}
-              className="absolute top-2 right-28 text-[15px] rouned-lg w-20 hover:bg-teal-700 hover:opacity-95 text-white px-4 py-[7px] rounded md:top-2 md:right-28 lg:landscape:right-60 lg:landscape:top-0 lg:right-56 xl:left-[63%] xl:mt-[1px]"
+              className="absolute top-3 right-28 text-[15px] rouned-lg w-20 hover:bg-teal-700 hover:opacity-95 dark:text-white hover:text-white px-4 py-[7px] rounded md:top-3 md:right-[7.5rem] lg:landscape:right-60 lg:landscape:top-0 lg:right-56 xl:left-[63%] xl:mt-[1px]"
             >
               Edit
             </button>
@@ -600,7 +601,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
               </div>
               <button
                 onClick={handleSetCoverImage}
-                className="border border-primary text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4 lg:landscape:mb-6"
+                className="border dark:bg-headerColor bg-customGray3 border-customGray3 dark:border-primary dark:text-tinWhite hover:border-primary px-4 p-2 rounded-lg mr-4 mb-4 lg:landscape:mb-6"
                 disabled={isUploading}
               >
                 Set cover image
@@ -608,7 +609,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
               {isUploading && (
                 <div className="flex items-center text-sm space-x-2 mb-4">
                   <span className="text-[14px]">Uploading</span>
-                  <div className="animate-spin rounded-[50%] h-3 w-3 border-t-2 border-b-2 border-teal-500 "></div>
+                  <div className="animate-spin rounded-[50%] h-3 w-3 border-t-2 border-b-2 border-teal-700 "></div>
                 </div>
               )}
               {coverImageUrl && (
@@ -629,18 +630,18 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   </button>
                 </div>
               )}
-              <div className=" w-full p-2 pb-4 lg:landscape:-mb-3">
+              <div className=" w-full px-2 lg:landscape:-mb-3">
                 <textarea
                   placeholder="Title..."
                   value={title}
                   onChange={handleTitleChange}
-                  className="w-full bg-headerColor text-2xl border-none -mb-7 font-bold text-tinWhite outline-none focus:ring-0 placeholder-gray-300 resize-none h-full overflow-hidden md:text-3xl"
+                  className="w-full border-none dark:bg-headerColor bg-customWhite2 text-2xl  -mb-7 font-bold dark:text-tinWhite outline-none focus:ring-0 dark:placeholder-gray-300 resize-none h-full overflow-hidden md:text-3xl"
                 />
               </div>
-              <div className="mb-6 relative">
+              <div className="mb-6 relative mt-10">
                 <div
                   onClick={toggleTagDropdown}
-                  className="w-full p-2 mb-4 rounded bg-headerColor outline-none cursor-pointer text-tinWhite"
+                  className="w-full p-2 mb-4 rounded dark:bg-headerColor bg-customWhite2 outline-none cursor-pointer dark:text-tinWhite border border-customGray3 dark:border-none"
                 >
                   {selectedTags.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
@@ -649,12 +650,12 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                         return tag ? (
                           <span
                             key={tag.id}
-                            className="bg-gray-800 rounded-full px-2 py-1 text-sm flex items-center tracking-wide"
+                            className="dark:bg-gray-800 bg-customGray3 rounded-full px-2 py-1 text-sm flex items-center tracking-wide"
                           >
                             <span style={{ color: tagColors[tag.id] }}>#</span>
                             {tag.name}
                             <XIcon
-                              className="ml-1 cursor-pointer hover:text-teal-300"
+                              className="ml-1 cursor-pointer dark:hover:text-teal-300 hover:text-teal-500"
                               size={16}
                               onClick={(e) => {
                                 e.stopPropagation(); // Prevent dropdown from toggling
@@ -670,15 +671,15 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   )}
                 </div>
                 {isTagDropdownOpen && (
-                  <div className="tag-dropdown w-full mt-1 max-h-[250px] overflow-y-auto border-none rounded shadow-lg bg-headerColor">
-                    <div className="sticky top-0 bg-headerColor z-10 p-2">
+                  <div className="tag-dropdown w-full mt-1 max-h-[250px] overflow-y-auto border-none rounded shadow-md dark:bg-headerColor ">
+                    <div className="sticky top-0 dark:bg-headerColor z-10 p-2">
                       <div className="relative">
                         <input
                           type="text"
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           placeholder="Search tags..."
-                          className="w-full p-2 rounded bg-headerColor border border-customGray1 outline-none text-white"
+                          className="w-full p-2 rounded dark:bg-headerColor border dark:border-customGray1 border-customGray3 outline-none dark:text-white"
                         />
                         <Search
                           className="absolute right-2 top-2 text-gray-400"
@@ -691,9 +692,9 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                         <div
                           key={tag.id}
                           onClick={() => handleTagSelect(tag)}
-                          className={`p-2 mb-2 rounded-md hover:bg-gray-800 cursor-pointer ${
-                            selectedTags.includes(tag.id) ? "bg-gray-800" : ""
-                          } text-tinWhite`}
+                          className={`p-2 mb-2 rounded-md dark:hover:bg-gray-800 hover:bg-customGray3 cursor-pointer ${
+                            selectedTags.includes(tag.id) ? "dark:bg-gray-800 bg-customGray3" : ""
+                          } dark:text-tinWhite`}
                         >
                           <span style={{ color: tagColors[tag.id] }}>#</span>
                           {tag.name}
@@ -757,7 +758,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                       <button
                         onClick={() => savePost(false)}
                         disabled={isPublishing || isSavingDraft}
-                        className="text-white px-2 py-1 rounded-md hover:bg-teal-800 hover:opacity-60"
+                        className="dark:text-white hover:text-white px-2 py-1 rounded-md hover:bg-teal-800 dark:hover:opacity-60"
                       >
                         {isSavingDraft ? "Saving" : "Save Draft"}
                       </button>
@@ -785,7 +786,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
                   <button
                     onClick={() => savePost(false)}
                     disabled={isPublishing || isSavingDraft}
-                    className=" text-white px-2 py-1 rounded-md hover:bg-teal-800 hover:opacity-60"
+                    className=" dark:text-white hover:text-white px-2 py-1 rounded-md hover:bg-teal-800 dark:hover:opacity-60"
                   >
                     {isSavingDraft ? "Saving" : "Save"}
                   </button>

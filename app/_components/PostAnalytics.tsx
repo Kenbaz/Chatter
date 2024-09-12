@@ -63,32 +63,32 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
     if (!analytics) return <AnalyticsSkeleton/>;
 
     return (
-      <div className="detailed-post-analytics mt-14 pb-16 p-2 gap-2 grid place-items-center md:w-[80%] md:m-auto md:mt-14 2xl:w-[55%]">
+      <div className="detailed-post-analytic mt-14 pb-16 p-2 gap-2 grid place-items-center md:w-[80%] md:m-auto md:mt-14 2xl:w-[55%]">
         {posts && (
           <h1 className="text-center font-bold text-2xl text-teal-700 p-2">
             {posts.title}
           </h1>
         )}
-        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+        <div className="grid place-items-center dark:bg-primary bg-customWhite3 w-full p-2 pb-4 dark:text-white rounded-md">
           <p className="tracking-wide">Readers</p>
           <p className="font-bold text-2xl">{analytics.views}</p>
         </div>
-        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+        <div className="grid place-items-center dark:bg-primary bg-customWhite3 w-full p-2 pb-4 dark:text-white rounded-md">
           <p className="tracking-wide">Likes</p>
           <p className="font-bold text-2xl">{analytics.likes}</p>
         </div>
-        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+        <div className="grid place-items-center dark:bg-primary bg-customWhite3 w-full p-2 pb-4 dark:text-white rounded-md">
           <p className="tracking-wide">Comments</p>
           <p className="font-bold text-2xl">{analytics.comments}</p>
         </div>
-        <div className="grid place-items-center dark:bg-primary w-full p-2 pb-4 dark:text-white rounded-md">
+        <div className="grid place-items-center dark:bg-primary bg-customWhite3 w-full p-2 pb-4 dark:text-white rounded-md">
           <p className="tracking-wide">Bookmarks</p>
           <p className="font-bold text-2xl">{analytics.bookmarks}</p>
         </div>
 
         {isAuthor && (
           <div className="w-full mt-2">
-            <div className="dark:bg-primary pb-3 rounded-md w-full">
+            <div className="dark:bg-primary bg-customWhite3 pb-3 rounded-md w-full">
               <h4 className="text-xl tracking-wide font-semibold p-2">
                 Like History
               </h4>
@@ -122,7 +122,7 @@ const PostAnalytics: FC<PostAnalyticsProps> = ({ postId, isAuthor }) => {
                 <p>...</p>
               )}
             </div>
-            <div className="dark:bg-primary pb-3 mt-3 rounded-md w-full">
+            <div className="dark:bg-primary bg-customWhite3 pb-3 mt-3 rounded-md w-full">
               <h4 className="text-xl tracking-wide font-semibold p-2">
                 Bookmark History
               </h4>

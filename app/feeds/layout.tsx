@@ -7,6 +7,7 @@ import SearchBar from "../_components/SearchBar";
 import { useRouter } from "next/navigation";
 import MenuButton from "../_components/MenuButton";
 import { FaSearch } from "react-icons/fa";
+import ThemeToggle from "../_components/ThemeToggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,8 +37,9 @@ export default function RootLayout({
         </div>
 
         <div className="flex items-center gap-20">
+          <ThemeToggle/>
           <button
-            className="w-32 rounded-lg border border-teal-900 text-teal-800 text-center relative py-2 font-semibold left-4"
+            className="w-32 rounded-lg border border-teal-900 hover:bg-teal-700 hover:text-white text-teal-800 text-center relative py-2 font-semibold left-4"
             onClick={handleCreatePostNavigation}
           >
             Create

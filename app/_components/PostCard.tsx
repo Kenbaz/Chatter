@@ -99,8 +99,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     const target = event.currentTarget;
     setTimeout(() => {
-      target.style.color = "rgba(15, 118, 110, 0.5)";
-      target.style.opacity = "50px";
+      target.style.color = "rgba(15, 118, 110, 0.6)";
     }, 150);
   };
 
@@ -109,16 +108,14 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
 
   return (
     <div
-      className={`post-card bg-primary mb-2 pb-4 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
+      className={`post-card dark:bg-primary bg-customWhite3 mb-2 pb-4 px-3 py-2 h-auto md:pl-4 md:pr-4 rounded-l-md lg:rounded-md xl:pr-10 transition-all duration-300 ${
         isClicked
           ? "md:border-2 md:border-teal-700 md:shadow-lg"
           : "md:border-2 md:border-transparent"
       }`}
     >
       <div className="flex items-center mt-2 gap-2">
-        <div
-          className="relative"
-        >
+        <div className="relative">
           <div className="flex items-center gap-2">
             <div className="w-[30px] h-[30px] rounded-[50%] border-2 border-teal-700 overflow-hidden flex justify-center items-center">
               {isLoading ? (
@@ -142,18 +139,16 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
                 />
               )}
             </div>
-              <small
-                className="text-[14px]"
-              >
-                {authorName}
-              </small>
+            <small className="text-[14px] hover:text-gray-700">
+              {authorName}
+            </small>
           </div>
         </div>
       </div>
 
       <Link href={`/post/${post.id}`}>
         <h1
-          className="text-xl font-bold mt-2 text-white hover:text-gray-300 mb-2 md:pl-8"
+          className="text-xl font-bold mt-2 dark:text-white dark:hover:text-gray-300 hover:text-gray-700 mb-2 md:pl-8"
           onClick={handleClick}
           style={{ position: "relative" }}
         >
@@ -163,8 +158,8 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
           <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="py-1 px-2 font-light rounded-md hover:bg-customGray1 hover:text-white transition-colors duration-200">
-              <span className="text-gray-400">#</span>
+            <span className="py-1 px-2 rounded-md font-light dark:hover:bg-customGray1 dark:text-gray-400 text-gray-800 hover:bg-customWhite2 dark:hover:text-white hover:text-customBlack transition-colors duration-200">
+              <span className="text-gray-500 dark:text-gray-400">#</span>
               {tag}
             </span>
           </Link>
@@ -176,7 +171,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
       <div className="post-actions relative items-center flex gap-5 md:pl-8">
         {likeCount > 0 && (
           <button
-            className="text-sm py-1 px-2 rounded-md font-light flex items-center gap-2 hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            className="text-sm py-1 px-2 rounded-md dark:font-light flex items-center gap-2 dark:hover:bg-customGray1 hover:bg-customWhite2 hover:opacity-90 transition-colors duration-200 dark:hover:text-white hover:text-customBlack"
             onClick={handleIconClick}
           >
             <span className=" rounded-lg flex items-center gap-1">
@@ -189,7 +184,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
 
         {commentCount > 0 && (
           <span
-            className="comment-button cursor-pointer rounded-md flex gap-2 items-center text-sm font-light py-1 px-2 relative hover:bg-customGray1 hover:opacity-90 transition-colors duration-200 hover:text-white"
+            className="comment-button cursor-pointer rounded-md flex gap-2 items-center text-sm dark:font-light py-1 px-2 relative dark:hover:bg-customGray1 hover:bg-customWhite2 hover:opacity-90 transition-colors duration-200 hover:text-customBlack dark:hover:text-white"
             onClick={handleIconClick}
           >
             <span className=" flex items-center gap-1">

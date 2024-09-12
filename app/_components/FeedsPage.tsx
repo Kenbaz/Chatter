@@ -372,7 +372,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
               <option value="popular">Most Popular</option>
             </select>
             <select
-              className="p-1 rounded-md text-sm border border-customWhite dark:border-teal-700 outline-none dark:text-white"
+              className="p-1 rounded-md text-sm border dark:bg-primary bg-customWhite3 border-customWhite dark:border-teal-700 outline-none dark:text-white"
               value={filters.dateRange}
               onChange={(e) =>
                 handleFilterChange("dateRange", e.target.value as DateRange)

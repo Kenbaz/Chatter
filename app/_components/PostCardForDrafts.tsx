@@ -96,7 +96,7 @@ const PostCardForDrafts: FC<PostCardProps> = ({ post, authorId }) => {
   if (!user) return;
 
   return (
-    <div className="post-card bg-primary mb-2 h-auto pb-4 p-2 relative md:pl-4">
+    <div className="post-card dark:bg-primary bg-customWhite3 mb-2 h-auto pb-4 p-2 relative md:pl-4">
       <div
         className="profile-picture-container"
         onMouseEnter={handleMouseEnter}
@@ -130,18 +130,18 @@ const PostCardForDrafts: FC<PostCardProps> = ({ post, authorId }) => {
         </div>
       </div>
       <Link href={`/post/${post.id}`}>
-        <h1 className="text-xl font-bold mt-2 text-customWhite hover:text-gray-300 mb-2 md:pl-9">
+        <h1 className="text-xl font-bold mt-2 dark:text-tinWhite dark:hover:text-gray-300 hover:text-gray-700 mb-2 md:pl-9">
           {post.title}
         </h1>
       </Link>
       <small className="flex gap-2 text-sm md:pl-8">
         {post.tags.map((tag) => (
-          <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}>
-            <span className="py-1 px-2 font-light rounded-lg hover:bg-gray-700">
+          <>
+            <span className="py-1 px-2 rounded-lg dark:hover:bg-gray-700 hover:bg-customWhite2">
               <span className="text-gray-400">#</span>
               {tag}
             </span>
-          </Link>
+          </>
         ))}
       </small>
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-[-20deg]">

@@ -149,22 +149,22 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
 
   const markdownComponents: Components = {
     h1: ({ node, ...props }) => (
-      <h1 className="text-3xl text-white font-bold my-4" {...props} />
+      <h1 className="text-3xl dark:text-white font-bold my-4" {...props} />
     ),
     h2: ({ node, ...props }) => (
-      <h2 className="text-2xl text-white font-bold my-3" {...props} />
+      <h2 className="text-2xl dark:text-white font-bold my-3" {...props} />
     ),
     h3: ({ node, ...props }) => (
-      <h3 className="text-xl text-white font-bold my-2" {...props} />
+      <h3 className="text-xl dark:text-white font-bold my-2" {...props} />
     ),
     h4: ({ node, ...props }) => (
-      <h4 className="text-lg text-white font-bold my-2" {...props} />
+      <h4 className="text-lg dark:text-white font-bold my-2" {...props} />
     ),
     h5: ({ node, ...props }) => (
-      <h5 className="text-base text-white font-bold my-1" {...props} />
+      <h5 className="text-base dark:text-white font-bold my-1" {...props} />
     ),
     h6: ({ node, ...props }) => (
-      <h6 className="text-sm text-white font-bold my-1" {...props} />
+      <h6 className="text-sm dark:text-white font-bold my-1" {...props} />
     ),
     ul: ({ node, ...props }) => (
       <ul className="list-disc list-inside my-4" {...props} />
@@ -571,10 +571,10 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
   if (post.status === "draft") {
     return (
       <div className="full-post-container mt-14 relative h-auto pb-10 md:w-[91%] md:m-auto md:mt-14">
-        <div className="full-post-content dark:bg-primary max-w-4xl mx-auto">
+        <div className="full-post-content dark:bg-primary bg-customWhite3 max-w-4xl mx-auto">
           <div className="p-2">
             {post.coverImage && (
-              <div className="relative w-full aspect-[16/8] mb-5">
+              <div className="relative w-full aspect-[17/8] lg:landscape:aspect-[12/4] mb-5">
                 <Image
                   src={post.coverImage}
                   alt="Cover"
@@ -589,14 +589,14 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             {user && post && user.uid === post.authorId && (
               <div className=" p-2 -top-[15px] relative justify-end font-light text-[15px] -mb-4 flex gap-4">
                 <button
-                  className="text-white hover:text-gold4"
+                  className="dark:text-white dark:hover:text-gold4 hover:text-gold4"
                   onClick={() => handleEditPost(post.id)}
                 >
                   Edit
                 </button>
                 <button
                   onClick={openDeleteModal}
-                  className="delete-post-btn text-white hover:text-red-600"
+                  className="delete-post-btn dark:text-white dark:hover:text-red-600 hover:text-red-700"
                 >
                   Delete post
                 </button>
@@ -617,7 +617,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
               </div>
               <div className="flex flex-col">
                 <Link href={`/profile/${post.authorId}`}>
-                  <p className="text-tinWhite font-semibold text-base tracking-wide">
+                  <p className="dark:text-tinWhite font-semibold text-base tracking-wide">
                     {authorName}
                   </p>
                 </Link>
@@ -626,14 +626,16 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                 </small>
               </div>
             </div>
-            <h1 className="text-3xl text-white font-bold mb-4">{post.title}</h1>
+            <h1 className="text-3xl dark:text-white font-bold mb-4">
+              {post.title}
+            </h1>
             <div className="mb-4">
               {post.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-block rounded-full bg-gray-200 mr-2 px-3 py-1 text-sm font-semibold text-gray-800 mb-2"
+                  className="inline-block rounded-full dark:bg-customGray1 bg-customWhite2 mr-2 px-3 py-1 text-sm font-semibold dark:text-tinWhite text-gray-800 mb-2"
                 >
-                  <span className="text-teal-700">#</span>
+                  <span className="text-gray-500">#</span>
                   {tag}
                 </span>
               ))}
@@ -690,7 +692,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                 </button>
                 <button
                   onClick={openDeleteModal}
-                  className="delete-post-btn dark:text-white hover:text-red-600"
+                  className="delete-post-btn dark:text-white dark:hover:text-red-600 hover:text-red-700"
                 >
                   Delete post
                 </button>
@@ -705,7 +707,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
             {user && post && !isOwnPost && (
               <button
                 onClick={handleFollow}
-                className="text-[15px] relative dark:bg-gray-200 bg-gray-900 text-white px-2 w-[23%] md:w-[15%] md:left-[80%] font-semibold dark:text-gray-900 left-[75%] p-1 rounded-md"
+                className="text-[15px] relative dark:bg-teal-700 bg-teal-800 text-tinWhite px-2 w-[23%] md:w-[15%] md:left-[80%] font-semibold left-[75%] p-1 rounded-md"
               >
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>

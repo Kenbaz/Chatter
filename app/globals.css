@@ -103,16 +103,17 @@ body {
   }
 
   /* Text editor styles starts*/
- .custom-editor {
+ /* .custom-editor {
    background-color: #262626;
- }
+ } */
 
  .custom-editor .rc-md-editor,
  .custom-editor .rc-md-editor .section-container,
  .custom-editor .rc-md-editor .editor-container,
  .custom-editor .rc-md-editor textarea {
-   background-color: #262626 !important;
-   color: #e2e8f0 !important;
+   /* background-color: #262626 !important; */
+   @apply dark:!bg-customGray1 !bg-customWhite3 dark:!text-tinWhite;
+   /* color: #e2e8f0 !important; */
    border: none;
    scrollbar-width: thin;
    scrollbar-color: #888 transparent;
@@ -134,7 +135,8 @@ body {
  
 
  .custom-editor .rc-md-editor .rc-md-navigation {
-   background-color: #262626;
+   /* background-color: #262626; */
+   @apply dark:bg-customGray1 bg-customWhite3;
    border: none;
    border-bottom: 1px solid #555;
    /* position: fixed;
@@ -147,7 +149,8 @@ body {
  }
 
  .custom-editor .rc-md-editor .rc-md-navigation:hover {
-  background-color: #555;
+  @apply dark:bg-customGray ;
+  /* background-color: #555; */
  }
 
  .custom-editor .rc-md-editor textarea {
@@ -345,7 +348,8 @@ body {
     .shimmer {
       width: 50%;
       height: 100%;
-      background: rgba(255, 255, 255, 0.01);
+      @apply dark:bg-shimmerColor bg-whiteShimmer;
+      /* background: rgba(255, 255, 255, 0.01); */
       transform: skewX(-20deg);
       box-shadow: 0 0 30px 0 rgba(255, 255, 255, 0.05);
     }

@@ -23,7 +23,7 @@ const LandingPage: FC = () => {
          <nav className=" flex gap-10 justify-between items-center py-2 px-3">
            <ThemeToggle />
            <button
-             className="py-2 px-3 hover:bg-teal-800 rounded-full"
+             className="py-2 px-3 hover:bg-teal-800 hover:text-white rounded-full"
              onClick={() => dispatch(openSigninModal())}
            >
              Sign in
