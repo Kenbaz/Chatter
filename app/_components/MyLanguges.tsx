@@ -2,7 +2,6 @@
 
 import { FC, useEffect, useState, useCallback } from "react";
 import { Profile } from "@/src/libs/userServices";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 
 const MyLanguages: FC = () => {

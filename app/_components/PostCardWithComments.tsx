@@ -4,7 +4,6 @@ import { FC, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PostData } from "@/src/libs/contentServices";
 import Markdown from "react-markdown";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 import Image from "next/image";
 import Link from "next/link";

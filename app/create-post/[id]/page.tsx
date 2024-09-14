@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/src/libs/firebase";
@@ -10,7 +9,6 @@ import ContentEditorSkeleton from "@/app/_components/skeletons/ContentEditorSkel
 import { useAuthentication } from "@/app/_components/AuthContext";
 
 const CreatePost = () => {
-  // const { user, loading } = useRequireAuth();
   const {user, loading} = useAuthentication()
 
   const params = useParams();

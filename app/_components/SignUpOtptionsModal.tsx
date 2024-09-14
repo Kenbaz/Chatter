@@ -1,22 +1,23 @@
-import React, { FC, useEffect, useState, useCallback } from "react";
+import React, { FC, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   closeModals,
   openSignupModal,
   openSigninModal,
 } from "../_store/modalSlice";
-import { useAuth } from "@/src/libs/authServices";
 import { RootState } from "../_store/store";
 import { FaGoogle } from "react-icons/fa";
 import { MdMail } from "react-icons/md";
 import { XIcon } from "lucide-react";
+import { useAuthentication } from "./AuthContext";
 
 const SignUpOptionsModal: FC = () => {
   const dispatch = useDispatch();
   const { showSignupOptionsModal } = useSelector(
     (state: RootState) => state.modal
   );
-  const { signInWithGoogle } = useAuth();
+ 
+  const {signInWithGoogle} = useAuthentication()
 
   const openSignUpWithEmailModal = () => {
     close()

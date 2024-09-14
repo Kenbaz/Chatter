@@ -8,17 +8,16 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/src/libs/authServices";
 import { clearError, setError } from "../_store/errorSlice";
 import {
   openSigninModal,
   openSignupOptionsModal,
   closeModals,
 } from "../_store/modalSlice";
-import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
 import { XIcon, Loader2 } from "lucide-react";
 import { FaChevronLeft } from "react-icons/fa";
+import { useAuthentication } from "./AuthContext";
 
 const SignUpModal: FC = () => {
   const dispatch = useDispatch();
@@ -33,14 +32,15 @@ const SignUpModal: FC = () => {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const emailInput = useRef<HTMLInputElement>(null);
 
-  const { registerUser, signInWithGoogle } = useAuth();
+  
+  const { signUp, signInWithGoogle } = useAuthentication();
 
 
-  const signUp = async (e: FormEvent) => {
+  const signUpUser = async (e: FormEvent) => {
     e.preventDefault();
     try {
       setIsEmailSignupLoading(true);
-      await registerUser(email, password);
+      await signUp(email, password);
       setSuccessMessage("User creation successful");
 
       setTimeout(() => {
@@ -127,7 +127,7 @@ const SignUpModal: FC = () => {
           {successMessage ? (
             <p className="text-green-500 mt-4 text-center">{successMessage}</p>
           ) : (
-            <form onSubmit={signUp} className="signup-form mt-14">
+            <form onSubmit={signUpUser} className="signup-form mt-14">
               <div className="flex flex-col w-72 mb-6">
                 <input
                   className="h-[2.3rem] rounded-md py-2 px-3 text-gray-900 dark:text-white outline-none text-base placeholder:text-sm tracking-wide font-sans"
@@ -214,7 +214,7 @@ const SignUpModal: FC = () => {
           {successMessage ? (
             <p className="text-green-500 mt-4 text-center">{successMessage}</p>
           ) : (
-            <form onSubmit={signUp} className="signup-form mt-10">
+            <form onSubmit={signUpUser} className="signup-form mt-10">
               <div className="flex flex-col w-72 mb-6">
                 <input
                   className="h-[2.3rem] rounded py-2 px-3 text-gray-900 dark:text-white outline-none text-base placeholder:text-sm tracking-wide font-sans"

@@ -7,12 +7,11 @@ import React, {
   useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/src/libs/authServices";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModals, openSignupModal } from "../_store/modalSlice";
-import { setLoading } from "../_store/loadingSlice";
 import { RootState } from "../_store/store";
-import {Loader2, XIcon} from 'lucide-react'
+import { Loader2, XIcon } from 'lucide-react'
+import { useAuthentication } from "./AuthContext";
 
 const SignInModal: FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -21,7 +20,7 @@ const SignInModal: FC = () => {
   const [isGoogleSignupLoading, setIsGoogleSignupLoading] = useState(false);
   const emailInput = useRef<HTMLInputElement>(null);
 
-  const { signInUser, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle } = useAuthentication();
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -34,7 +33,7 @@ const SignInModal: FC = () => {
     e.preventDefault();
     try {
       setIsEmailSignupLoading(true);
-      await signInUser(email, password);
+      await signIn(email, password);
       setTimeout(() => {
         router.push("/feeds");
         close();

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, FC } from "react";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 import { postFuncs, PostData } from "@/src/libs/contentServices";
 import { useBookmarkFuncs, BookmarkWithId } from "@/src/libs/bookmark";

@@ -24,17 +24,16 @@ import {
   FieldValue,
 } from "firebase/firestore";
 import { setLoading } from "../_store/loadingSlice";
-import { useAuth } from "@/src/libs/authServices";
 import { auth } from "@/src/libs/firebase";
 import { setError, clearError } from "../_store/errorSlice";
 import ContentPreview from "./ContentPreview";
-import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import "react-markdown-editor-lite/lib/index.css";
 import { tagFuncs } from "@/src/libs/contentServices";
 import { Comment } from "@/src/libs/contentServices";
 import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 import { useRouter } from "next/navigation";
 import { Search, XIcon } from "lucide-react";
+import { useAuthentication } from "./AuthContext";
 
 
 const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
@@ -111,7 +110,6 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
   const { error } = useSelector((state: RootState) => state.error);
   const {isLoading} = useSelector((state: RootState) => state.loading);
 
-  const { signOutUser } = useAuth();
   const router = useRouter();
 
   const [localContent, setLocalContent] = useLocalStorage<LocalContent>(
@@ -151,7 +149,7 @@ const ContentEditor: FC<ContentEditorProps> = ({ userId, postId, postStatus }) =
   const editorRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { user } = useRequireAuth();
+  const { user } = useAuthentication();
 
   const INITIAL_EDITOR_HEIGHT = "370px";
   const FULL_SCREEN_THRESHOLD = 0;

@@ -36,16 +36,21 @@ export default function RootLayout({
           <SearchBar />
         </div>
 
-        <div className="flex items-center gap-20">
-          <ThemeToggle/>
-          <button
-            className="w-32 rounded-lg border border-teal-900 hover:bg-teal-700 hover:text-white text-teal-800 text-center relative py-2 font-semibold left-4"
-            onClick={handleCreatePostNavigation}
-          >
-            Create
-          </button>
-          <div className="relative right-4">
-            <MenuButton />
+        <div className="flex items-center justify-evenly gap-20 md:gap-11">
+          <div className="relative md:left-4">
+            <ThemeToggle />
+          </div>
+
+          <div className="flex items-center justify-evenly gap-14">
+            <button
+              className="w-32 rounded-lg border border-teal-900 hover:bg-teal-700 hover:text-white text-teal-800 text-center relative py-2 font-semibold left-4"
+              onClick={handleCreatePostNavigation}
+            >
+              Create
+            </button>
+            <div className="relative right-4">
+              <MenuButton />
+            </div>
           </div>
         </div>
       </header>

@@ -22,25 +22,25 @@ const SideBarContent: FC = () => {
         <div className="space-y-2 -mt-1 mb-7 lg:relative lg:left-4">
           <button
             onClick={handleNavHome}
-            className="flex items-center space-x-2 w-full p-2 rounded cursor-pointer dark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200"
+            className="flex items-center space-x-2 w-full p-2 rounded cursor-pointer hover:bg-teal-900 hover:opacity-85 hover:text-white transition-colors duration-200"
           >
             <FaHome className="text-orange-300" />
             <span>Home</span>
           </button>
 
-          <button className="flex items-center space-x-2 w-full p-2 rounded dark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200">
+          <button className="flex items-center space-x-2 w-full p-2 rounded hover:bg-teal-900  hover:opacity-85 hover:text-white  transition-colors duration-200">
             <FaInfoCircle className="text-purple-500" />
             <span>About</span>
           </button>
 
-          <button className="flex items-center space-x-2 w-full p-2 rounded dark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200">
+          <button className="flex items-center space-x-2 w-full p-2 rounded hover:bg-teal-900 hover:opacity-85 hover:text-white transition-colors duration-200">
             <FaTags className="text-gold4" />
             <span>Tags</span>
           </button>
 
           <button
             onClick={navigateToReadingList}
-            className="flex items-center justify-between w-full p-2 dark:text-white rounded cursor-pointer dark:hover:bg-teal-900 hover:bg-customWhite3 hover:opacity-85 dark:hover:text-white hover:text-customBlack transition-colors duration-200"
+            className="flex items-center justify-between w-full p-2 dark:text-white rounded cursor-pointer hover:bg-teal-900 hover:opacity-85 hover:text-white transition-colors duration-200"
           >
             <div className="flex items-center space-x-2">
               <FaBookmark className="text-blue-800" />

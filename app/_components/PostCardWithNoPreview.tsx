@@ -2,7 +2,6 @@
 
 import { FC, useState, useEffect } from "react";
 import { PostData } from "@/src/libs/contentServices";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 import Image from "next/image";
 import Link from "next/link";

@@ -13,8 +13,6 @@ import {
   limit,
   getDoc,
   startAfter,
-  startAt,
-  endAt,
   arrayUnion,
   arrayRemove,
   runTransaction,
@@ -35,8 +33,9 @@ interface Reply {
   author: string;
   content: string;
   createdAt: string;
-  likes: string[]; 
+  likes: string[];
   profilePicture?: string;
+  parentReplyId?: string;
 }
 
 export interface Comment {
@@ -825,6 +824,144 @@ export const commentFuncs = () => {
     }
   };
 
+  const deleteReply = async (postId: string, commentId: string, replyId: string, userId: string) => {
+    try {
+      const postRef = doc(firestore, "Posts", postId);
+
+      await runTransaction(firestore, async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists()) {
+          throw new Error("Post not found");
+        }
+
+        const post = postDoc.data() as PostData;
+        const updatedComments = post.comments.map((comment) => {
+          if (comment.id === commentId) {
+            const replyToDelete = comment.replies.find((reply) => reply.id === replyId);
+            if (!replyToDelete) {
+              throw new Error("Reply not found");
+            }
+            if (replyToDelete.authorId !== userId) {
+              throw new Error("You dont have permission to delete this reply");
+            }
+            return {
+              ...comment, replies: comment.replies.filter((reply) => reply.id !== replyId),
+            };
+          }
+          return comment;
+        });
+
+        transaction.update(postRef, { comments: updatedComments });
+      });
+
+      console.log("Reply deleted successfully");
+    } catch (error) {
+      console.error("Error deleting reply:", error);
+      throw error;
+    }
+  };
+
+  const updateReply = async (
+    postId: string,
+    commentId: string,
+    replyId: string,
+    content: string,
+    userId: string
+  ) => {
+    try {
+      const postRef = doc(firestore, "Posts", postId);
+
+      await runTransaction(firestore, async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists()) {
+          throw new Error("Post not found");
+        }
+
+        const post = postDoc.data() as PostData;
+        const updatedComments = post.comments.map((comment) => {
+          if (comment.id === commentId) {
+            const updatedReplies = comment.replies.map((reply) => {
+              if (reply.id === replyId) {
+                if (reply.authorId !== userId) {
+                  throw new Error("You dont have permission to update this reply");
+                };
+                return {
+                  ...reply, content, updatedAt: new Date().toISOString(),
+                };
+              }
+              return reply;
+            });
+            return { ...comment, replies: updatedReplies };
+          }
+          return comment;
+        });
+
+        transaction.update(postRef, { comments: updatedComments });
+      });
+
+      console.log("Reply updated successfully");
+    } catch (error) {
+      console.error("Error updating reply:", error);
+      throw error;
+    }
+  };
+
+
+  const replyToReply = async (
+    postId: string,
+    commentId: string,
+    parentReplyId: string,
+    authorId: string,
+    content: string,
+    author: string,
+    profilePicture?: string
+  ): Promise<Reply> => {
+    try {
+      const replyData: Reply = {
+        id: uuidv4(),
+        authorId,
+        commentId,
+        parentReplyId,
+        content,
+        author,
+        createdAt: new Date().toISOString(),
+        likes: []
+      };
+
+      if (profilePicture) {
+        replyData.profilePicture = profilePicture;
+      };
+
+      const postRef = doc(firestore, "Posts", postId);
+
+      await runTransaction(firestore, async (transaction) => {
+        const postDoc = await transaction.get(postRef);
+        if (!postDoc.exists()) {
+          throw new Error("Post not found");
+        }
+
+        const post = postDoc.data() as PostData;
+        const updatedComments = post.comments.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              replies: [...comment.replies, replyData],
+            };
+          }
+          return comment;
+        });
+
+        transaction.update(postRef, { comments: updatedComments });
+      });
+
+      return replyData;
+    } catch (error) {
+      console.error("Error adding reply to reply:", error);
+      throw error;
+    }
+  };
+  
+
   const likeComment = async (postId: string, commentId: string, userId: string) => {
     try {
       const postRef = doc(firestore, "Posts", postId);
@@ -932,7 +1069,7 @@ export const commentFuncs = () => {
     }
   };
 
-  return { addComment, updateComment, deleteComment, getComments, addReply, likeComment, unlikeComment, likeReply, unlikeReply };
+  return { addComment, updateComment, deleteComment, getComments, addReply, likeComment, unlikeComment, likeReply, unlikeReply, deleteReply, updateReply, replyToReply };
 };
 
 export const bookmarkFuncs = () => {

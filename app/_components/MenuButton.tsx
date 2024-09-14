@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, FC } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Profile } from "@/src/libs/userServices";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuth } from "@/src/libs/authServices";
 import { FaBookmark, FaPlus } from "react-icons/fa6";
 import { useAuthentication } from "./AuthContext";

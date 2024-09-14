@@ -11,7 +11,6 @@ import { RootState } from "../_store/store";
 import PostCardForDrafts from "./PostCardForDrafts";
 import Image from "next/image";
 import Link from "next/link";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 import PostCard from "./PostCard";
 import { ImplementFollowersFuncs } from "@/src/libs/userServices";

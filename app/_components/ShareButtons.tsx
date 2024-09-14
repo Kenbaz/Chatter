@@ -38,7 +38,7 @@ const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, postAuthor }) 
     return (
       <div className="share-buttons flex flex-col w-full gap-2 h-full">
         <button
-          className="dark:text-white flex items-center p-2 justify-between w-full dark:hover:bg-teal-800 hover:bg-customGray3 rounded-md font-semibold tracking-wide"
+          className="dark:text-white flex items-center p-2 justify-between w-full hover:text-white hover:bg-teal-800 rounded-md font-semibold tracking-wide"
           onClick={() => copyLinkToClipboard(postId)}
         >
           <span>{copyButtonText}</span>
@@ -47,13 +47,13 @@ const ShareButtons: FC<ShareButtonsProps> = ({ postId, postTitle, postAuthor }) 
           </span>
         </button>
         <button
-          className="tracking-wide p-2 rounded-md dark:hover:bg-teal-800 hover:bg-customGray3 hover:text-black hover:font-medium text-start w-full"
+          className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:text-black hover:font-medium text-start w-full"
           onClick={() => shareOnTwitter(postId, postTitle, postAuthor)}
         >
           Share on Twitter
         </button>
         <button
-          className="tracking-wide p-2 rounded-md dark:hover:bg-teal-800 hover:bg-customGray3 hover:text-black hover:font-medium text-start w-full"
+          className="tracking-wide p-2 rounded-md hover:bg-teal-800 hover:text-black hover:font-medium text-start w-full"
           onClick={() => shareOnLinkedIn(postId, postTitle)}
         >
           Share on LinkedIn

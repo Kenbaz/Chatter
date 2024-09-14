@@ -9,7 +9,6 @@ import {
   useRef,
 } from "react";
 import { useInView } from "react-intersection-observer";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import ContentsNavigation from "./ContentsNav";
 import PostCardWithComments from "./PostCardWithComments";
 import { feeds, PostData } from "@/src/libs/contentServices";
@@ -22,6 +21,7 @@ import FeedsPageSkeleton from "./skeletons/FeedsPageSkeleton";
 import { Search, ArrowUp, ArrowDown } from "lucide-react";
 import CustomPullToRefreshIndicator from "./CustomPullToRefreshIndicator";
 import { useAuthentication } from "./AuthContext";
+import ThemeToggle from "./ThemeToggle";
 
 type SortBy = "recent" | "popular";
 type DateRange = "all" | "today" | "thisWeek" | "thisMonth";
@@ -288,6 +288,9 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
         </div>
+        <div className="absolute">
+          <ThemeToggle />
+        </div>
         <div
           ref={iconRef}
           onClick={toggleSearchBar}
@@ -296,7 +299,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           <Search className="text-[22px] font-light md:hidden" />
         </div>
 
-        <div className="flex z-50 items-center gap-20">
+        <div className="flex z-50 items-center relative left-1 gap-20">
           <button
             className="w-32 rounded-lg hidden border text-center relative py-2"
             onClick={handleCreatePostNavigation}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, FC, ChangeEvent, FormEvent } from "react";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 import { Profile, UserData } from "@/src/libs/userServices";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";

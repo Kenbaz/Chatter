@@ -22,7 +22,7 @@ const storage = getStorage(app);
 // set persistence to local
 setPersistence(auth, browserLocalPersistence)
   .then(() => {
-    // console.log('Persistence set to local storage');
+    console.log('Persistence set to local storage');
   })
   .catch((error) => {
     console.error('Error setting persistence:', error);

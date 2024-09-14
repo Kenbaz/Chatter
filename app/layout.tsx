@@ -6,6 +6,7 @@ import { Providers } from "./_components/Providers";
 import ClientInitWrapper from "./_components/ClientInitWrapper";
 import { ThemeProvider } from "next-themes";
 import ConsoleWatermark from "./_components/ConsoleWatermark";
+import { AuthWrapper } from "./_components/AuthWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,8 +27,10 @@ export default function RootLayout({
         <Providers>
           <ThemeProvider attribute="class">
             <ClientInitWrapper>
-              {children}
-              <ConsoleWatermark/>
+              <AuthWrapper>
+                {children}
+                <ConsoleWatermark />
+              </AuthWrapper>
             </ClientInitWrapper>
           </ThemeProvider>
         </Providers>

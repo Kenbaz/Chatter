@@ -21,12 +21,10 @@ import ConfirmModal from "./ConfirmModal";
 import { algoliaPostsIndex } from "@/src/libs/algoliaClient";
 import { analyticsFuncs } from "@/src/libs/contentServices";
 import BookmarkButton from "./BookmarkButton";
-import {
-  FaEllipsis,
-} from "react-icons/fa6";
+import { FaEllipsis } from "react-icons/fa6";
 import ShareButtons from "./ShareButtons";
 import "prismjs/themes/prism-tomorrow.css";
-import { Heart, MessageCircle, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, Loader2 } from "lucide-react";
 import { FaHeart } from "react-icons/fa";
 import { useAuthentication } from "./AuthContext";
 
@@ -34,6 +32,10 @@ type FullPostViewProps = {
   postId: string;
 };
 
+type ReplyingTo = {
+  commentId: string;
+  replyId: string;
+} | null;
 
 const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
   const { user } = useAuthentication();
@@ -61,7 +63,11 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
   const [openMenuCommentId, setOpenMenuCommentId] = useState<string | null>(
     null
   );
-
+  const [openMenuReplyId, setOpenMenuReplyId] = useState<string | null>(null);
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editReplyContent, setEditReplyContent] = useState("");
+  const [replyingToReply, setReplyingToReply] = useState<ReplyingTo>(null);
+  const [newReplyToReply, setNewReplyToReply] = useState("");
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
@@ -79,6 +85,9 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     unlikeComment,
     likeReply,
     unlikeReply,
+    deleteReply,
+    updateReply,
+    replyToReply,
   } = commentFuncs();
   const { followUser, unfollowUser, isFollowingUser } =
     ImplementFollowersFuncs();
@@ -442,6 +451,100 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     }
   };
 
+  const handleEditReply = async (
+    commentId: string,
+    replyId: string,
+    newContent: string
+  ) => {
+    if (!newContent.trim() || !user || !post) return;
+
+    try {
+      await updateReply(
+        post.id,
+        commentId,
+        replyId,
+        newContent.trim(),
+        user.uid
+      );
+
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: comment.replies.map((reply) =>
+                  reply.id === replyId
+                    ? { ...reply, content: newContent.trim() }
+                    : reply
+                ),
+              }
+            : comment
+        )
+      );
+
+      setEditingReplyId(null);
+    } catch (error) {
+      console.error("Error editing reply:", error);
+    }
+  };
+
+  const handleDeleteReply = async (commentId: string, replyId: string) => {
+    if (!user || !post) return;
+
+    try {
+      await deleteReply(post.id, commentId, replyId, user.uid);
+
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: comment.replies.filter(
+                  (reply) => reply.id !== replyId
+                ),
+              }
+            : comment
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting reply:", error);
+    }
+  };
+
+  const handleReplyToReply = async (
+    commentId: string,
+    parentReplyId: string
+  ) => {
+    if (!newReplyToReply.trim() || !user || !post) return;
+
+    try {
+      const currentUserName = await fetchAuthorName(user.uid);
+      const profilePicture = await getUserProfilePicture(user.uid);
+      const newReply = await replyToReply(
+        post.id,
+        commentId,
+        parentReplyId,
+        user.uid,
+        newReplyToReply.trim(),
+        currentUserName,
+        profilePicture
+      );
+
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId
+            ? { ...comment, replies: [...comment.replies, newReply] }
+            : comment
+        )
+      );
+
+      setReplyingToReply(null);
+      setNewReplyToReply("");
+    } catch (error) {
+      console.error("Error replying to reply:", error);
+    }
+  };
+
   const handleCancelReply = () => {
     setReplyingTo(null);
     setNewReply("");
@@ -511,14 +614,14 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     }
   };
 
-   function formatDateString(date: Date): string {
-     const options: Intl.DateTimeFormatOptions = {
-       day: "numeric",
-       month: "short",
-       year: "numeric",
-     };
-     return date.toLocaleDateString("en-US", options).replace(",", "");
-   }
+  function formatDateString(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    };
+    return date.toLocaleDateString("en-US", options).replace(",", "");
+  }
 
   function formatDate(
     date: string | number | Date | Timestamp | FieldValue | undefined
@@ -535,7 +638,6 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
       return "Unknown date";
     }
   }
-
 
   const handleEditPost = (postId: string) => {
     router.push(`/create-post/${postId}`);
@@ -554,14 +656,28 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
     };
   }, [openMenuCommentId]);
 
-  if (loading) return (
-    <div>
-      <Loader2
-        size={20}
-        className="animate-spin relative left-[50%] top-[50%] text-customWhite"
-      />
-    </div>
-  );
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (openMenuReplyId && !(event.target as Element).closest(".reply")) {
+        setOpenMenuReplyId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [openMenuReplyId]);
+
+  if (loading)
+    return (
+      <div>
+        <Loader2
+          size={20}
+          className="animate-spin relative left-[50%] top-[50%] text-customWhite"
+        />
+      </div>
+    );
   if (!user) return;
   if (!post) return <div>Post not found</div>;
 
@@ -921,8 +1037,11 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                     </div>
                     <div className="h-5 border-teal-700 border-dashed border w-0 ml-[9px] mt-[1px] "></div>
                   </div>
-                  <div className="comment-box relative">
-                    <div className="flex relative flex-col p-[10px] border dark:border-customGray rounded-lg mb-2 -mt-6">
+                  <div className="comment-box relative -mt-6">
+                    <div className="flex relative flex-col pt-2 p-[10px] border dark:border-customGray rounded-lg mb-2 ">
+                      {user.uid !== comment.authorId && (
+                        <div className="mb-3"></div>
+                      )}
                       {user.uid === comment.authorId && (
                         <div className="relative ml-auto -mb-3">
                           <button
@@ -935,13 +1054,13 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                               )
                             }
                           >
-                            <FaEllipsis className="dark:hover:text-white transition-colors duration-200" />
+                            <FaEllipsis className="dark:hover:text-white hover:text-black transition-colors duration-200" />
                           </button>
                           {openMenuCommentId === comment.id && (
                             <div className="absolute right-0 mt-2 w-48 dark:bg-primary bg-customWhite3 border dark:border-customGray rounded-md shadow-lg z-10">
                               <div className="py-1">
                                 <button
-                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-customGray3 dark:hover:bg-teal-800 transition-colors duration-200"
+                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:text-white hover:bg-teal-800 transition-colors duration-200"
                                   onClick={() => {
                                     setEditingCommentId(comment.id);
                                     setEditCommentContent(comment.content);
@@ -951,7 +1070,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                                   Edit
                                 </button>
                                 <button
-                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:bg-customGray3 dark:hover:bg-teal-800 transition-colors duration-200"
+                                  className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm dark:text-gray-200 hover:text-white hover:bg-teal-800 transition-colors duration-200"
                                   onClick={() => {
                                     handleDeleteComment(comment.id);
                                     setOpenMenuCommentId(null);
@@ -966,7 +1085,10 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                       )}
                       <div className="">
                         <small className="dark:text-gray-400">
-                          {comment.author} on {formatDate(comment.createdAt)}
+                          <Link className="hover:text-gray-600" href={`/profile/${comment.authorId}`}>
+                            {comment.author}
+                          </Link>{" "}
+                          on {formatDate(comment.createdAt)}
                         </small>
                         <p className="mt-3 w-full tracking-normal text-[15px]">
                           {comment.content}
@@ -1005,7 +1127,7 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                         </span>
                       </button>
                       <button
-                        className="relative -top-[6.8px]"
+                        className="relative -top-[9px]"
                         onClick={() => setReplyingTo(comment.id)}
                       >
                         <MessageCircle size={18} />
@@ -1067,8 +1189,8 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                   </div>
                 )}
                 {comment.replies.map((reply) => (
-                  <div key={reply.id} className="reply">
-                    <div className="flex mb-3 ml-5">
+                  <>
+                    <div key={reply.id} className="reply flex ml-10 mb-2">
                       <div>
                         <div className="w-[20px] h-[20px] rounded-[50%] cursor-pointer overflow-hidden flex justify-center items-center">
                           <Image
@@ -1082,51 +1204,174 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                             style={{ objectFit: "cover" }}
                           />
                         </div>
+                        <div className="h-5 border-teal-700 border-dashed border w-0 ml-[9px] mt-[1px] "></div>
                       </div>
-                      <div>
-                        <div>
-                          <div className="flex flex-col p-[10px] border dark:border-customGray rounded-lg mb-2 -mt-4">
-                            <small>
-                              {reply.author} on {formatDate(reply.createdAt)}
-                            </small>
+                      <div className="flex flex-col">
+                        <div className="relative flex pt-1 flex-col p-[10px] border dark:border-customGray rounded-lg mb-2 -mt-4 w-full">
+                          {/* Ellipsis button and dropdown for replies */}
+                          {user.uid !== reply.authorId && (
+                            <div className="mb-3"></div>
+                          )}
+                          {user.uid === reply.authorId && (
+                            <div className="relative ml-auto -mb-3">
+                              <button
+                                className="dark:text-gray-500 hover:text-gray-700 relative"
+                                onClick={() =>
+                                  setOpenMenuReplyId(
+                                    openMenuReplyId === reply.id
+                                      ? null
+                                      : reply.id
+                                  )
+                                }
+                              >
+                                <FaEllipsis className="dark:hover:text-white transition-colors duration-200" />
+                              </button>
+                              {openMenuReplyId === reply.id && (
+                                <div className="absolute right-0 mt-2 w-48 dark:bg-primary bg-customWhite3 border dark:border-customGray rounded-md shadow-lg z-10">
+                                  <div className="py-1">
+                                    <button
+                                      className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm hover:text-white dark:text-gray-200 hover:bg-teal-800 transition-colors duration-200"
+                                      onClick={() => {
+                                        setEditingReplyId(reply.id);
+                                        setEditReplyContent(reply.content);
+                                        setOpenMenuReplyId(null);
+                                      }}
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      className="block w-[95%] rounded-md m-auto text-left px-2 py-2 text-sm hover:text-white dark:text-gray-200 hover:bg-teal-800 transition-colors duration-200"
+                                      onClick={() => {
+                                        handleDeleteReply(comment.id, reply.id);
+                                        setOpenMenuReplyId(null);
+                                      }}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          <small>
+                            <Link className="hover:text-gray-600" href={`/profile/${reply.authorId}`}>{reply.author}</Link> on{" "}
+                            {formatDate(reply.createdAt)}
+                          </small>
+                          {editingReplyId === reply.id ? (
+                            <div>
+                              <textarea
+                                value={editReplyContent}
+                                onChange={(e) =>
+                                  setEditReplyContent(e.target.value)
+                                }
+                                className="border dark:border-teal-700 rounded-md p-2 w-full outline-none mt-2"
+                              />
+                              <div className="mt-2">
+                                <button
+                                  className="bg-teal-800 text-white dark:text-customBlack px-3 py-1 rounded-lg mr-2"
+                                  onClick={() =>
+                                    handleEditReply(
+                                      comment.id,
+                                      reply.id,
+                                      editReplyContent
+                                    )
+                                  }
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  className="bg-gray-500 dark:text-customBlack text-white px-2 py-1 rounded-lg"
+                                  onClick={() => setEditingReplyId(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
                             <p className="mt-3 w-full tracking-normal text-[15px]">
                               {reply.content}
                             </p>
-                          </div>
+                          )}
                         </div>
-                        <button
-                          className={`mb-5 flex items-center gap-2 relative ${
-                            reply.likes.includes(user?.uid) ? "liked-reply" : ""
-                          }`}
-                          onClick={() =>
-                            handleLikeReply(
-                              comment.id,
-                              reply.id,
+                        {/* Like and reply button */}
+                        <div className="flex items-center gap-7 mb-4">
+                          <button
+                            className={`mb-5 flex items-center gap-2 relative ${
                               reply.likes.includes(user?.uid)
-                            )
-                          }
-                        >
-                          <span className="p-1 relative">
-                            {reply.likes.includes(user?.uid) ? (
-                              <FaHeart
-                                size={19}
-                                color=""
-                                className="text-red-600 transition-all duration-200 ease-in-out"
+                                ? "liked-reply"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              handleLikeReply(
+                                comment.id,
+                                reply.id,
+                                reply.likes.includes(user?.uid)
+                              )
+                            }
+                          >
+                            <span className="p-1 relative">
+                              {reply.likes.includes(user?.uid) ? (
+                                <FaHeart
+                                  size={19}
+                                  className="text-red-600 transition-all duration-200 ease-in-out"
+                                />
+                              ) : (
+                                <Heart
+                                  size={19}
+                                  className="transition-all duration-200 ease-in-out"
+                                />
+                              )}
+                            </span>
+                            <span className="font-light text-[15px]">
+                              {reply.likes.length}
+                            </span>
+                          </button>
+                          <button
+                            className="relative -top-[10px]"
+                            onClick={() =>
+                              setReplyingToReply({
+                                commentId: comment.id,
+                                replyId: reply.id,
+                              })
+                            }
+                          >
+                            <MessageCircle size={18} />
+                          </button>
+                        </div>
+                        {/* Replying to a reply */}
+                        {replyingToReply &&
+                          replyingToReply.commentId === comment.id &&
+                          replyingToReply.replyId === reply.id && (
+                            <div className="flex flex-col gap-2 -mt-4 mb-10">
+                              <textarea
+                                value={newReplyToReply}
+                                onChange={(e) =>
+                                  setNewReplyToReply(e.target.value)
+                                }
+                                placeholder="Reply..."
+                                className="border dark:border-teal-700 rounded-md p-2 outline-none"
                               />
-                            ) : (
-                              <Heart
-                                size={19}
-                                className="transition-all duration-200 ease-in-out"
-                              />
-                            )}
-                          </span>
-                          <span className="font-light text-[15px]">
-                            {reply.likes.length}
-                          </span>
-                        </button>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  className="w-20 p-1 rounded-lg text-white dark:text-customBlack bg-teal-800"
+                                  onClick={() =>
+                                    handleReplyToReply(comment.id, reply.id)
+                                  }
+                                >
+                                  Reply
+                                </button>
+                                <button
+                                  className="w-20 p-1 rounded-lg text-white dark:text-customBlack bg-gray-600"
+                                  onClick={() => setReplyingToReply(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
                       </div>
                     </div>
-                  </div>
+                  </>
                 ))}
               </div>
             ))}

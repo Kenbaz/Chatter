@@ -10,7 +10,6 @@ import { RootState } from "../_store/store";
 import Link from "next/link";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/src/libs/firebase";
-// import { useRequireAuth } from "@/src/libs/useRequireAuth";
 import { useAuthentication } from "./AuthContext";
 
 const SearchBar: FC = () => {
