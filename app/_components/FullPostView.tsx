@@ -1084,8 +1084,8 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                         </div>
                       )}
                       <div className="">
-                        <small className="dark:text-gray-400">
-                          <Link className="hover:text-gray-600" href={`/profile/${comment.authorId}`}>
+                        <small className="dark:text-gray-300 text-gray-800">
+                          <Link className="dark:hover:text-white hover:text-customBlack" href={`/profile/${comment.authorId}`}>
                             {comment.author}
                           </Link>{" "}
                           on {formatDate(comment.createdAt)}
@@ -1253,8 +1253,8 @@ const FullPostView: FC<FullPostViewProps> = ({ postId }) => {
                               )}
                             </div>
                           )}
-                          <small>
-                            <Link className="hover:text-gray-600" href={`/profile/${reply.authorId}`}>{reply.author}</Link> on{" "}
+                          <small className="dark:text-gray-300 text-gray-800">
+                            <Link className="dark:hover:text-white hover:text-black" href={`/profile/${reply.authorId}`}>{reply.author}</Link> on{" "}
                             {formatDate(reply.createdAt)}
                           </small>
                           {editingReplyId === reply.id ? (

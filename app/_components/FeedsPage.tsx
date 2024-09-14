@@ -132,15 +132,31 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
   const toggleSearchBar = () => {
     setIsSearchBarVisible((prev) => {
       if (!prev) {
-        // scroll to the search bar when its being opened
         setTimeout(() => {
-          searchBarRef.current?.scrollIntoView({ behavior: 'smooth' });
-          searchInputRef.current?.focus();
+          const headerHeight = 56; // Adjust this value based on your header's actual height
+          const searchBarElement = searchBarRef.current;
+          const searchInputElement = searchInputRef.current;
+
+          if (searchBarElement) {
+            const searchBarRect = searchBarElement.getBoundingClientRect();
+            const scrollTop =
+              window.pageYOffset || document.documentElement.scrollTop;
+            const targetScrollPosition =
+              scrollTop + searchBarRect.top - headerHeight - 10; // 10px extra space
+
+            window.scrollTo({
+              top: targetScrollPosition,
+              behavior: "smooth",
+            });
+          }
+
+          searchInputElement?.focus();
         }, 100);
       }
       return !prev;
     });
   };
+
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -288,9 +304,9 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
         <div className="text-outline-teal -ml-8 p-1 text-black text-xl font-bold tracking-wide">
           Chatter
         </div>
-        <div className="absolute">
+        {/* <div className="absolute">
           <ThemeToggle />
-        </div>
+        </div> */}
         <div
           ref={iconRef}
           onClick={toggleSearchBar}
@@ -299,7 +315,7 @@ const FeedsPage: FC<FeedsPageProps> = ({ initialFeedType }) => {
           <Search className="text-[22px] font-light md:hidden" />
         </div>
 
-        <div className="flex z-50 items-center relative left-1 gap-20">
+        <div className="flex z-50 items-center relative  gap-20">
           <button
             className="w-32 rounded-lg hidden border text-center relative py-2"
             onClick={handleCreatePostNavigation}
