@@ -139,7 +139,7 @@ const PostCard: FC<PostCardProps> = ({ post, authorId }) => {
                 />
               )}
             </div>
-            <small className="text-[14px] hover:text-gray-700">
+            <small className="text-[14px]">
               {authorName}
             </small>
           </div>
